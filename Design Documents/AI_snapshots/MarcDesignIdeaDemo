@@ -1,0 +1,404 @@
+======================Input======================
+make me a demo of this game using html: Game: Name Pending
+
+Description:
+-	A blend of real time head-to-head class competition and study revision in one.
+-	Students will have to complete a series of minigames with the goal to increase their score higher than their peers (winner gets bragging rights!)
+-	These minigames could either be adaptable to a range of subjects using a customisable question pack or have pre-set questions made by the developers (us). Customisable questions would allow for more versatility. However, having a selection of already made questions would enrich the student experience greater.
+
+
+Highlights:
+-	Students are encouraged to revise in an engaging manner
+-	Questions will inevitably be repeated so it gives learners the opportunity to correct their mistakes and eventually end up getting 100% correct
+-	(idea) have the timer continuously get shorter as the game progresses, game ends when timer expires. Adds an extra layer of engagement and challenge. Will shake up each playthrough and increase the stakes.
+-	Including competition amongst peers will increase the desire to play more (and as such learn more)
+
+
+Relations to existing games:
+
+Inspiration 1: Kahoot
+My main takeaways from Kahoot are the power of competing against your peers. From personal experience, this method of teaching students is extremely effective. You are easily able to gain the students attention and have them actually want to improve their knowledge. Students take a great level of satisfaction from learning more and beating their friends. 
+
+Inspiration 2: Bumb ways to die
+My current game idea follows a similar flow to the very popular game ‘dumb ways to die’. It follows a  game loop of selecting a random minigame from a group, playing the minigame - with the goal of either completing an action before the timer expires (see minigame 1 where you have to put out the fire) or surviving until the timer expires (see minigame 2 where you have to avoid being eaten for the duration).
+
+To apply this to the idea:
+1.	Minigames would happen (i.e. building a electrical circuit) depending on the performance of the student,
+2.	Student would pass or fail depending on the outcome
+3.	Score is increased or decreased
+4.	Next minigame would commence
+
+
+
+
+======================Output======================
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Name Pending — Classroom Minigame Demo</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#7dd3fc;--muted:#94a3b8;--win:#86efac}
+    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071021 0%,#07141b 60%);color:#e6f0ff}
+    .app{max-width:1100px;margin:24px auto;padding:18px}
+    header{display:flex;gap:12px;align-items:center}
+    h1{margin:0;font-size:20px}
+    .subtitle{color:var(--muted);font-size:13px}
+
+    .layout{display:grid;grid-template-columns:360px 1fr;gap:18px;margin-top:18px}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+
+    /* Left column */
+    .controls .row{margin-bottom:12px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input[type=text],select,textarea{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    button{background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer;color:#04202b;font-weight:600}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted)}
+
+    .players{display:flex;flex-direction:column;gap:8px}
+    .player{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
+    .player .color{width:18px;height:18px;border-radius:6px}
+    .player input{background:transparent;border:none;color:inherit}
+
+    /* Right column */
+    .stage{min-height:420px;padding:16px;display:flex;flex-direction:column;gap:12px}
+    .stage-top{display:flex;justify-content:space-between;align-items:center}
+    .timer{font-weight:700;font-size:22px}
+    .round{color:var(--muted)}
+
+    .game-area{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));border-radius:10px;padding:12px;position:relative;overflow:hidden}
+
+    /* Minigame styles */
+    .flame{position:absolute;width:36px;height:48px;background:radial-gradient(circle at 30% 30%, #ffd166, #fb5607 40%, #cb1b00 100%);border-radius:50%;transform-origin:center;box-shadow:0 6px 12px rgba(203,27,0,0.4)}
+    .water-btn{position:absolute;right:12px;bottom:12px}
+
+    .avoider{display:flex;flex-direction:column;height:100%}
+    .arena{flex:1;position:relative;background:linear-gradient(180deg,#071827,#04141a);border-radius:8px;overflow:hidden}
+    .player-avatar{position:absolute;bottom:14px;width:34px;height:34px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#04202b;font-weight:700}
+    .hazard{position:absolute;width:28px;height:28px;border-radius:6px;background:#ff7ab6}
+
+    /* Quiz */
+    .question{font-weight:700}
+    .answers{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .answer{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer}
+
+    /* Leaderboard */
+    .leader{display:flex;gap:12px;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px}
+    .leader .rank{font-weight:800;width:28px}
+    .leader .meta{flex:1}
+    .score{font-weight:800}
+
+    footer{margin-top:12px;color:var(--muted);font-size:13px}
+
+    /* small screens */
+    @media(max-width:880px){.layout{grid-template-columns:1fr}.stage{min-height:360px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Name Pending — Classroom Minigame Demo</h1>
+        <div class="subtitle">A prototype showing real-time head-to-head rounds, minigames & a customizable question pack</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel controls">
+        <div class="row">
+          <label>Game name</label>
+          <input id="gameName" type="text" value="Name Pending Demo">
+        </div>
+
+        <div class="row">
+          <label>Players (local or bots)</label>
+          <div class="players" id="playersList"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="addPlayer">Add player</button>
+            <button id="addBot" class="ghost">Add bot</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Question pack (JSON) — you can edit or paste your own questions</label>
+          <textarea id="questionPack" rows="6">[
+  {"q":"What is 7 × 6?","choices":["42","36","48","56"],"a":0},
+  {"q":"Water boils at what °C?","choices":["90","100","110","120"],"a":1},
+  {"q":"Capital of France?","choices":["Paris","Berlin","Rome","Madrid"],"a":0}
+]</textarea>
+        </div>
+
+        <div class="row">
+          <label>Round settings</label>
+          <div style="display:flex;gap:8px">
+            <input id="rounds" type="number" value="6" min="1" style="width:88px">
+            <input id="startTimer" type="number" value="10" min="3" style="width:88px">
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px">Timer shrinks by a multiplier each round (configurable below)</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <label style="font-size:12px;color:var(--muted);align-self:center">Shrink</label>
+            <input id="shrink" type="number" value="0.85" step="0.01" style="width:88px">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="startGame">Start Game</button>
+          <button id="resetGame" class="ghost">Reset</button>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
+        <div style="font-size:13px;color:var(--muted)">Controls (local):
+          <ul style="margin:6px 0 0 16px;padding:0">
+            <li>Player 1: Arrow keys / Enter to shoot water</li>
+            <li>Player 2: A/D and W</li>
+            <li>Use "Add bot" to simulate classmates</li>
+          </ul>
+        </div>
+      </aside>
+
+      <main class="panel stage">
+        <div class="stage-top">
+          <div>
+            <div class="round" id="roundInfo">Round: -</div>
+            <div class="timer" id="timerDisplay">Timer: --</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted)">Game mode: <strong id="modeLabel">Random minigames</strong></div>
+          </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+          <div style="position:absolute;left:12px;top:12px;color:var(--muted);font-size:13px">Minigame demo: Fire / Avoid / Quiz</div>
+        </div>
+
+        <div style="display:flex;gap:12px">
+          <div style="flex:1">
+            <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Leaderboard</div>
+            <div id="leaderboard"></div>
+          </div>
+
+          <div style="width:260px">
+            <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Round log</div>
+            <div id="log" style="height:120px;overflow:auto;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);font-size:13px"></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <footer class="subtitle">Prototype by Marc Jones — use this file in the browser. This demo runs fully locally and simulates up to 4 players (human+bots).</footer>
+  </div>
+
+  <script>
+    // --- Utility & state ---
+    const players = [];
+    const MIN_PLAYERS = 1;
+    const playersList = document.getElementById('playersList');
+    const leaderboardEl = document.getElementById('leaderboard');
+    const logEl = document.getElementById('log');
+    const gameArea = document.getElementById('gameArea');
+
+    function randId(){return Math.random().toString(36).slice(2,9)}
+    const colors = ['#7dd3fc','#fca5a5','#fde68a','#c7f9cc']
+
+    function addPlayer(name='Player', isBot=false){
+      const id = randId();
+      const p = {id,name:name+ (players.length+1),score:0,isBot,controls:{left:'',right:'',action:''}};
+      players.push(p);
+      renderPlayers();
+      return p;
+    }
+
+    function renderPlayers(){
+      playersList.innerHTML = '';
+      players.forEach((p,i)=>{
+        const el = document.createElement('div'); el.className='player';
+        el.innerHTML = `<div class="color" style="background:${colors[i%colors.length]}"></div>`;
+        const inp = document.createElement('input'); inp.value = p.name; inp.oninput = e=>p.name=e.target.value;
+        el.appendChild(inp);
+        const score = document.createElement('div'); score.style.marginLeft='auto'; score.textContent = p.score; el.appendChild(score);
+        playersList.appendChild(el);
+      })
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard(){
+      const sorted = [...players].sort((a,b)=>b.score-a.score);
+      leaderboardEl.innerHTML = '';
+      sorted.forEach((p,idx)=>{
+        const el = document.createElement('div'); el.className='leader';
+        el.innerHTML = `<div class='rank'>${idx+1}</div><div class='meta'><div style='font-weight:700'>${p.name}</div><div style='color:var(--muted);font-size:12px'>${p.isBot? 'bot' : 'human'}</div></div><div class='score'>${p.score}</div>`;
+        leaderboardEl.appendChild(el);
+      })
+    }
+
+    // add initial players
+    addPlayer('Alice'); addPlayer('Ben');
+
+    document.getElementById('addPlayer').onclick = ()=>addPlayer('Player');
+    document.getElementById('addBot').onclick = ()=>addPlayer('Bot',true);
+
+    // --- Questions ---
+    function loadQuestions(){
+      const raw = document.getElementById('questionPack').value;
+      try{ const q = JSON.parse(raw); return q; } catch(e){return []}
+    }
+
+    // Logging
+    function log(msg){ const li=document.createElement('div'); li.textContent = msg; logEl.prepend(li); }
+
+    // --- Minigames ---
+    const minigames = ['fire','avoid','quiz'];
+
+    // Fire minigame: click flames before timer runs out
+    function runFire(pctx){
+      const area = document.createElement('div'); area.style.width='100%'; area.style.height='100%'; area.style.position='relative';
+      const flames = [];
+      let active = true;
+      function spawn(){ if(!active) return; const f=document.createElement('div'); f.className='flame';
+        const x = Math.random()*(gameArea.clientWidth-60); const y = 40+Math.random()*(gameArea.clientHeight-120);
+        f.style.left = x+'px'; f.style.top = y+'px';
+        area.appendChild(f);
+        flames.push(f);
+        f.onclick = ()=>{ if(!active) return; area.removeChild(f); const idx = flames.indexOf(f); if(idx>=0) flames.splice(idx,1); pctx.onScore(10); }
+      }
+      const sp = setInterval(spawn,700);
+      // spawn a few immediately
+      for(let i=0;i<3;i++) spawn();
+      // show water button for keyboard control
+      const water = document.createElement('button'); water.className='water-btn'; water.textContent='Spray water (Enter/W)'; water.onclick=()=>{
+        // remove one flame
+        if(flames.length>0){ const f=flames.pop(); try{area.removeChild(f)}catch{} pctx.onScore(8);} }
+      area.appendChild(water);
+
+      gameArea.appendChild(area);
+      return ()=>{ active=false; clearInterval(sp); try{gameArea.removeChild(area)}catch{} // give partial points for remaining flames removed
+        const rem = flames.length; if(rem>0) pctx.onScore(-rem*3);
+      }
+    }
+
+    // Avoid minigame: move avatar to dodge hazards
+    function runAvoid(pctx){
+      const wrap = document.createElement('div'); wrap.className='avoider';
+      const arena = document.createElement('div'); arena.className='arena'; wrap.appendChild(arena);
+      const avatar = document.createElement('div'); avatar.className='player-avatar'; avatar.style.left='calc(50% - 17px)'; avatar.textContent='P'; arena.appendChild(avatar);
+      const hazards=[]; let active=true; let avatarX = (arena.clientWidth/2)||200;
+      function spawnHazard(){ if(!active) return; const h=document.createElement('div'); h.className='hazard'; const x = Math.random()*(arena.clientWidth-50); h.style.left = x+'px'; h.style.top='-30px'; arena.appendChild(h); hazards.push(h);
+        // animate
+        let top = -30; const id = setInterval(()=>{ if(!active){clearInterval(id);return;} top+=6; h.style.top = top+'px'; if(top>arena.clientHeight){ try{arena.removeChild(h)}catch{} const idx=hazards.indexOf(h); if(idx>=0)hazards.splice(idx,1); clearInterval(id); pctx.onScore(1); } else {
+          // collision
+          const ax = parseFloat(avatar.style.left || 0); const ay = arena.clientHeight-50;
+          const hx = parseFloat(h.style.left || 0); const hy = top;
+          if(hy+28 >= ay && hx+20 > ax && hx < ax+34){ // hit
+            pctx.onScore(-12); // penalty
+            clearInterval(id); try{arena.removeChild(h)}catch{} const idx=hazards.indexOf(h); if(idx>=0)hazards.splice(idx,1);
+          }
+        }
+        },60);
+      }
+      const sp = setInterval(spawnHazard,800);
+
+      // keyboard controls for local players
+      function moveAvatar(dx){ const cur = parseFloat(avatar.style.left||0); let next = cur+dx; next = Math.max(6, Math.min(arena.clientWidth-44,next)); avatar.style.left = next+'px'; }
+      window.addEventListener('keydown', kd);
+      function kd(e){ if(e.key==='ArrowLeft') moveAvatar(-18); if(e.key==='ArrowRight') moveAvatar(18); if(e.key==='a') moveAvatar(-18); if(e.key==='d') moveAvatar(18); }
+
+      arena.appendChild(avatar); gameArea.appendChild(wrap);
+      return ()=>{ active=false; clearInterval(sp); window.removeEventListener('keydown',kd); try{gameArea.removeChild(wrap)}catch{} }
+    }
+
+    // Quiz minigame
+    function runQuiz(pctx,questions,roundTime){
+      const wrap = document.createElement('div');
+      const q = questions[Math.floor(Math.random()*questions.length)];
+      wrap.innerHTML = `<div class='question'>${q.q}</div><div class='answers'></div>`;
+      const answers = wrap.querySelector('.answers');
+      q.choices.forEach((c,idx)=>{
+        const a = document.createElement('div'); a.className='answer'; a.textContent = c; a.onclick = ()=>{ if(pctx.answered) return; pctx.answered=true; if(idx===q.a){ pctx.onScore(15); a.style.border='2px solid '+ '#86efac'; } else { pctx.onScore(-6); a.style.opacity=0.6; } }
+        answers.appendChild(a);
+      });
+      gameArea.appendChild(wrap);
+      return ()=>{ try{gameArea.removeChild(wrap)}catch{} }
+    }
+
+    // --- Game loop ---
+    let currentCleanup = null;
+    function clearArea(){ if(currentCleanup){ currentCleanup(); currentCleanup=null; } gameArea.innerHTML=''; }
+
+    async function runRound(roundIndex, totalRounds, roundTime, questions){
+      document.getElementById('roundInfo').textContent = `Round ${roundIndex+1} / ${totalRounds}`;
+      document.getElementById('timerDisplay').textContent = `Timer: ${Math.round(roundTime)}s`;
+
+      // choose minigame randomly
+      const mg = minigames[Math.floor(Math.random()*minigames.length)];
+      log(`Round ${roundIndex+1}: ${mg}`);
+
+      // for each player sequentially (simulating simultaneous but simple)
+      for(const p of players){
+        // show player's turn
+        const hdr = document.createElement('div'); hdr.style.position='absolute'; hdr.style.left='12px'; hdr.style.bottom='12px'; hdr.style.padding='6px 10px'; hdr.style.borderRadius='8px'; hdr.style.background='rgba(255,255,255,0.02)'; hdr.textContent = `Turn: ${p.name}`; gameArea.appendChild(hdr);
+
+        // context for callbacks
+        const pctx = {onScore:(v)=>{ p.score += v; renderLeaderboard()}, answered:false};
+
+        clearArea(); gameArea.appendChild(hdr);
+        if(mg==='fire'){
+          currentCleanup = runFire(pctx);
+        } else if(mg==='avoid'){
+          currentCleanup = runAvoid(pctx);
+        } else if(mg==='quiz'){
+          currentCleanup = runQuiz(pctx,questions,roundTime);
+        }
+        // simple timer with bots simulated actions
+        let t = roundTime; const tick = 200;
+        const interval = setInterval(()=>{ t-=tick/1000; document.getElementById('timerDisplay').textContent = `Timer: ${t.toFixed(1)}s`; if(t<=0){ clearInterval(interval); }
+        },tick);
+
+        // simulate bots taking actions occasionally
+        if(p.isBot){ const botInterval = setInterval(()=>{ if(mg==='fire'){ p.score += Math.random()>0.5?6:0; renderLeaderboard(); } else if(mg==='quiz'){ if(Math.random()>0.5) p.score+=15; else p.score-=6; renderLeaderboard(); } else if(mg==='avoid'){ p.score += Math.floor(Math.random()*3); renderLeaderboard(); } },800);
+          await sleep(roundTime*1000);
+          clearInterval(botInterval);
+        } else {
+          await sleep(roundTime*1000);
+        }
+        // end of turn cleanup
+        if(currentCleanup){ currentCleanup(); currentCleanup=null; }
+        try{gameArea.removeChild(hdr)}catch{}
+        renderLeaderboard();
+        await sleep(250);
+      }
+
+    }
+
+    function sleep(ms){ return new Promise(res=>setTimeout(res,ms)); }
+
+    // Main start
+    document.getElementById('startGame').onclick = async ()=>{
+      const rounds = parseInt(document.getElementById('rounds').value)||6;
+      let timer = parseFloat(document.getElementById('startTimer').value)||10;
+      const shrink = parseFloat(document.getElementById('shrink').value)||0.9;
+      const questions = loadQuestions();
+      if(players.length<MIN_PLAYERS){ alert('Add at least one player'); return }
+      document.getElementById('modeLabel').textContent = 'Random minigames (fire / avoid / quiz)';
+      for(let r=0;r<rounds;r++){
+        await runRound(r,rounds,timer,questions);
+        timer *= shrink; // shorten
+      }
+      // game end
+      log('Game ended');
+      const winner = [...players].sort((a,b)=>b.score-a.score)[0];
+      alert('Game over! Winner: '+winner.name+' — score: '+winner.score);
+    }
+
+    document.getElementById('resetGame').onclick = ()=>{ players.length=0; addPlayer('Alice'); addPlayer('Ben'); renderPlayers(); log('Reset game'); }
+
+    // initial render
+    renderPlayers();
+
+  </script>
+</body>
+</html>
+
+
