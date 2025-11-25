@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Time Team Jr. – Design Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ---------- RESET ---------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, #fbd38d 0, transparent 55%),
+        linear-gradient(135deg, #05051a 0, #141b3b 45%, #102025 100%);
+      color: #f9fafb;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    /* ---------- PAGE SHELL ---------- */
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .title-block {
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(10, 14, 40, 0.85);
+      border: 1px solid rgba(251, 211, 141, 0.5);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .title-main {
+      font-size: 1.9rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fed7aa;
+      margin-bottom: 2px;
+    }
+
+    .title-sub {
+      font-size: 0.9rem;
+      color: #cbd5f5;
+    }
+
+    .title-meta {
+      font-size: 0.8rem;
+      color: #9ca3c7;
+      margin-top: 6px;
+    }
+
+    .timer-block {
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(12, 24, 55, 0.92);
+      border: 1px solid rgba(125, 211, 252, 0.6);
+      min-width: 220px;
+    }
+
+    .timer-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #7dd3fc;
+      margin-bottom: 4px;
+    }
+
+    .timer-display {
+      font-size: 1.4rem;
+      color: #fef9c3;
+      margin-bottom: 4px;
+    }
+
+    .timer-status {
+      font-size: 0.8rem;
+      color: #a7f3d0;
+      margin-bottom: 6px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      color: #111827;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(248, 181, 37, 0.7);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(248, 181, 37, 0.9);
+    }
+
+    /* ---------- LAYOUT ---------- */
+    .main-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 880px) {
+      .main-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* ---------- PANELS ---------- */
+    .panel {
+      background: rgba(7, 12, 35, 0.95);
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #93c5fd;
+    }
+
+    .panel-tag {
+      font-size: 0.75rem;
+      color: #e5e7eb;
+      opacity: 0.8;
+    }
+
+    /* ---------- LEFT: EXPLORER SIDE ---------- */
+    .roles-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .role-chip {
+      flex: 1 1 120px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      cursor: pointer;
+      transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+    }
+
+    .role-chip span.icon {
+      font-size: 1.1rem;
+    }
+
+    .role-chip strong {
+      font-size: 0.85rem;
+    }
+
+    .role-chip small {
+      display: block;
+      font-size: 0.7rem;
+      opacity: 0.8;
+    }
+
+    .role-chip--active {
+      background: linear-gradient(135deg, #0f172a, #1d4ed8);
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    .scene-box {
+      margin-top: 4px;
+      display: grid;
+      grid-template-rows: 120px auto;
+      gap: 8px;
+    }
+
+    .scene-top {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background:
+        linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.2)),
+        repeating-linear-gradient(
+          135deg,
+          rgba(251, 191, 36, 0.1) 0,
+          rgba(251, 191, 36, 0.1) 2px,
+          transparent 2px,
+          transparent 5px
+        );
+      position: relative;
+    }
+
+    .scene-era-label {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(249, 250, 251, 0.3);
+      color: #facc15;
+    }
+
+    .scene-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 3px;
+      padding: 8px;
+    }
+
+    .scene-tile {
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: #e5e7eb;
+      opacity: 0.85;
+    }
+
+    .scene-tile--glitch {
+      background: radial-gradient(circle at top, #f97316, #b91c1c);
+      color: #fefce8;
+      font-weight: 600;
+      box-shadow: 0 0 18px rgba(248, 113, 113, 0.8);
+    }
+
+    .scene-bottom {
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.95);
+      font-size: 0.8rem;
+    }
+
+    .scene-bottom strong {
+      color: #bfdbfe;
+    }
+
+    /* Era selector strip */
+
+    .era-strip-title {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #fed7aa;
+    }
+
+    .era-strip {
+      margin-top: 6px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .era-pill {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+    }
+
+    .era-pill span {
+      font-size: 1.05rem;
+    }
+
+    .era-pill--active {
+      background: linear-gradient(135deg, #f97316, #eab308);
+      color: #111827;
+      border-color: #fde68a;
+      transform: translateY(-1px);
+    }
+
+    /* Glitch list */
+
+    .glitch-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+    }
+
+    .glitch-card {
+      border-radius: 10px;
+      padding: 7px 9px;
+      font-size: 0.76rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      cursor: pointer;
+      transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+    }
+
+    .glitch-card strong {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+      color: #facc15;
+    }
+
+    .glitch-card small {
+      font-size: 0.7rem;
+      color: #a5b4fc;
+    }
+
+    .glitch-card--active {
+      border-color: #facc15;
+      background: radial-gradient(circle at top, #1d283a, #0f172a);
+      transform: translateY(-1px);
+    }
+
+    /* ---------- RIGHT: OPERATOR TABLET ---------- */
+    .tablet-body {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 8px;
+      height: 100%;
+    }
+
+    .tablet-row {
+      border-radius: 10px;
+      padding: 8px 9px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.78rem;
+    }
+
+    .tablet-caption {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #93c5fd;
+      margin-bottom: 4px;
+    }
+
+    .tablet-era-name {
+      font-size: 0.9rem;
+      color: #e5e7eb;
+      margin-bottom: 3px;
+    }
+
+    .tablet-tags {
+      font-size: 0.7rem;
+      color: #cbd5f5;
+    }
+
+    .tablet-list {
+      list-style: none;
+      margin-top: 2px;
+    }
+
+    .tablet-list li {
+      margin-bottom: 2px;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .tablet-dot {
+      margin-top: 3px;
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: #f97316;
+      flex-shrink: 0;
+    }
+
+    .tablet-glitch-text {
+      font-size: 0.78rem;
+      color: #fef3c7;
+      line-height: 1.4;
+    }
+
+    .log-box {
+      height: 145px;
+      overflow-y: auto;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      background: radial-gradient(circle at top, #020617, #020617);
+      border-radius: 8px;
+      padding: 6px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+    }
+
+    .log-line {
+      margin-bottom: 4px;
+      color: #e5e7eb;
+    }
+
+    .log-tag {
+      color: #6ee7b7;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .stability-bar {
+      margin-top: 6px;
+      height: 8px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stability-fill {
+      position: absolute;
+      inset: 0;
+      width: 60%;
+      background: linear-gradient(90deg, #22c55e, #facc15, #f97316);
+      animation: breathe 3.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes breathe {
+      from { width: 35%; }
+      to   { width: 85%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="title-block">
+        <div class="title-main">Time Team Jr.</div>
+        <div class="title-sub">Fix the Past – Two-Player History Adventure</div>
+        <div class="title-meta">
+          Player 1: Explorer • Player 2: Time Tablet Operator • Ages 10–14
+        </div>
+      </div>
+      <div class="timer-block">
+        <div class="timer-label">Mission Timer</div>
+        <div class="timer-display" id="timer">05:00</div>
+        <div class="timer-status" id="timerStatus">Standing by. Choose an era to brief the team.</div>
+        <button class="btn" id="timerBtn">▶ Start Mission</button>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <!-- LEFT: EXPLORER VIEW -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Explorer Screen</div>
+          <div class="panel-tag">On the TV or main display</div>
+        </div>
+
+        <!-- Roles -->
+        <div class="roles-row">
+          <button class="role-chip role-chip--active" data-role="Explorer">
+            <span class="icon">🧭</span>
+            <div>
+              <strong>Field Explorer</strong>
+              <small>Moves, talks to NPCs, spots time glitches.</small>
+            </div>
+          </button>
+          <button class="role-chip" data-role="Operator">
+            <span class="icon">📟</span>
+            <div>
+              <strong>Time Tablet Operator</strong>
+              <small>Checks facts, maps & mini-puzzles.</small>
+            </div>
+          </button>
+        </div>
+
+        <!-- Scene mock -->
+        <div class="scene-box">
+          <div class="scene-top" id="sceneTop">
+            <div class="scene-era-label" id="sceneEraLabel">Ancient Egypt · Ceremony Hall</div>
+            <div class="scene-grid" id="sceneGrid">
+              <!-- Tiles injected by JS -->
+            </div>
+          </div>
+          <div class="scene-bottom">
+            <div id="objectiveMain">
+              <strong>Objective:</strong> Find the time glitch in the pharaoh’s hall.
+            </div>
+            <div id="objectiveDetail">
+              Talk to NPCs, look for weird modern items, and report anything suspicious to the Operator.
+            </div>
+          </div>
+        </div>
+
+        <!-- Era selector -->
+        <div class="era-strip-title">Time Destination</div>
+        <div class="era-strip" id="eraStrip">
+          <button class="era-pill era-pill--active" data-era="egypt">
+            <span>🏺</span> Ancient Egypt
+          </button>
+          <button class="era-pill" data-era="greece">
+            <span>🏛️</span> Ancient Greece
+          </button>
+          <button class="era-pill" data-era="medieval">
+            <span>⚔️</span> Medieval Europe
+          </button>
+          <button class="era-pill" data-era="early">
+            <span>🔥</span> Early Civilizations
+          </button>
+        </div>
+
+        <!-- Glitches -->
+        <div class="era-strip-title" style="margin-top: 12px;">Glitches in this era</div>
+        <div class="glitch-grid" id="glitchGrid">
+          <!-- cards from JS -->
+        </div>
+      </section>
+
+      <!-- RIGHT: OPERATOR TABLET -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Time Tablet</div>
+          <div class="panel-tag">Operator’s device – helps fix the timeline</div>
+        </div>
+
+        <div class="tablet-body">
+          <!-- Era facts -->
+          <div class="tablet-row">
+            <div class="tablet-caption">Era Briefing</div>
+            <div class="tablet-era-name" id="tabletEraName">Ancient Egypt</div>
+            <div class="tablet-tags" id="tabletEraTag">
+              Temples, pyramids, and a royal ceremony in trouble.
+            </div>
+            <ul class="tablet-list" id="tabletEraFacts">
+              <!-- facts -->
+            </ul>
+          </div>
+
+          <!-- Glitch instructions -->
+          <div class="tablet-row">
+            <div class="tablet-caption">Active Glitch</div>
+            <div class="tablet-glitch-text" id="tabletGlitchText">
+              Tap a glitch card on the left. The tablet will show instructions only the Operator sees.
+            </div>
+            <div class="stability-bar">
+              <div class="stability-fill"></div>
+            </div>
+          </div>
+
+          <!-- Log -->
+          <div class="tablet-row">
+            <div class="tablet-caption">Team Log</div>
+            <div class="log-box" id="logBox">
+              <!-- log lines -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // ---------- DATA ----------
+    const ERAS = {
+      egypt: {
+        name: "Ancient Egypt",
+        tag: "Temples, pyramids, and a royal ceremony in trouble.",
+        sceneLabel: "Ancient Egypt · Ceremony Hall",
+        objectiveMain: "Objective: Restore order to the pharaoh’s ceremony.",
+        objectiveDetail: "Explorer spots strange gadgets; Operator checks scrolls & facts to confirm what belongs.",
+        facts: [
+          "Pharaohs were powerful rulers living along the River Nile.",
+          "They wrote on papyrus, not in notebooks or on tablets.",
+          "No electricity: no phones, no lights, no robots.",
+        ],
+        tiles: [
+          "Guard", "Priest", "Torch", "???", "Pillar",
+          "Scribe", "Chest", "Pharaoh", "???", "Statue",
+          "Drum", "Offering", "Cat", "Sand", "Door"
+        ],
+        glitchIndices: [3, 8] // two tiles get glitch styling
+      },
+      greece: {
+        name: "Ancient Greece",
+        tag: "Festival games, marble temples, and heroic stories.",
+        sceneLabel: "Ancient Greece · Games Arena",
+        objectiveMain: "Objective: Save the ancient games from future sports tech.",
+        objectiveDetail: "Explorer walks the arena; Operator checks which rules and equipment actually existed.",
+        facts: [
+          "The Olympic Games started in ancient Greece.",
+          "Athletes did not wear branded sports clothes or trainers.",
+          "No digital scoreboards, speakers, or energy drinks.",
+        ],
+        tiles: [
+          "Track", "Runner", "???", "Column", "Spectator",
+          "Laurel", "Judge", "Torch", "???", "Sand",
+          "Vendor", "Banner", "Drum", "Gate", "Hills"
+        ],
+        glitchIndices: [2, 8]
+      },
+      medieval: {
+        name: "Medieval Europe",
+        tag: "Castles, markets, and knights preparing for a tournament.",
+        sceneLabel: "Medieval Europe · Castle Yard",
+        objectiveMain: "Objective: Return the knight’s gear to the right time.",
+        objectiveDetail: "Explorer checks stalls & armour racks; Operator knows which items are too modern.",
+        facts: [
+          "Armour and weapons were made by blacksmiths, not factories.",
+          "No phones, headphones, or electric torches existed.",
+          "Books were copied by hand, not printed quickly.",
+        ],
+        tiles: [
+          "Stall", "Knight", "Horse", "???", "Tower",
+          "Gate", "Banner", "Blacksmith", "???", "Cart",
+          "Hay", "Child", "Well", "Bench", "Dog"
+        ],
+        glitchIndices: [3, 8]
+      },
+      early: {
+        name: "Early Civilizations",
+        tag: "First villages, fields, and simple tools.",
+        sceneLabel: "Early Civilizations · Village Fields",
+        objectiveMain: "Objective: Protect early farming from future machines.",
+        objectiveDetail: "Explorer sees what the villagers use; Operator spots anything too high-tech.",
+        facts: [
+          "People were just learning to farm and live in one place.",
+          "Tools were simple: stone, wood, and early metal.",
+          "No drones, tractors, or plastic buckets existed.",
+        ],
+        tiles: [
+          "Hut", "Field", "Fire", "???", "Tree",
+          "Child", "Water", "Axe", "???", "Path",
+          "Sheep", "Granary", "Stone", "River", "Sky"
+        ],
+        glitchIndices: [3, 8]
+      }
+    };
+
+    const GLITCHES = {
+      objects: {
+        label: "Misplaced Objects",
+        hint: "Explorer: pick up things that look too modern. Operator: cross-check with era facts.",
+        summary: "Co-op sorting mini-game using objects and a future scanner."
+      },
+      npc: {
+        label: "NPC From the Wrong Century",
+        hint: "Explorer: listen to what characters say. Operator: correct phrases that don’t match the era.",
+        summary: "Dialogue puzzle where the team chooses the historically correct answers."
+      },
+      riddle: {
+        label: "Time Lock Riddle",
+        hint: "Operator: uses the fact sheet to solve a riddle; Explorer presses symbols in the right order.",
+        summary: "Short logic puzzle based on dates and inventions."
+      },
+      machine: {
+        label: "Broken Time Gear",
+        hint: "Operator: sees the blueprint; Explorer rotates and places parts to match.",
+        summary: "Physical puzzle with gears or crystals that must be arranged correctly."
+      }
+    };
+
+    // ---------- DOM ELEMENTS ----------
+    const eraStrip = document.getElementById("eraStrip");
+    const timerEl = document.getElementById("timer");
+    const timerStatusEl = document.getElementById("timerStatus");
+    const timerBtn = document.getElementById("timerBtn");
+
+    const sceneEraLabel = document.getElementById("sceneEraLabel");
+    const sceneGrid = document.getElementById("sceneGrid");
+    const objectiveMainEl = document.getElementById("objectiveMain");
+    const objectiveDetailEl = document.getElementById("objectiveDetail");
+
+    const tabletEraNameEl = document.getElementById("tabletEraName");
+    const tabletEraTagEl = document.getElementById("tabletEraTag");
+    const tabletEraFactsEl = document.getElementById("tabletEraFacts");
+    const tabletGlitchTextEl = document.getElementById("tabletGlitchText");
+    const logBox = document.getElementById("logBox");
+
+    const glitchGrid = document.getElementById("glitchGrid");
+    const roleChips = document.querySelectorAll(".role-chip");
+
+    // ---------- STATE ----------
+    let currentEraKey = "egypt";
+    let currentGlitchKey = null;
+    let timerHandle = null;
+    let timeLeft = 5 * 60;
+
+    // ---------- HELPERS ----------
+    function addLog(source, text) {
+      const line = document.createElement("div");
+      line.className = "log-line";
+      const tag = document.createElement("span");
+      tag.className = "log-tag";
+      tag.textContent = `[${source}]`;
+      line.appendChild(tag);
+      line.appendChild(document.createTextNode(" " + text));
+      logBox.appendChild(line);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60)
+        .toString()
+        .padStart(2, "0");
+      const s = (seconds % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    // ---------- RENDER FUNCTIONS ----------
+    function renderEra(eraKey) {
+      currentEraKey = eraKey;
+      const data = ERAS[eraKey];
+
+      // Explorer scene
+      sceneEraLabel.textContent = data.sceneLabel;
+      objectiveMainEl.innerHTML = `<strong>${data.objectiveMain}</strong>`;
+      objectiveDetailEl.textContent = data.objectiveDetail;
+
+      sceneGrid.innerHTML = "";
+      data.tiles.forEach((label, index) => {
+        const tile = document.createElement("div");
+        tile.className = "scene-tile";
+        if (data.glitchIndices.includes(index)) {
+          tile.classList.add("scene-tile--glitch");
+          tile.textContent = "GLITCH";
+        } else {
+          tile.textContent = label;
+        }
+        sceneGrid.appendChild(tile);
+      });
+
+      // Operator tablet
+      tabletEraNameEl.textContent = data.name;
+      tabletEraTagEl.textContent = data.tag;
+      tabletEraFactsEl.innerHTML = "";
+      data.facts.forEach(f => {
+        const li = document.createElement("li");
+        const dot = document.createElement("span");
+        dot.className = "tablet-dot";
+        const text = document.createElement("span");
+        text.textContent = f;
+        li.appendChild(dot);
+        li.appendChild(text);
+        tabletEraFactsEl.appendChild(li);
+      });
+
+      addLog("Tablet", `Era changed to ${data.name}. Facts and map updated.`);
+    }
+
+    function renderGlitches() {
+      glitchGrid.innerHTML = "";
+      Object.entries(GLITCHES).forEach(([key, info]) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "glitch-card";
+        card.dataset.glitch = key;
+
+        const title = document.createElement("strong");
+        const emoji = document.createElement("span");
+        emoji.textContent = key === "objects" ? "🎒"
+          : key === "npc" ? "🗣️"
+          : key === "riddle" ? "📜"
+          : "⚙️";
+        title.appendChild(emoji);
+        title.appendChild(document.createTextNode(info.label));
+
+        const summary = document.createElement("div");
+        summary.textContent = info.summary;
+
+        const hint = document.createElement("small");
+        hint.textContent = info.hint;
+
+        card.appendChild(title);
+        card.appendChild(summary);
+        card.appendChild(hint);
+        glitchGrid.appendChild(card);
+      });
+    }
+
+    function setActiveGlitch(key) {
+      currentGlitchKey = key;
+      const info = GLITCHES[key];
+      tabletGlitchTextEl.textContent = info.hint;
+      addLog("Glitch", `Selected "${info.label}" puzzle for this mission.`);
+    }
+
+    function updateTimerLabel() {
+      timerEl.textContent = formatTime(timeLeft);
+    }
+
+    // ---------- EVENT WIRES ----------
+    // Era pills
+    eraStrip.addEventListener("click", (e) => {
+      const btn = e.target.closest(".era-pill");
+      if (!btn) return;
+      const eraKey = btn.dataset.era;
+      if (!eraKey) return;
+
+      document.querySelectorAll(".era-pill").forEach(b => b.classList.remove("era-pill--active"));
+      btn.classList.add("era-pill--active");
+      renderEra(eraKey);
+    });
+
+    // Glitch cards (use event delegation)
+    glitchGrid.addEventListener("click", (e) => {
+      const card = e.target.closest(".glitch-card");
+      if (!card) return;
+      const key = card.dataset.glitch;
+      if (!key) return;
+
+      document.querySelectorAll(".glitch-card").forEach(c => c.classList.remove("glitch-card--active"));
+      card.classList.add("glitch-card--active");
+      setActiveGlitch(key);
+    });
+
+    // Role chips
+    roleChips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        roleChips.forEach(c => c.classList.remove("role-chip--active"));
+        chip.classList.add("role-chip--active");
+        const role = chip.dataset.role;
+        addLog("System", `${role} is now the focus of the demo.`);
+      });
+    });
+
+    // Timer
+    timerBtn.addEventListener("click", () => {
+      // Reset if already running
+      if (timerHandle) {
+        clearInterval(timerHandle);
+        timerHandle = null;
+      }
+      timeLeft = 5 * 60;
+      updateTimerLabel();
+
+      timerStatusEl.textContent = "Mission running. Team must fix glitches before time runs out.";
+      addLog("System", "Mission timer started. Ask players to explain their plan out loud.");
+
+      timerHandle = setInterval(() => {
+        timeLeft--;
+        updateTimerLabel();
+        if (timeLeft <= 0) {
+          clearInterval(timerHandle);
+          timerHandle = null;
+          timerStatusEl.textContent = "Time up! Debrief what the team found and fixed.";
+          addLog("System", "Timer finished. Mentor can now ask what each player did.");
+        }
+      }, 1000);
+    });
+
+    // ---------- INIT ----------
+    renderEra(currentEraKey);
+    renderGlitches();
+    updateTimerLabel();
+    addLog("System", "Prototype ready. Choose an era and a glitch to walk your mentor through the flow.");
+  </script>
+</body>
+</html>
