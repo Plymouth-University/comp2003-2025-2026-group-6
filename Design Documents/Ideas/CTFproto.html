@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber CTF - Capture The Flag</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a2a, #1a1a3a);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.3);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            margin-bottom: 5px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: #00ccff;
+            margin-bottom: 20px;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+        
+        .team {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .red-team {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff3333;
+        }
+        
+        .blue-team {
+            background: rgba(0, 0, 255, 0.2);
+            border: 2px solid #3333ff;
+        }
+        
+        .team h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .red-score {
+            color: #ff3333;
+        }
+        
+        .blue-score {
+            color: #3333ff;
+        }
+        
+        .player-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+        
+        .player-list li {
+            padding: 5px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        .round-info {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .round-title {
+            font-size: 2rem;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .challenges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .challenge-card {
+            background: rgba(30, 30, 60, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .challenge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 200, 255, 0.5);
+            border: 2px solid #00ccff;
+        }
+        
+        .challenge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #00ccff;
+        }
+        
+        .challenge-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+        }
+        
+        .challenge-points {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #00ff99;
+        }
+        
+        .challenge-desc {
+            font-size: 0.9rem;
+            color: #cccccc;
+            margin-bottom: 15px;
+        }
+        
+        .start-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #ff3333, #ff9900);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 100, 0, 0.5);
+        }
+        
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 100, 0, 0.7);
+        }
+        
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .role-card {
+            background: rgba(40, 40, 80, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .role-card:hover {
+            background: rgba(60, 60, 120, 0.8);
+            transform: translateY(-5px);
+        }
+        
+        .role-card.selected {
+            border: 2px solid #ffcc00;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+        }
+        
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #00ccff;
+        }
+        
+        .role-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+        }
+        
+        .role-desc {
+            font-size: 0.8rem;
+            color: #cccccc;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 20px 0;
+            color: #ffcc00;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .challenges {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-board {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CAPTURE THE FLAG</h1>
+            <h2>CYBER EDITION</h2>
+        </header>
+        
+        <div class="game-area">
+            <div class="score-board">
+                <div class="team red-team">
+                    <h3>RED TEAM</h3>
+                    <div class="score red-score">3</div>
+                    <ul class="player-list">
+                        <li>REDPLAYER1</li>
+                        <li>REDPLAYER2</li>
+                        <li>REDPLAYER3</li>
+                    </ul>
+                </div>
+                
+                <div class="team blue-team">
+                    <h3>BLUE TEAM</h3>
+                    <div class="score blue-score">0</div>
+                    <ul class="player-list">
+                        <li>BLUEPLAYER1</li>
+                        <li>BLUEPLAYER2</li>
+                        <li>BLUEPLAYER3</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="round-info">
+                <div class="round-title">ROUND 1</div>
+                <div class="timer">Time Remaining: 04:32</div>
+            </div>
+            
+            <div class="role-selection">
+                <div class="role-card selected">
+                    <div class="role-icon">🔍</div>
+                    <div class="role-title">Analyst</div>
+                    <div class="role-desc">Best at phishing identification & logs</div>
+                </div>
+                
+                <div class="role-card">
+                    <div class="role-icon">🔐</div>
+                    <div class="role-title">Cryptographer</div>
+                    <div class="role-desc">Expert in cipher puzzles</div>
+                </div>
+                
+                <div class="role-card">
+                    <div class="role-icon">⚙️</div>
+                    <div class="role-title">Engineer</div>
+                    <div class="role-desc">System vulnerabilities & patching</div>
+                </div>
+                
+                <div class="role-card">
+                    <div class="role-icon">🎭</div>
+                    <div class="role-title">Wildcard</div>
+                    <div class="role-desc">Mixed tasks & adaptability</div>
+                </div>
+            </div>
+            
+            <div class="challenges">
+                <div class="challenge-card">
+                    <div class="challenge-icon">🎣</div>
+                    <div class="challenge-title">PHISHING SPOTTER</div>
+                    <div class="challenge-points">10 POINTS</div>
+                    <div class="challenge-desc">Identify phishing attempts in emails, chat messages, and social media posts</div>
+                </div>
+                
+                <div class="challenge-card">
+                    <div class="challenge-icon">🔢</div>
+                    <div class="challenge-title">CIPHER STATION</div>
+                    <div class="challenge-points">20 POINTS</div>
+                    <div class="challenge-desc">Solve cryptography puzzles and decode secret messages</div>
+                </div>
+                
+                <div class="challenge-card">
+                    <div class="challenge-icon">🔑</div>
+                    <div class="challenge-title">PASSWORD CLINIC</div>
+                    <div class="challenge-points">10 POINTS</div>
+                    <div class="challenge-desc">Test password strength and identify authentication vulnerabilities</div>
+                </div>
+                
+                <div class="challenge-card">
+                    <div class="challenge-icon">🌐</div>
+                    <div class="challenge-title">WEB APP LAB</div>
+                    <div class="challenge-points">20 POINTS</div>
+                    <div class="challenge-desc">Find and exploit vulnerabilities in web applications</div>
+                </div>
+            </div>
+            
+            <button class="start-btn">START</button>
+        </div>
+    </div>
+
+    <script>
+        // Role selection functionality
+        const roleCards = document.querySelectorAll('.role-card');
+        roleCards.forEach(card => {
+            card.addEventListener('click', () => {
+                roleCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+        
+        // Challenge selection functionality
+        const challengeCards = document.querySelectorAll('.challenge-card');
+        challengeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                challengeCards.forEach(c => c.style.border = '2px solid transparent');
+                card.style.border = '2px solid #ffcc00';
+                card.style.boxShadow = '0 0 15px rgba(255, 204, 0, 0.7)';
+                
+                // In a real implementation, this would load the selected challenge
+                const challengeTitle = card.querySelector('.challenge-title').textContent;
+                alert(`Loading challenge: ${challengeTitle}`);
+            });
+        });
+        
+        // Start button functionality
+        const startBtn = document.querySelector('.start-btn');
+        startBtn.addEventListener('click', () => {
+            alert('Game starting! Teams will now compete in cybersecurity challenges.');
+            
+            // Simulate game progression
+            let timeLeft = 300; // 5 minutes in seconds
+            const timerElement = document.querySelector('.timer');
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `Time Remaining: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerElement.textContent = "Round Over!";
+                    alert("Round complete! Calculating scores...");
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
