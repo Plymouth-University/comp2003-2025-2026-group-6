@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capture The Flag - Cyber Edition Demo</title>
+
+<style>
+/* --- GENERAL STYLES --- */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI'; }
+body { background: linear-gradient(135deg,#0a0a2a,#1a1a3a); color:white; padding:20px; }
+
+.hidden { display:none; }
+
+button {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: linear-gradient(135deg,#ff3333,#ff9900);
+    color: white;
+    margin-top: 20px;
+}
+
+.container { max-width: 1100px; margin: 0 auto; }
+
+header { text-align:center; margin-bottom:30px; }
+header h1 { font-size:3rem; color:#ffcc00; text-shadow:0 0 10px rgba(255,204,0,0.7); }
+header h2 { color:#00ccff; }
+
+/* Scoreboard */
+.score-board {
+    display:flex; justify-content:space-between;
+    background:rgba(0,0,0,.7);
+    padding:20px; border-radius:10px;
+    margin-bottom:20px;
+}
+.team { text-align:center; flex:1; }
+.red-team { border:2px solid #ff3333; margin-right:10px; border-radius:10px; }
+.blue-team { border:2px solid #3333ff; margin-left:10px; border-radius:10px; }
+.score { font-size:2.5rem; }
+
+/* Role Select */
+.role-selection { display:flex; gap:20px; justify-content:center; margin-top:30px; }
+.role-card {
+    background:rgba(40,40,80,0.8); padding:20px;
+    width:180px; border-radius:10px;
+    text-align:center; cursor:pointer;
+    transition:0.3s; border:2px solid transparent;
+}
+.role-card:hover { transform:scale(1.05); }
+.selected { border:2px solid #ffcc00; }
+
+/* Challenges */
+.challenges {
+    margin-top:40px;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+.challenge-card {
+    background:rgba(30,30,60,0.8); padding:20px;
+    border-radius:10px; text-align:center;
+    cursor:pointer; transition:0.3s;
+}
+.challenge-card:hover { transform:translateY(-5px); border:2px solid #00ccff; }
+
+/* Popup */
+.popup {
+    position:fixed; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    background:#222; padding:30px;
+    border-radius:10px; text-align:center;
+    width:300px; display:none;
+    box-shadow:0 0 20px rgba(255,255,255,0.3);
+    z-index: 20;
+}
+
+.timer { text-align:center; margin:20px; font-size:1.4rem; color:#ffcc00; }
+
+/* Mini-Games */
+#phishingGame, #cipherGame, #passwordClinic, #webappLab {
+    background:rgba(0,0,0,0.6);
+    padding:20px;
+    border-radius:10px;
+    margin-top:30px;
+    display:none;
+}
+
+.fish-area {
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:center;
+    margin-top:20px;
+}
+.fish {
+    background:rgba(255,255,255,0.1);
+    padding:15px;
+    border-radius:8px;
+    width:250px;
+    cursor:pointer;
+    transition:0.2s;
+}
+.fish:hover { background:rgba(255,255,255,0.2); }
+.phish { border-left:5px solid #ff3333; }
+.safe { border-left:5px solid #33ff55; }
+
+/* Cipher Input */
+#encodedMessage {
+    background: rgba(255,255,255,0.1);
+    padding: 15px; border-radius:8px;
+    margin: 15px 0; font-size:1.2rem;
+    color: #ffcc00;
+}
+#cipherInput {
+    padding:10px;
+    width:80%;
+    font-size:1rem;
+    border-radius:5px;
+    border:none;
+}
+
+/* WebApp Lab Inputs */
+.webapp-field {
+    display:flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.webapp-field input {
+    padding:8px;
+    border-radius:5px;
+    border:none;
+}
+.webapp-field button {
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<header>
+    <h1>CAPTURE THE FLAG</h1>
+    <h2>CYBER EDITION (Demo)</h2>
+</header>
+
+<!-- SCOREBOARD -->
+<div class="score-board">
+    <div class="team red-team">
+        <h3>RED TEAM</h3>
+        <div class="score" id="redScore">0</div>
+    </div>
+
+    <div class="team blue-team">
+        <h3>BLUE TEAM</h3>
+        <div class="score" id="blueScore">0</div>
+    </div>
+</div>
+
+<!-- TIMER -->
+<div class="timer" id="timer">Time Remaining: 05:00</div>
+
+<!-- ROLE SELECT -->
+<h2 style="text-align:center;">Select Your Role</h2>
+<div class="role-selection">
+    <div class="role-card" data-role="Analyst">🔍<br>Analyst</div>
+    <div class="role-card" data-role="Cryptographer">🔐<br>Cryptographer</div>
+    <div class="role-card" data-role="Engineer">⚙️<br>Engineer</div>
+    <div class="role-card" data-role="Wildcard">🎭<br>Wildcard</div>
+</div>
+
+<button id="startRoundBtn">Start Round</button>
+
+<!-- CHALLENGES -->
+<div id="challengeArea" class="hidden">
+<h2 style="text-align:center; margin-top:30px;">Choose a Challenge</h2>
+<div class="challenges">
+    <div class="challenge-card" data-mini="phishingGame">🎣<br>Phishing Spotter</div>
+    <div class="challenge-card" data-mini="cipherGame">🔢<br>Cipher Station</div>
+    <div class="challenge-card" data-mini="passwordClinic">🔑<br>Password Clinic</div>
+    <div class="challenge-card" data-mini="webappLab">💻<br>WebApp Lab</div>
+</div>
+</div>
+</div>
+
+<!-- PHISHING MINI GAME -->
+<div id="phishingGame" class="hidden">
+<h2>🎣 Phishing Mini-Game</h2>
+<p>Click ONLY the phishing emails! (Red tags are suspicious 🐟)</p>
+<div class="fish-area" id="fishArea"></div>
+<button id="finishPhishingBtn">Finish Mini-Game</button>
+</div>
+
+<!-- CIPHER MINI GAME -->
+<div id="cipherGame" class="hidden">
+<h2>🔢 Cipher Station</h2>
+<p>Decode the Caesar cipher message:</p>
+<div id="encodedMessage"></div>
+<input type="text" id="cipherInput" placeholder="Your answer...">
+<button id="submitCipherBtn">Submit</button>
+</div>
+
+<!-- PASSWORD CLINIC MINI GAME -->
+<div id="passwordClinic" class="hidden">
+<h2>🔑 Password Clinic</h2>
+<p>Select which passwords are STRONG!</p>
+<div class="fish-area" id="passwordArea"></div>
+<button id="finishPasswordBtn">Finish Mini-Game</button>
+</div>
+
+<!-- WEBAPP LAB MINI GAME -->
+<div id="webappLab" class="hidden">
+<h2>💻 WebApp Lab</h2>
+<p>Find the vulnerable input! (Hint: Only one is vulnerable)</p>
+<div class="webapp-field">
+    <label>Username:</label>
+    <input type="text" id="webUsername">
+</div>
+<div class="webapp-field">
+    <label>Password:</label>
+    <input type="password" id="webPassword">
+</div>
+<div class="webapp-field">
+    <label>Email:</label>
+    <input type="email" id="webEmail">
+</div>
+<button id="submitWebAppBtn">Submit</button>
+</div>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+<h3 id="popupTitle">Challenge Complete!</h3>
+<p id="popupText"></p>
+<button id="helpBtn">Help My Team</button>
+<button id="hinderBtn">Hinder Opponents</button>
+</div>
+
+<script>
+// --- GENERAL VARIABLES ---
+let selectedRole = null;
+let timeLeft = 300;
+let timerInterval;
+let redScore = 0;
+let blueScore = 0;
+
+// ROLE SELECTION
+const roleCards = document.querySelectorAll('.role-card');
+roleCards.forEach(card => {
+    card.onclick = () => {
+        roleCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedRole = card.dataset.role;
+    };
+});
+
+// START ROUND
+document.getElementById('startRoundBtn').onclick = () => {
+    if (!selectedRole) return alert("Choose a role first!");
+    document.getElementById('challengeArea').classList.remove('hidden');
+    startTimer();
+};
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        const min = Math.floor(timeLeft / 60).toString().padStart(2,'0');
+        const sec = (timeLeft % 60).toString().padStart(2,'0');
+        document.getElementById('timer').textContent = `Time Remaining: ${min}:${sec}`;
+        if(timeLeft <=0){ clearInterval(timerInterval); alert("Round Over!"); }
+    },1000);
+}
+
+// --- CHALLENGE SELECTION ---
+const challengeCards = document.querySelectorAll('.challenge-card');
+const phishingGame = document.getElementById("phishingGame");
+const cipherGame = document.getElementById("cipherGame");
+const passwordClinic = document.getElementById("passwordClinic");
+const webappLab = document.getElementById("webappLab");
+
+challengeCards.forEach(card => {
+    card.onclick = () => {
+        const mini = card.dataset.mini;
+        phishingGame.style.display = "none";
+        cipherGame.style.display = "none";
+        passwordClinic.style.display = "none";
+        webappLab.style.display = "none";
+        if(mini==="phishingGame") startPhishingGame();
+        if(mini==="cipherGame") startCipherGame();
+        if(mini==="passwordClinic") startPasswordClinic();
+        if(mini==="webappLab") startWebAppLab();
+    };
+});
+
+// --- PHISHING MINI ---
+const fishArea = document.getElementById("fishArea");
+const finishPhishingBtn = document.getElementById("finishPhishingBtn");
+const fishData = [
+    {text:"Netflix expired!", type:"phish"},
+    {text:"Homework due Friday", type:"safe"},
+    {text:"Free iPhone!", type:"phish"},
+    {text:"Timetable updated", type:"safe"},
+    {text:"Bank unusual activity", type:"phish"}
+];
+let phishingScore = 0;
+
+function startPhishingGame() {
+    phishingGame.style.display="block"; phishingScore=0; fishArea.innerHTML="";
+    fishData.forEach(f=>{
+        const div=document.createElement("div");
+        div.classList.add("fish", f.type==="phish"?"phish":"safe");
+        div.textContent=f.text;
+        div.onclick=()=>{ phishingScore += f.type==="phish"?5:-3; div.style.background=f.type==="phish"?"rgba(0,255,0,0.3)":"rgba(255,0,0,0.3)"; div.style.pointerEvents="none";};
+        fishArea.appendChild(div);
+    });
+}
+
+finishPhishingBtn.onclick = () => {
+    phishingGame.style.display="none";
+    popup.style.display="block";
+    popupText.textContent=`You scored ${phishingScore} points in Phishing Spotter!`;
+    popup.dataset.points=phishingScore;
+};
+
+// --- CIPHER MINI ---
+const encodedMessageEl = document.getElementById("encodedMessage");
+const cipherInput = document.getElementById("cipherInput");
+const submitCipherBtn = document.getElementById("submitCipherBtn");
+let cipherAnswer = "";
+
+function caesarCipher(msg, shift){
+    return msg.toUpperCase().replace(/[A-Z]/g,c=>String.fromCharCode((c.charCodeAt(0)-65+shift)%26+65));
+}
+
+function startCipherGame(){
+    cipherGame.style.display="block";
+    const messages=["HELLO","SECURE","DATA","PASSWORD","CYBER"];
+    const msg=messages[Math.floor(Math.random()*messages.length)];
+    const shift=Math.floor(Math.random()*25)+1;
+    cipherAnswer=msg;
+    encodedMessageEl.textContent=caesarCipher(msg,shift);
+    cipherInput.value="";
+}
+
+submitCipherBtn.onclick = ()=>{
+    const userInput=cipherInput.value.toUpperCase();
+    let score=userInput===cipherAnswer?20:5;
+    cipherGame.style.display="none";
+    popup.style.display="block";
+    popupText.textContent=`Cipher Station complete! You scored ${score} points.`;
+    popup.dataset.points=score;
+};
+
+// --- PASSWORD CLINIC MINI ---
+const passwordArea = document.getElementById("passwordArea");
+const finishPasswordBtn = document.getElementById("finishPasswordBtn");
+const passwordData=[
+    {text:"123456", type:"weak"},
+    {text:"password", type:"weak"},
+    {text:"Tr0ub4dor!", type:"strong"},
+    {text:"qwerty", type:"weak"},
+    {text:"S3cur3P@ss", type:"strong"},
+    {text:"letmein", type:"weak"},
+];
+let passwordScore=0;
+
+function startPasswordClinic(){
+    passwordClinic.style.display="block"; passwordScore=0; passwordArea.innerHTML="";
+    passwordData.forEach(p=>{
+        const div=document.createElement("div");
+        div.classList.add("fish",p.type==="strong"?"safe":"phish");
+        div.textContent=p.text;
+        div.onclick=()=>{ passwordScore += p.type==="strong"?5:-3; div.style.background=p.type==="strong"?"rgba(0,255,0,0.3)":"rgba(255,0,0,0.3)"; div.style.pointerEvents="none";};
+        passwordArea.appendChild(div);
+    });
+}
+
+finishPasswordBtn.onclick = ()=>{
+    passwordClinic.style.display="none";
+    popup.style.display="block";
+    popupText.textContent=`Password Clinic complete! You scored ${passwordScore} points.`;
+    popup.dataset.points=passwordScore;
+};
+
+// --- WEBAPP LAB MINI ---
+let webAppScore=0;
+function startWebAppLab(){
+    webappLab.style.display="block"; webAppScore=0;
+    document.getElementById("webUsername").value="";
+    document.getElementById("webPassword").value="";
+    document.getElementById("webEmail").value="";
+}
+
+document.getElementById("submitWebAppBtn").onclick = ()=>{
+    const username=document.getElementById("webUsername").value;
+    const password=document.getElementById("webPassword").value;
+    const email=document.getElementById("webEmail").value;
+    // Only password field is "vulnerable"
+    if(password.includes("admin")) webAppScore=20; else webAppScore=5;
+    webappLab.style.display="none";
+    popup.style.display="block";
+    popupText.textContent=`WebApp Lab complete! You scored ${webAppScore} points.`;
+    popup.dataset.points=webAppScore;
+};
+
+// --- POPUP HELP/HINDER ---
+document.getElementById('helpBtn').onclick = ()=>{
+    redScore += Number(popup.dataset.points);
+    document.getElementById('redScore').textContent=redScore;
+    popup.style.display="none";
+};
+document.getElementById('hinderBtn').onclick = ()=>{
+    blueScore -= Number(popup.dataset.points);
+    if(blueScore<0) blueScore=0;
+    document.getElementById('blueScore').textContent=blueScore;
+    popup.style.display="none";
+};
+</script>
+</body>
+</html>
