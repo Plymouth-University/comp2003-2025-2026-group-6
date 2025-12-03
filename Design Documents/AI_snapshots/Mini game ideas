@@ -1,0 +1,52 @@
+Input: give me some mini game ideas
+
+Output:
+Here are some fun, simple mini-game ideas you can build or play anywhere:
+
+1. Color Catch
+
+Colored balls fall from the top of the screen; the player moves a basket left/right to catch only the correct color that matches a target shown.
+
+2. One-Tap Jumper
+
+A character auto-runs. Tapping jumps over obstacles. Holding makes a longer jump. Score increases with distance.
+
+3. Memory Match Rush
+
+Classic card-matching but timed: each round, you have less time to match all pairs. Occasionally add a “fake” pair to confuse players.
+
+4. Shape Shifter
+
+The player’s character changes shape (circle/square/triangle) every few seconds. Obstacles appear with shape-shaped holes; you can pass only if you match.
+
+5. Swipe Duel
+
+Two players (local) swipe in directions quickly when prompts appear (↑ ↓ ← →). Wrong swipe loses a point. First to 5 wins.
+
+6. Tower Stack
+
+Blocks swing left and right; tap to drop them. If they overhang too much, the extra gets cut off, making the next block smaller.
+
+7. Ghost Maze
+
+Tiny maze that changes every 10 seconds. A ghost chases the player but can only move when the player moves (turn-based feel).
+
+8. Reaction Dot
+
+A dot changes color randomly—tap only when it becomes green. Speed gradually increases.
+
+9. Quick Draw Quiz
+
+Small trivia questions with only 2–3 seconds to answer. Correct answers build a streak multiplier.
+
+10. Gravity Flip
+
+Player taps to flip gravity (up/down) to avoid obstacles. Simple lane-runner feel.
+
+11. Mini Farm Loop
+
+Tiny farm with a single plot: plant → grow → harvest → sell → upgrade to grow faster. Loop is short and satisfying.
+
+12. Laser Deflect
+
+Lasers move across the screen; the player rotates mirrors to redirect them into targets before the laser passes.
