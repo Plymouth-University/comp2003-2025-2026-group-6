@@ -140,3 +140,6 @@ button{
   margin-top: 8px;
   font-weight: 800;
 }
+.staminaWrap { font-weight: 800; display:flex; align-items:center; gap:8px; }
+progress { width: 140px; height: 14px; }
+.target { font-weight: 900; }
