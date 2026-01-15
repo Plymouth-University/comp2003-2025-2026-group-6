@@ -5,9 +5,10 @@ using UnityEngine.UI;
 
 public class CyberWorm : MonoBehaviour
 {
+    // --- SETTINGS ---
     [Header("Game Settings")]
-    public float moveSpeed = 0.15f; // Your preferred speed
-    public int borderSize = 12;     // Your preferred map size
+    public float moveSpeed = 0.15f;
+    public int borderSize = 12;
     public int growthAmount = 2;
 
     [Header("References")]
@@ -15,13 +16,32 @@ public class CyberWorm : MonoBehaviour
     public GameObject foodPrefab;
     public GameObject obstaclePrefab;
     public GameObject wallPrefab;
+
+    // UI Panels
+    public GameObject gameOverPanel;
+    public GameObject startMenuPanel;
     public Text scoreText;
     public Text modeText;
 
-    // State
+    [Header("Audio")]
+    public AudioClip eatSound;
+    public AudioClip crashSound;
+    public AudioClip switchSound;
+
+    // --- STATE ---
     private Vector2 _direction = Vector2.right;
     private List<Transform> _segments = new List<Transform>();
+
+    // Game Flow Flags
     private bool _isAlive = true;
+    private bool _isGameOver = false;
+    private bool _inMenu = true;        // True = Showing Start Screen
+    private bool _hasStartedMoving = false; // True = Player pressed WASD
+
+    // Folders for hierarchy organization
+    private Transform wallFolder;
+    private Transform bodyFolder;
+    private Transform itemFolder;
 
     // CTF Logic
     private bool _isSabotageMode = false;
@@ -30,22 +50,69 @@ public class CyberWorm : MonoBehaviour
 
     private void Start()
     {
+        // Pause time immediately
+        Time.timeScale = 0;
+
+        // Show Menu, Hide Game Over
+        if (startMenuPanel != null) startMenuPanel.SetActive(true);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+
+        // Reset lists and add head
         _segments.Clear();
         _segments.Add(this.transform);
-
-        // SCALE CHANGE: Set head to 0.9 (Big Square)
         transform.localScale = new Vector3(0.9f, 0.9f, 1f);
 
+        // Create folders to clean up hierarchy
+        wallFolder = new GameObject("--- WALLS ---").transform;
+        bodyFolder = new GameObject("--- BODY ---").transform;
+        itemFolder = new GameObject("--- ITEMS ---").transform;
+
+        // Spawn initial items
         SpawnFood();
         SpawnObstacle();
         SpawnWalls();
         UpdateUI();
 
-        InvokeRepeating(nameof(Move), moveSpeed, moveSpeed);
+        // NOTE: We do NOT start moving here anymore. We wait for WASD.
     }
 
     private void Update()
     {
+        // 1. MENU PHASE (Waiting for 'R')
+        if (_inMenu)
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                InitializeSystem();
+            }
+            return; // Stop here, don't read other inputs
+        }
+
+        // 2. GAME OVER PHASE (Waiting for 'R')
+        if (_isGameOver)
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                Time.timeScale = 1;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+            return;
+        }
+
+        // 3. READY PHASE (Waiting for WASD to start moving)
+        if (!_hasStartedMoving)
+        {
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow) ||
+                Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow) ||
+                Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) ||
+                Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                _hasStartedMoving = true;
+                InvokeRepeating(nameof(Move), moveSpeed, moveSpeed); // Start the loop
+            }
+        }
+
+        // 4. INPUTS (Direction Control)
         if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && _direction != Vector2.down)
             _direction = Vector2.up;
         else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && _direction != Vector2.up)
@@ -55,26 +122,41 @@ public class CyberWorm : MonoBehaviour
         else if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && _direction != Vector2.left)
             _direction = Vector2.right;
 
+        // Mode Toggle (Can be done even before moving)
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _isSabotageMode = !_isSabotageMode;
+            if (switchSound != null) GetComponent<AudioSource>().PlayOneShot(switchSound);
             UpdateUI();
         }
+    }
+
+    // Called when player presses 'R' at the menu
+    public void InitializeSystem()
+    {
+        _inMenu = false;
+        Time.timeScale = 1; // Unfreeze visuals
+
+        if (startMenuPanel != null) startMenuPanel.SetActive(false); // Hide Menu
+        if (switchSound != null) GetComponent<AudioSource>().PlayOneShot(switchSound);
     }
 
     private void Move()
     {
         if (!_isAlive) return;
 
+        // Move body parts to follow head
         for (int i = _segments.Count - 1; i > 0; i--)
         {
             _segments[i].position = _segments[i - 1].position;
         }
 
+        // Calculate new head position
         float x = Mathf.Round(transform.position.x) + _direction.x;
         float y = Mathf.Round(transform.position.y) + _direction.y;
         transform.position = new Vector3(x, y, 0.0f);
 
+        // Check map boundaries
         if (Mathf.Abs(x) >= borderSize || Mathf.Abs(y) >= borderSize)
         {
             GameOver();
@@ -83,7 +165,7 @@ public class CyberWorm : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Ignore hitting our own tail if it just spawned
+        // Hit Self
         if (other.CompareTag("Player"))
         {
             if (_segments.Contains(other.transform))
@@ -92,17 +174,22 @@ public class CyberWorm : MonoBehaviour
             }
             GameOver();
         }
+        // Hit Obstacle
         else if (other.CompareTag("Obstacle"))
         {
             GameOver();
         }
+        // Hit Food
         else if (other.CompareTag("Food"))
         {
+            if (eatSound != null) GetComponent<AudioSource>().PlayOneShot(eatSound);
+
             for (int i = 0; i < growthAmount; i++) { Grow(); }
 
             Destroy(other.gameObject);
             SpawnFood();
 
+            // Update Score
             if (_isSabotageMode) _enemyScore -= 10;
             else _myScore += 10;
 
@@ -113,20 +200,17 @@ public class CyberWorm : MonoBehaviour
     private void Grow()
     {
         GameObject segment = Instantiate(bodyPrefab);
+        segment.transform.SetParent(bodyFolder); // Clean hierarchy
 
         Vector3 spawnPos;
-        if (_segments.Count == 1)
-            spawnPos = _segments[0].position - (Vector3)_direction;
-        else
-            spawnPos = _segments[_segments.Count - 1].position;
+        if (_segments.Count == 1) spawnPos = _segments[0].position - (Vector3)_direction;
+        else spawnPos = _segments[_segments.Count - 1].position;
 
         segment.transform.position = spawnPos;
         segment.tag = "Player";
-
-        // SCALE CHANGE: Set body to 0.9 (Big Square)
         segment.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
 
-        // FIX APPLIED HERE: Use Color.white to keep original sprite colors
+        // Color based on mode
         Color modeColor = _isSabotageMode ? Color.red : Color.white;
         segment.GetComponent<SpriteRenderer>().color = modeColor;
 
@@ -142,7 +226,7 @@ public class CyberWorm : MonoBehaviour
         Vector3 pos = GetRandomPos();
         GameObject f = Instantiate(foodPrefab, pos, Quaternion.identity);
         f.tag = "Food";
-        // SCALE CHANGE: Set food to 0.9
+        f.transform.SetParent(itemFolder);
         f.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
     }
 
@@ -151,7 +235,7 @@ public class CyberWorm : MonoBehaviour
         Vector3 pos = GetRandomPos();
         GameObject o = Instantiate(obstaclePrefab, pos, Quaternion.identity);
         o.tag = "Obstacle";
-        // SCALE CHANGE: Set obstacle to 0.9
+        o.transform.SetParent(itemFolder);
         o.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
     }
 
@@ -159,7 +243,6 @@ public class CyberWorm : MonoBehaviour
     {
         if (wallPrefab == null) return;
 
-        // Logic changed to Integers so walls line up perfectly with 0.9 scale
         for (int x = -borderSize; x <= borderSize; x++)
         {
             CreateWall(x, borderSize);
@@ -176,7 +259,7 @@ public class CyberWorm : MonoBehaviour
     {
         GameObject w = Instantiate(wallPrefab, new Vector3(x, y, 0), Quaternion.identity);
         w.tag = "Obstacle";
-        // SCALE CHANGE: Set wall to 0.9
+        w.transform.SetParent(wallFolder);
         w.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
     }
 
@@ -190,7 +273,6 @@ public class CyberWorm : MonoBehaviour
 
     private void UpdateUI()
     {
-        // FIX APPLIED HERE: Use Color.white so the Green Bug isn't tinted neon green
         GetComponent<SpriteRenderer>().color = _isSabotageMode ? Color.red : Color.white;
 
         if (scoreText != null) scoreText.text = "BLUE: " + _myScore + " | RED: " + _enemyScore;
@@ -200,7 +282,13 @@ public class CyberWorm : MonoBehaviour
     private void GameOver()
     {
         _isAlive = false;
+        _isGameOver = true;
+
         CancelInvoke();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        if (crashSound != null) GetComponent<AudioSource>().PlayOneShot(crashSound);
+
+        Time.timeScale = 0; // Freeze everything
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
     }
 }
