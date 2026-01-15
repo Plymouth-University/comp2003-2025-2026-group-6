@@ -1,55 +1,146 @@
-/* RETRO DYNAMIC LAYOUT */
+/* --- GLOBAL PAGE SETTINGS --- */
 body {
-    background-color: #1a2a6c; /* Dark Blue background */
-    color: white;
-    font-family: 'Courier New', Courier, monospace;
+    background-color: #1a2a6c; /* Deep Blue Background */
+    color: #333;
+    font-family: 'Verdana', sans-serif;
     margin: 0;
+    /* Flexbox centering for the whole page */
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
 }
 
+/* --- HEADER BAR --- */
 header {
     width: 100%;
-    background: #4b0082; /* Purple header */
-    text-align: center;
-    border-bottom: 4px solid #b31de1;
+    background: #6a0dad; /* Purple */
+    text-align: left;
+    padding: 15px 40px;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+    border-bottom: 4px solid #b31de1; /* Neon accent */
+    color: white;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.5);
 }
 
+h1 {
+    margin: 0;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* --- MAIN LAYOUT (Game + Sidebar) --- */
+/* This forces the side-by-side layout */
 .main-layout {
-    display: flex;
-    flex-direction: row; /* Game left, Sidebar right */
-    gap: 30px;
-    padding: 40px;
+    display: flex !important;
+    flex-direction: row !important; /* Forces horizontal alignment */
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 20px; /* Space between game and sidebar */
+    padding: 20px;
+    width: auto !important;
 }
 
-/* THE GAME WINDOW */
+/* --- UNITY GAME WINDOW OVERRIDES --- */
 #unity-container {
-    border: 8px solid #b31de1; /* Neon Purple Border */
-    box-shadow: 0 0 20px #b31de1;
+    /* These !important tags override Unity's default centering code */
+    position: static !important; 
+    width: 960px !important;
+    height: 600px !important;
+    border: 5px solid black;
+    background: black;
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.5); /* Retro Hard Shadow */
+    margin: 0 !important;
+    transform: none !important;
 }
 
-/* THE SIDEBAR PANELS */
+/* --- SIDEBAR CONTAINER --- */
 .sidebar {
+    width: 260px;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    width: 300px;
+    z-index: 10;
 }
 
+/* --- UI PANELS (Match Controls / Leaderboard) --- */
 .panel {
-    background-color: #e0f0ff; /* Light Blue Panels */
-    border: 4px solid black;
-    color: black;
-    padding: 15px;
+    background: #e0f7fa; /* Cyan/Light Blue */
+    border: 3px solid black;
+    box-shadow: 5px 5px 0px rgba(0,0,0,0.4);
 }
 
-.retro-btn {
-    background: #90ee90; /* Green Buttons */
-    border: 3px solid black;
-    font-weight: bold;
+.panel h3 {
+    background: #6a0dad; /* Purple Header inside panels */
+    color: white;
+    margin: 0;
     padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-bottom: 3px solid black;
+}
+
+.panel-content {
+    padding: 15px;
+    text-align: center;
+}
+
+/* --- RETRO BUTTONS --- */
+.retro-btn {
     width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid black;
+    font-weight: bold;
+    font-family: 'Verdana', sans-serif;
+    font-size: 14px;
     cursor: pointer;
-    margin-bottom: 5px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 0px black;
+    transition: transform 0.1s;
+}
+
+.retro-btn:active {
+    transform: translate(2px, 2px); /* Click effect */
+    box-shadow: 1px 1px 0px black;
+}
+
+/* Specific Button Colors */
+.start {
+    background-color: #90ee90; /* Retro Green */
+}
+
+.reset {
+    background-color: #ffcccb; /* Retro Pink/Red */
+}
+
+/* --- LEADERBOARD LIST --- */
+ol {
+    text-align: left;
+    padding-left: 25px;
+    margin: 0;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* --- STAMINA BAR --- */
+.stamina-bar {
+    width: 100%;
+    height: 15px;
+    background: #555;
+    border: 2px solid black;
+    margin-top: 10px;
+    position: relative;
+}
+
+.fill {
+    width: 70%;
+    height: 100%;
+    background: #76c7c0; /* Teal fill */
+    display: block;
 }
