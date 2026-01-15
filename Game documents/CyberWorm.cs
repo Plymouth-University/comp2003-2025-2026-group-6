@@ -29,14 +29,15 @@ public class CyberWorm : MonoBehaviour
     public AudioClip switchSound;
 
     // --- STATE ---
-    private Vector2 _direction = Vector2.right;
+    private Vector2 _direction = Vector2.right; // Pending direction change
+    private Vector2 _lastMovedDir = Vector2.right; // Fixes the 180-turn death bug
     private List<Transform> _segments = new List<Transform>();
 
     // Game Flow Flags
     private bool _isAlive = true;
     private bool _isGameOver = false;
-    private bool _inMenu = true;        // True = Showing Start Screen
-    private bool _hasStartedMoving = false; // True = Player pressed WASD
+    private bool _inMenu = true;
+    private bool _hasStartedMoving = false;
 
     // Folders for hierarchy organization
     private Transform wallFolder;
@@ -47,6 +48,7 @@ public class CyberWorm : MonoBehaviour
     private bool _isSabotageMode = false;
     private int _myScore = 0;
     private int _enemyScore = 150;
+    private int _nextDifficultyScore = 50; // Score needed for next firewall
 
     private void Start()
     {
@@ -72,23 +74,18 @@ public class CyberWorm : MonoBehaviour
         SpawnObstacle();
         SpawnWalls();
         UpdateUI();
-
-        // NOTE: We do NOT start moving here anymore. We wait for WASD.
     }
 
     private void Update()
     {
-        // 1. MENU PHASE (Waiting for 'R')
+        // 1. MENU PHASE
         if (_inMenu)
         {
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                InitializeSystem();
-            }
-            return; // Stop here, don't read other inputs
+            if (Input.GetKeyDown(KeyCode.R)) InitializeSystem();
+            return;
         }
 
-        // 2. GAME OVER PHASE (Waiting for 'R')
+        // 2. GAME OVER PHASE
         if (_isGameOver)
         {
             if (Input.GetKeyDown(KeyCode.R))
@@ -99,7 +96,7 @@ public class CyberWorm : MonoBehaviour
             return;
         }
 
-        // 3. READY PHASE (Waiting for WASD to start moving)
+        // 3. READY PHASE (Wait for WASD)
         if (!_hasStartedMoving)
         {
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow) ||
@@ -108,21 +105,21 @@ public class CyberWorm : MonoBehaviour
                 Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
             {
                 _hasStartedMoving = true;
-                InvokeRepeating(nameof(Move), moveSpeed, moveSpeed); // Start the loop
+                InvokeRepeating(nameof(Move), moveSpeed, moveSpeed);
             }
         }
 
-        // 4. INPUTS (Direction Control)
-        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && _direction != Vector2.down)
+        // 4. INPUTS (Now checks against _lastMovedDir to prevent suicide)
+        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && _lastMovedDir != Vector2.down)
             _direction = Vector2.up;
-        else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && _direction != Vector2.up)
+        else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && _lastMovedDir != Vector2.up)
             _direction = Vector2.down;
-        else if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && _direction != Vector2.right)
+        else if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && _lastMovedDir != Vector2.right)
             _direction = Vector2.left;
-        else if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && _direction != Vector2.left)
+        else if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && _lastMovedDir != Vector2.left)
             _direction = Vector2.right;
 
-        // Mode Toggle (Can be done even before moving)
+        // Mode Toggle
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _isSabotageMode = !_isSabotageMode;
@@ -131,13 +128,11 @@ public class CyberWorm : MonoBehaviour
         }
     }
 
-    // Called when player presses 'R' at the menu
     public void InitializeSystem()
     {
         _inMenu = false;
-        Time.timeScale = 1; // Unfreeze visuals
-
-        if (startMenuPanel != null) startMenuPanel.SetActive(false); // Hide Menu
+        Time.timeScale = 1;
+        if (startMenuPanel != null) startMenuPanel.SetActive(false);
         if (switchSound != null) GetComponent<AudioSource>().PlayOneShot(switchSound);
     }
 
@@ -145,16 +140,19 @@ public class CyberWorm : MonoBehaviour
     {
         if (!_isAlive) return;
 
-        // Move body parts to follow head
+        // Move body parts
         for (int i = _segments.Count - 1; i > 0; i--)
         {
             _segments[i].position = _segments[i - 1].position;
         }
 
-        // Calculate new head position
+        // Move head
         float x = Mathf.Round(transform.position.x) + _direction.x;
         float y = Mathf.Round(transform.position.y) + _direction.y;
         transform.position = new Vector3(x, y, 0.0f);
+
+        // Update the 'safe' direction for input checks
+        _lastMovedDir = _direction;
 
         // Check map boundaries
         if (Mathf.Abs(x) >= borderSize || Mathf.Abs(y) >= borderSize)
@@ -189,9 +187,16 @@ public class CyberWorm : MonoBehaviour
             Destroy(other.gameObject);
             SpawnFood();
 
-            // Update Score
+            // Score Logic
             if (_isSabotageMode) _enemyScore -= 10;
             else _myScore += 10;
+
+            // Difficulty Logic: Add Firewall every 50 points
+            if (_myScore >= _nextDifficultyScore)
+            {
+                SpawnObstacle(); // Add extra firewall
+                _nextDifficultyScore += 50; // Set next target
+            }
 
             UpdateUI();
         }
@@ -200,7 +205,7 @@ public class CyberWorm : MonoBehaviour
     private void Grow()
     {
         GameObject segment = Instantiate(bodyPrefab);
-        segment.transform.SetParent(bodyFolder); // Clean hierarchy
+        segment.transform.SetParent(bodyFolder);
 
         Vector3 spawnPos;
         if (_segments.Count == 1) spawnPos = _segments[0].position - (Vector3)_direction;
@@ -210,7 +215,6 @@ public class CyberWorm : MonoBehaviour
         segment.tag = "Player";
         segment.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
 
-        // Color based on mode
         Color modeColor = _isSabotageMode ? Color.red : Color.white;
         segment.GetComponent<SpriteRenderer>().color = modeColor;
 
@@ -260,7 +264,8 @@ public class CyberWorm : MonoBehaviour
         GameObject w = Instantiate(wallPrefab, new Vector3(x, y, 0), Quaternion.identity);
         w.tag = "Obstacle";
         w.transform.SetParent(wallFolder);
-        w.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
+        // Slightly smaller scale to fix "Crowded" look
+        w.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
     }
 
     private Vector3 GetRandomPos()
@@ -288,7 +293,7 @@ public class CyberWorm : MonoBehaviour
 
         if (crashSound != null) GetComponent<AudioSource>().PlayOneShot(crashSound);
 
-        Time.timeScale = 0; // Freeze everything
+        Time.timeScale = 0;
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
     }
 }
