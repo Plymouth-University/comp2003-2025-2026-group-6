@@ -29,8 +29,8 @@ public class CyberWorm : MonoBehaviour
     public AudioClip switchSound;
 
     // --- STATE ---
-    private Vector2 _direction = Vector2.right; // Pending direction change
-    private Vector2 _lastMovedDir = Vector2.right; // Fixes the 180-turn death bug
+    private Vector2 _direction = Vector2.right;
+    private Vector2 _lastMovedDir = Vector2.right;
     private List<Transform> _segments = new List<Transform>();
 
     // Game Flow Flags
@@ -48,7 +48,9 @@ public class CyberWorm : MonoBehaviour
     private bool _isSabotageMode = false;
     private int _myScore = 0;
     private int _enemyScore = 150;
-    private int _nextDifficultyScore = 50; // Score needed for next firewall
+
+    // New Difficulty Logic
+    private int _itemsCollected = 0; // Counts total files eaten
 
     private void Start()
     {
@@ -109,7 +111,7 @@ public class CyberWorm : MonoBehaviour
             }
         }
 
-        // 4. INPUTS (Now checks against _lastMovedDir to prevent suicide)
+        // 4. INPUTS
         if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && _lastMovedDir != Vector2.down)
             _direction = Vector2.up;
         else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && _lastMovedDir != Vector2.up)
@@ -151,7 +153,6 @@ public class CyberWorm : MonoBehaviour
         float y = Mathf.Round(transform.position.y) + _direction.y;
         transform.position = new Vector3(x, y, 0.0f);
 
-        // Update the 'safe' direction for input checks
         _lastMovedDir = _direction;
 
         // Check map boundaries
@@ -185,19 +186,21 @@ public class CyberWorm : MonoBehaviour
             for (int i = 0; i < growthAmount; i++) { Grow(); }
 
             Destroy(other.gameObject);
-            SpawnFood();
+
+            // Increment total items collected
+            _itemsCollected++;
 
             // Score Logic
             if (_isSabotageMode) _enemyScore -= 10;
             else _myScore += 10;
 
-            // Difficulty Logic: Add Firewall every 50 points
-            if (_myScore >= _nextDifficultyScore)
+            // Difficulty Logic: Add Firewall every 5 items collected
+            if (_itemsCollected > 0 && _itemsCollected % 5 == 0)
             {
-                SpawnObstacle(); // Add extra firewall
-                _nextDifficultyScore += 50; // Set next target
+                SpawnObstacle();
             }
 
+            SpawnFood();
             UpdateUI();
         }
     }
@@ -225,9 +228,11 @@ public class CyberWorm : MonoBehaviour
         _segments.Add(segment.transform);
     }
 
+    // --- SPAWNING LOGIC (Updated to check for empty space) ---
+
     private void SpawnFood()
     {
-        Vector3 pos = GetRandomPos();
+        Vector3 pos = GetSafeRandomPos(); // Uses new safe checker
         GameObject f = Instantiate(foodPrefab, pos, Quaternion.identity);
         f.tag = "Food";
         f.transform.SetParent(itemFolder);
@@ -236,11 +241,38 @@ public class CyberWorm : MonoBehaviour
 
     private void SpawnObstacle()
     {
-        Vector3 pos = GetRandomPos();
+        Vector3 pos = GetSafeRandomPos(); // Uses new safe checker
         GameObject o = Instantiate(obstaclePrefab, pos, Quaternion.identity);
         o.tag = "Obstacle";
         o.transform.SetParent(itemFolder);
         o.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
+    }
+
+    // New function that retries if the position is inside the worm
+    private Vector3 GetSafeRandomPos()
+    {
+        int attempts = 0;
+        bool isSafe = false;
+        Vector3 potentialPos = Vector3.zero;
+
+        while (!isSafe && attempts < 50)
+        {
+            potentialPos = GetRandomPos();
+            isSafe = true;
+
+            // Check if this position hits any body part
+            foreach (Transform part in _segments)
+            {
+                if (Mathf.Round(part.position.x) == potentialPos.x &&
+                    Mathf.Round(part.position.y) == potentialPos.y)
+                {
+                    isSafe = false;
+                    break;
+                }
+            }
+            attempts++;
+        }
+        return potentialPos;
     }
 
     private void SpawnWalls()
@@ -264,7 +296,6 @@ public class CyberWorm : MonoBehaviour
         GameObject w = Instantiate(wallPrefab, new Vector3(x, y, 0), Quaternion.identity);
         w.tag = "Obstacle";
         w.transform.SetParent(wallFolder);
-        // Slightly smaller scale to fix "Crowded" look
         w.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
     }
 
