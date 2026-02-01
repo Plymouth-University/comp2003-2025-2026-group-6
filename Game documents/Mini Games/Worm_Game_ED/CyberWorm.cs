@@ -50,7 +50,7 @@ public class CyberWorm : MonoBehaviour
     private int _enemyScore = 150;
 
     // New Difficulty Logic
-    private int _itemsCollected = 0; // Counts total files eaten
+    private int _itemsCollected = 0;
 
     private void Start()
     {
@@ -111,7 +111,7 @@ public class CyberWorm : MonoBehaviour
             }
         }
 
-        // 4. INPUTS
+        // 4. INPUTS (Checks against last moved direction to prevent instant death)
         if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && _lastMovedDir != Vector2.down)
             _direction = Vector2.up;
         else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && _lastMovedDir != Vector2.up)
@@ -228,11 +228,11 @@ public class CyberWorm : MonoBehaviour
         _segments.Add(segment.transform);
     }
 
-    // --- SPAWNING LOGIC (Updated to check for empty space) ---
+    // --- SPAWNING LOGIC ---
 
     private void SpawnFood()
     {
-        Vector3 pos = GetSafeRandomPos(); // Uses new safe checker
+        Vector3 pos = GetSafeRandomPos();
         GameObject f = Instantiate(foodPrefab, pos, Quaternion.identity);
         f.tag = "Food";
         f.transform.SetParent(itemFolder);
@@ -241,26 +241,26 @@ public class CyberWorm : MonoBehaviour
 
     private void SpawnObstacle()
     {
-        Vector3 pos = GetSafeRandomPos(); // Uses new safe checker
+        Vector3 pos = GetSafeRandomPos();
         GameObject o = Instantiate(obstaclePrefab, pos, Quaternion.identity);
         o.tag = "Obstacle";
         o.transform.SetParent(itemFolder);
         o.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
     }
 
-    // New function that retries if the position is inside the worm
+    // Prevents spawning items on top of the player or firewalls
     private Vector3 GetSafeRandomPos()
     {
         int attempts = 0;
         bool isSafe = false;
         Vector3 potentialPos = Vector3.zero;
 
-        while (!isSafe && attempts < 50)
+        while (!isSafe && attempts < 100)
         {
             potentialPos = GetRandomPos();
             isSafe = true;
 
-            // Check if this position hits any body part
+            // Check if spot is inside worm body
             foreach (Transform part in _segments)
             {
                 if (Mathf.Round(part.position.x) == potentialPos.x &&
@@ -270,6 +270,14 @@ public class CyberWorm : MonoBehaviour
                     break;
                 }
             }
+
+            // Check if spot is occupied by a Firewall or Wall
+            Collider2D overlap = Physics2D.OverlapCircle(potentialPos, 0.2f);
+            if (overlap != null && overlap.CompareTag("Obstacle"))
+            {
+                isSafe = false;
+            }
+
             attempts++;
         }
         return potentialPos;
