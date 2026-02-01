@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PLYM CTF | HOST LOBBY</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific Styles for the Lobby Layout */
+        .lobby-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 800px;
+        }
+
+        .game-info {
+            background: #6a0dad;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border: 3px solid black;
+            box-shadow: 5px 5px 0 black;
+        }
+
+        .teams-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .team-panel {
+            flex: 1;
+            min-height: 300px;
+        }
+
+        .team-header {
+            background: black;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .team-a .team-header { color: #00ff41; border-bottom: 4px solid #00ff41; }
+        .team-b .team-header { color: #ff3333; border-bottom: 4px solid #ff3333; }
+
+        .player-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        .player-list li {
+            padding: 10px;
+            border-bottom: 2px solid black;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .role-badge {
+            background: white;
+            color: black;
+            padding: 2px 5px;
+            font-size: 10px;
+            border: 1px solid black;
+        }
+
+        .start-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #d6eef5;
+            border: 3px solid black;
+            padding: 20px;
+        }
+        
+        .user-count { font-weight: bold; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <div class="retro-header">
+        <div class="header-accents">///</div>
+        <h1>TEACHER CONTROL DECK</h1>
+        <div class="header-accents">///</div>
+    </div>
+
+    <div class="lobby-container">
+        
+        <div class="game-info">
+            <h2>GAME PIN: <span style="color:#00ff41">839-104</span></h2>
+            <p>STATUS: LOBBY OPEN // WAITING FOR PLAYERS</p>
+        </div>
+
+        <div class="teams-wrapper">
+            
+            <div class="panel team-panel team-a">
+                <div class="team-header">TEAM A (ATTACK)</div>
+                <ul class="player-list">
+                    <li>PLAYER_1 <span class="role-badge">HACKER</span></li>
+                    <li>PLAYER_2 <span class="role-badge">SCOUT</span></li>
+                    <li>PLAYER_3 <span class="role-badge">HACKER</span></li>
+                    </ul>
+            </div>
+
+            <div class="panel team-panel team-b">
+                <div class="team-header">TEAM B (DEFEND)</div>
+                <ul class="player-list">
+                    <li>PLAYER_4 <span class="role-badge">SYSADMIN</span></li>
+                    <li>PLAYER_5 <span class="role-badge">FIREWALL</span></li>
+                    <li>PLAYER_6 <span class="role-badge">SYSADMIN</span></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="start-section">
+            <div class="user-count">USERS: 6/30</div>
+            
+            <a href="#" class="btn-start" style="width: 200px;">INITIATE MATCH</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

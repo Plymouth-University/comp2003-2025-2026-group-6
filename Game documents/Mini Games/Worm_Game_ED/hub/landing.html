@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PLYM CTF | SYSTEM ENTRY</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .split-container {
+            display: flex;
+            gap: 50px;
+        }
+        .choice-card {
+            width: 300px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .choice-card:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="retro-header">
+        <h1>SYSTEM ENTRY PORTAL</h1>
+    </div>
+
+    <div class="split-container">
+        
+        <div class="panel choice-card">
+            <h2>STUDENT</h2>
+            <p>JOIN AN EXISTING SESSION</p>
+            <br>
+            <a href="index.html" class="btn-start">ENTER PIN</a>
+        </div>
+
+        <div class="panel choice-card">
+            <h2>TEACHER</h2>
+            <p>MANAGE CLASSROOM & HOST</p>
+            <br>
+            <a href="teacher_lobby.html" class="btn-start" style="background:#ffcccb">HOST LOGIN</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

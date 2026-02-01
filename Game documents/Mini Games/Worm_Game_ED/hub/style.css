@@ -1,0 +1,120 @@
+/* GLOBAL SETTINGS - Matches your "Purple/Blue" Theme */
+body {
+    background-color: #383cc1; /* The Retro Blue/Purple from your screenshot */
+    font-family: 'Verdana', sans-serif; /* Cleaner font */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    border: 10px solid #6a0dad; /* Purple Frame */
+    box-sizing: border-box;
+}
+
+/* HEADER BAR */
+.retro-header {
+    width: 100%;
+    background: #6a0dad;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+    border-bottom: 5px solid white;
+    position: absolute;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 50px;
+    box-sizing: border-box;
+}
+
+.retro-header h1 {
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 3px 3px 0px #000;
+}
+
+.header-accents {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+/* LAYOUT CONTAINER */
+.main-container {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+/* PANELS (The Light Blue Boxes) */
+.panel {
+    background: #d6eef5; /* That retro light blue color */
+    border: 4px solid black;
+    padding: 30px;
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.5); /* Hard Retro Shadow */
+    text-align: center;
+}
+
+.login-box {
+    width: 350px;
+}
+
+.side-panel {
+    width: 250px;
+}
+
+h2 {
+    margin-top: 0;
+    text-transform: uppercase;
+    border-bottom: 3px solid black;
+    padding-bottom: 10px;
+    font-size: 18px;
+}
+
+/* INPUT FIELD */
+.retro-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    text-align: center;
+    border: 3px solid black;
+    margin-bottom: 20px;
+    font-family: 'Courier New', monospace;
+    box-sizing: border-box;
+}
+
+/* BUTTON */
+.btn-start {
+    display: block;
+    width: 100%;
+    background: #00ff41; /* Start Green */
+    color: black;
+    padding: 15px 0;
+    font-weight: bold;
+    font-size: 20px;
+    text-decoration: none;
+    border: 3px solid black;
+    box-shadow: 5px 5px 0px black;
+    transition: transform 0.1s;
+}
+
+.btn-start:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px black;
+}
+
+/* LIST STYLES */
+ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 2;
+}
+
+.team-a { color: green; }
+.team-b { color: red; }
+.status { font-size: 12px; margin-top: 20px; font-weight: bold; }
