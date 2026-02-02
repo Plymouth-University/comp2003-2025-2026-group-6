@@ -3,79 +3,48 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Capture the Flag – Working Prototype</title>
+  <title>Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="tabs">
+      <div class="tabs" aria-hidden="true">
         <span></span><span></span><span></span><span></span>
       </div>
-      <div class="windowBtns">
+      <div class="windowBtns" aria-hidden="true">
         <i></i><i></i><i></i>
       </div>
     </header>
 
     <main class="screen">
       <section class="hero">
-        <div class="flagIcon"></div>
+        <img src="flag.png" class="flagIcon" alt="Flag icon">
+
         <div class="title">
-          <div class="title-outline">CAPTURE<br/>THE FLAG!</div>
-          <div class="title-main">CAPTURE<br/>THE FLAG!</div>
-        </div>
-
-        <div class="controls">
-          <button id="startBtn">Start</button>
-          <button id="resetBtn">Reset</button>
-          <div class="timer">Time: <span id="timeLeft">60</span>s</div>
-          <div class="target">First to <span id="targetScore">5</span></div>
-          
-          <div class="staminaWrap">
-            Stamina:
-            <progress id="stamina" value="100" max="100"></progress>
+          <div class="title-outline">CAPTURE THE<br>FLAG!</div>
+          <div class="title-main">CAPTURE THE<br>FLAG!</div>
         </div>
       </section>
 
-      <section class="content">
-        <div class="cards">
-          <div class="card">
-            <div class="cardTitle teamA">Team A</div>
-            <div class="scoreRow">Score: <span id="scoreA">0</span></div>
-            <div class="cardBody">
-              <p class="hint">Controls: Arrow keys</p>
-              <p class="hint">Goal: touch the flag</p>
-            </div>
-          </div>
+      <section class="welcomeCard">
+        <p class="hint welcomeText">
+          Steal the flag and return to base.<br>
+          Ready to play?
+        </p>
 
-          <div class="card">
-            <div class="cardTitle teamB">Team B</div>
-            <div class="scoreRow">Score: <span id="scoreB">0</span></div>
-            <div class="cardBody">
-              <p class="hint">Auto opponent: scores randomly</p>
-              <p class="hint">(demo behaviour)</p>
-            </div>
-          </div>
+        <div class="welcomeControls">
+          <button id="startBtn" class="startBig">Start</button>
         </div>
-
-        <aside class="leaderboard">
-          <div class="lbTitle">LEADERBOARD</div>
-          <ol class="lbList" id="lbList">
-            <li><span class="crown">👑</span> Aarju – <span data-player="Aarju">0</span></li>
-            <li>BotB – <span data-player="BotB">0</span></li>
-          </ol>
-        </aside>
-      </section>
-
-      <!-- GAME AREA -->
-      <section class="gameWrap">
-        <div class="gameHeader">Game Area (Playable Prototype)</div>
-        <canvas id="game" width="900" height="420"></canvas>
-        <div class="status" id="status">Press Start to begin.</div>
       </section>
     </main>
   </div>
 
-  <script src="game.js"></script>
+  <script>
+    document.getElementById("startBtn").addEventListener("click", () => {
+      window.location.href = "game.html";
+    });
+  </script>
 </body>
 </html>
