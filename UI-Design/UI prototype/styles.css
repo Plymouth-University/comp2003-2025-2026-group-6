@@ -157,3 +157,9 @@ button{
 .startBig{
   font-size: 20px;
 }
+
+.gameWrap       { max-width: 900px; margin: 0 auto; text-align: center; color: white; }
+.gameHeader     { font-size: 1.4em; margin: 20px 0; }
+.gameControls   { margin: 10px 0; }
+.gameControls button { margin: 0 8px; }
+.gameInfo       { margin-top: 15px; font-size: 1.1em; }
