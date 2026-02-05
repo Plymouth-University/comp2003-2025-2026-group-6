@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sign In – Capture the Flag</title>
+  <title>Log In – Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -21,16 +21,16 @@
     <main class="screen">
       <section class="welcomeCard">
         <h2 style="margin-top:0; font-size:32px; font-weight:900;">
-          Sign In
+          Log In
         </h2>
 
-        <form id="signinForm">
+        <form id="loginForm">
           <p class="welcomeText">Enter your player name</p>
 
           <input
             type="text"
-            id="playerName"
-            placeholder="Player name"
+            id="loginName"
+            placeholder="Your player name"
             required
             style="
               font-size:18px;
@@ -43,28 +43,33 @@
             "
           />
 
+          <!-- You can add password field later -->
+          <!-- <input type="password" placeholder="Password" style="..."> -->
+
           <button class="startBig" type="submit">
-            Enter Game
+            Log In
           </button>
         </form>
 
+        <!-- Link back to sign in / create account -->
         <p style="margin-top: 24px; font-size: 16px; color: #333;">
-          Already have an account? 
-          <a href="login.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Log in</a>
+          Don't have an account? 
+          <a href="signin.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Sign in</a>
         </p>
       </section>
     </main>
   </div>
 
   <script>
-    document.getElementById("signinForm").addEventListener("submit", (e) => {
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("playerName").value.trim();
+      const name = document.getElementById("loginName").value.trim();
       if (!name) return;
 
+      // For now: just use the name (same as sign in)
       localStorage.setItem("playerName", name);
-      window.location.href = "game.html";
+      window.location.href = "game.html";  // or wherever your game lives
     });
   </script>
 </body>

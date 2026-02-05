@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Game – Capture the Flag</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="tabs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="windowBtns" aria-hidden="true"><i></i><i></i><i></i></div>
+    </header>
+
+    <main class="screen">
+      <h2 style="text-align:center; color:white; margin:20px;">Capture the Flag</h2>
+      
+      <div style="text-align:center; color:white; margin:10px;">
+        Welcome, <strong id="playerNameDisplay">Player</strong>!
+      </div>
+
+      <div style="max-width:840px; margin:0 auto; padding:20px;">
+        <!-- Controls -->
+        <div style="margin-bottom:15px;">
+          <button id="startBtnGame">Start</button>
+          <button id="pauseBtn">Pause</button>
+          <button id="resetBtn">Reset</button>
+        </div>
+
+        <!-- Canvas -->
+        <canvas id="game" width="800" height="500" style="border:4px solid #000; background:#222;"></canvas>
+
+        <!-- Info -->
+        <div style="margin-top:15px; color:white; font-size:1.1em;">
+          <p>Time left: <span id="timeLeft">60</span>s</p>
+          <p id="status">Press Start to begin!</p>
+          <p>Team A: <span id="scoreA">0</span>  –  Team B: <span id="scoreB">0</span></p>
+          <p>Stamina: <progress id="stamina" max="100" value="100"></progress></p>
+          <p>Target score: <span id="targetScore">5</span></p>
+        </div>
+
+        <!-- Leaderboard bits your JS expects -->
+        <div style="display:none;">
+          <div data-player="Aarju">0</div>
+          <div data-player="BotB">0</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="game.js"></script>
+
+  <script>
+    // Show saved player name
+    const savedName = localStorage.getItem("playerName") || "Player";
+    document.getElementById("playerNameDisplay").textContent = savedName;
+  </script>
+</body>
+</html>

@@ -163,3 +163,15 @@ button{
 .gameControls   { margin: 10px 0; }
 .gameControls button { margin: 0 8px; }
 .gameInfo       { margin-top: 15px; font-size: 1.1em; }
+
+.welcomeCard p {
+  margin: 16px 0;
+}
+
+a {
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #4a1aa3 !important;
+}
