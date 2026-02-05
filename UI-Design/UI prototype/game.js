@@ -1,7 +1,13 @@
 const canvas = document.getElementById("game");
+
+if (!canvas) {
+  console.log("Game canvas not loaded yet");
+  return;
+}
+
 const ctx = canvas.getContext("2d");
 
-const startBtn = document.getElementById("startBtn");
+const startBtn = document.getElementById("startBtnGame");
 const resetBtn = document.getElementById("resetBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 
@@ -15,6 +21,7 @@ const lbB = document.querySelector('[data-player="BotB"]');
 
 const staminaEl = document.getElementById("stamina");
 const targetScoreEl = document.getElementById("targetScore");
+const playerName = localStorage.getItem("playerName") || "Player";
 
 let running = false;
 let paused = false;

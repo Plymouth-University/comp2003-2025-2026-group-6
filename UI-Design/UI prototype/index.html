@@ -19,31 +19,47 @@
     </header>
 
     <main class="screen">
-      <section class="hero">
-        <img src="flag.png" class="flagIcon" alt="Flag icon">
 
-        <div class="title">
-          <div class="title-outline">CAPTURE THE<br>FLAG!</div>
-          <div class="title-main">CAPTURE THE<br>FLAG!</div>
-        </div>
-      </section>
+      <!-- ===== WELCOME SCREEN ===== -->
+      <section id="welcomeScreen">
+        <section class="hero">
+          <img src="flag.png" class="flagIcon" alt="Flag icon">
+          
+          <div class="title">
+            <div class="title-outline">CAPTURE THE<br>FLAG!</div>
+            <div class="title-main">CAPTURE THE<br>FLAG!</div>
+          </div>
+        </section>
+        
+        <section class="welcomeCard">
+          <p class="hint welcomeText">
+            Steal the flag and return to base.<br>
+            Ready to play?
+          </p>
 
-      <section class="welcomeCard">
-        <p class="hint welcomeText">
-          Steal the flag and return to base.<br>
-          Ready to play?
-        </p>
+          <div class="welcomeControls">
+            <button id="startBtn" class="startBig">Start</button>
+          </div>
+        </section>
 
-        <div class="welcomeControls">
-          <button id="startBtn" class="startBig">Start</button>
-        </div>
-      </section>
-    </main>
-  </div>
+        <!-- ===== GAME SCREEN ===== -->
+        <section id="gameScreen" style="display:none;">
+          <div class="gameWrap">
+            <div class="gameHeader">
+              Welcome, <span id="playerNameDisplay"></span>
+            </div>
+
+            <canvas id="game"></canvas>
+
+            <div id="gameStatus"></div>
+          </div>
+        </section>
+      </main>
+    </div>
 
   <script>
     document.getElementById("startBtn").addEventListener("click", () => {
-      window.location.href = "game.html";
+      window.location.href = "signin.html";
     });
   </script>
 </body>
