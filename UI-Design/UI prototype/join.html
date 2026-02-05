@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Log In – Capture the Flag</title>
+  <title>Join Session – Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -21,55 +21,60 @@
     <main class="screen">
       <section class="welcomeCard">
         <h2 style="margin-top:0; font-size:32px; font-weight:900;">
-          Log In
+          Join Game Session
         </h2>
 
-        <form id="loginForm">
-          <p class="welcomeText">Enter your player name</p>
+        <p class="welcomeText" style="margin: 20px 0;">
+          Enter the PIN your teacher gave you
+        </p>
 
+        <form id="joinForm">
           <input
             type="text"
-            id="loginName"
-            placeholder="Your player name"
+            id="sessionPin"
+            placeholder="Session PIN (e.g. 123456)"
             required
+            maxlength="6"
             style="
-              font-size:18px;
-              padding:10px;
+              font-size:24px;
+              padding:15px;
               border:4px solid #000;
               width:100%;
               max-width:300px;
-              margin:10px auto;
+              margin:20px auto;
               display:block;
+              text-align:center;
+              letter-spacing: 4px;
             "
           />
 
-          <!-- You can add password field later -->
-          <!-- <input type="password" placeholder="Password" style="..."> -->
-
           <button class="startBig" type="submit">
-            Log In
+            Join Session
           </button>
         </form>
 
-        <!-- Link back to sign in / create account -->
         <p style="margin-top: 24px; font-size: 16px; color: #333;">
-          Don't have an account? 
-          <a href="signin.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Sign in</a>
+          <a href="signin.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Back to Sign In</a>
         </p>
       </section>
     </main>
   </div>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
+    document.getElementById("joinForm").addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("loginName").value.trim();
-      if (!name) return;
+      const pin = document.getElementById("sessionPin").value.trim();
+      if (!pin || pin.length < 4) {
+        alert("Please enter a valid PIN!");
+        return;
+      }
 
-      // For now: just use the name (same as sign in)
-      localStorage.setItem("playerName", name);
-      window.location.href = "join.html";  // or wherever your game lives
+      // Save PIN to localStorage (simple for now)
+      localStorage.setItem("sessionPin", pin);
+
+      // For now: just go to game (later validate against real sessions)
+      window.location.href = "game.html";
     });
   </script>
 </body>

@@ -20,6 +20,10 @@
         Welcome, <strong id="playerNameDisplay">Player</strong>!
       </div>
 
+      <div style="text-align:center; color:white; margin:10px; font-size:1.2em;">
+        Session PIN: <strong id="sessionPinDisplay">??????</strong>
+      </div>
+
       <div style="max-width:840px; margin:0 auto; padding:20px;">
         <!-- Controls -->
         <div style="margin-bottom:15px;">
@@ -32,15 +36,31 @@
         <canvas id="game" width="800" height="500" style="border:4px solid #000; background:#222;"></canvas>
 
         <!-- Info -->
-        <div style="margin-top:15px; color:white; font-size:1.1em;">
-          <p>Time left: <span id="timeLeft">60</span>s</p>
-          <p id="status">Press Start to begin!</p>
-          <p>Team A: <span id="scoreA">0</span>  –  Team B: <span id="scoreB">0</span></p>
-          <p>Stamina: <progress id="stamina" max="100" value="100"></progress></p>
-          <p>Target score: <span id="targetScore">5</span></p>
-        </div>
+        <div style="margin-top: 20px; padding: 15px; background: rgba(20, 20, 40, 0.7); border-radius: 10px; color: #e0f7ff; max-width: 800px; margin-left: auto; margin-right: auto;">
+        <p style="margin: 8px 0; font-size: 1.2em;">
+          Time left: <span id="timeLeft" style="color: #fffb99; font-weight: bold;">60</span>s
+        </p>
+        
+        <p id="status" style="color: #ffd700; font-weight: bold; font-size: 1.3em; margin: 12px 0;">
+          Press Start to begin!
+        </p>
+        
+        <p style="margin: 8px 0;">
+          Team A: <span id="scoreA" style="color: #00ff9d;">0</span> 
+          – Team B: <span id="scoreB" style="color: #ff5e5e;">0</span>
+        </p>
+        
+        <p style="margin: 12px 0;">
+          Stamina: 
+          <progress id="stamina" max="100" value="100" style="width: 220px; height: 18px;"></progress>
+        </p>
+        
+        <p style="margin: 8px 0;">
+          Target score: <span id="targetScore" style="color: #d19cff; font-weight: bold;">5</span>!
+        </p>
+      </div>
 
-        <!-- Leaderboard bits your JS expects -->
+
         <div style="display:none;">
           <div data-player="Aarju">0</div>
           <div data-player="BotB">0</div>
@@ -55,6 +75,11 @@
     // Show saved player name
     const savedName = localStorage.getItem("playerName") || "Player";
     document.getElementById("playerNameDisplay").textContent = savedName;
+
+    const pin = localStorage.getItem("sessionPin") || "N/A";
+    const pinDisplay = document.getElementById("sessionPinDisplay");
+    if (pinDisplay) pinDisplay.textContent = pin;
   </script>
+  
 </body>
 </html>

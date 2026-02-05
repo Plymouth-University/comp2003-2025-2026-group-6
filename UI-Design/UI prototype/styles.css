@@ -164,6 +164,56 @@ button{
 .gameControls button { margin: 0 8px; }
 .gameInfo       { margin-top: 15px; font-size: 1.1em; }
 
+.game-info-panel {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(15, 15, 35, 0.75);
+  border: 2px solid #444466;
+  border-radius: 12px;
+  color: #d0f0ff;
+  font-size: 1.15em;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.game-info-panel p {
+  margin: 10px 0;
+}
+
+.game-info-panel #timeLeft {
+  color: #ffeb3b;
+  font-weight: bold;
+}
+
+.game-info-panel #status {
+  color: #ffca28;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.game-info-panel #scoreA {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.game-info-panel #scoreB {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.game-info-panel #targetScore {
+  color: #ab47bc;
+  font-weight: bold;
+}
+
+progress#stamina {
+  width: 240px;
+  height: 20px;
+  accent-color: #40c4ff;  
+}
+
 .welcomeCard p {
   margin: 16px 0;
 }
