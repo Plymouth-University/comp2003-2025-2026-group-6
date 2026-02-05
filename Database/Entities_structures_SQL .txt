@@ -1,0 +1,214 @@
+
+-- =========================================================
+-- 1) USERS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS users (
+  user_id        BIGSERIAL PRIMARY KEY,
+  username       VARCHAR(50)  NOT NULL UNIQUE,
+  password_hash  TEXT         NOT NULL,
+  role           VARCHAR(20)  NOT NULL CHECK (role IN ('student', 'teacher', 'admin')),
+  created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  last_login_at  TIMESTAMPTZ
+);
+
+-- =========================================================
+-- 2) ROOMS (LOBBY)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS rooms (
+  room_id       BIGSERIAL PRIMARY KEY,
+  host_user_id  BIGINT      NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+  join_code     VARCHAR(20) NOT NULL UNIQUE,
+  status        VARCHAR(20) NOT NULL CHECK (status IN ('open', 'in_game', 'closed')),
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  settings_json JSONB
+);
+
+CREATE INDEX IF NOT EXISTS idx_rooms_host_user_id ON rooms(host_user_id);
+
+-- =========================================================
+-- 3) ROOM MEMBERSHIPS (User <-> Room)
+--    (Tracks who is/was in a room; no team assignment here)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS room_memberships (
+  room_id       BIGINT      NOT NULL REFERENCES rooms(room_id) ON DELETE CASCADE,
+  user_id       BIGINT      NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  room_role_id  VARCHAR(50),
+  joined_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  left_at       TIMESTAMPTZ,
+
+  PRIMARY KEY (room_id, user_id),
+  CONSTRAINT chk_room_membership_times CHECK (left_at IS NULL OR left_at >= joined_at)
+);
+
+CREATE INDEX IF NOT EXISTS idx_room_memberships_user_id ON room_memberships(user_id);
+
+-- =========================================================
+-- 4) MATCHES (GAME SESSIONS)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS matches (
+  match_id        BIGSERIAL PRIMARY KEY,
+  room_id         BIGINT      NOT NULL REFERENCES rooms(room_id) ON DELETE CASCADE,
+  started_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ended_at        TIMESTAMPTZ,
+  winning_team_id BIGINT, -- FK added after teams table exists
+
+  CONSTRAINT chk_match_times CHECK (ended_at IS NULL OR ended_at >= started_at)
+);
+
+CREATE INDEX IF NOT EXISTS idx_matches_room_id ON matches(room_id);
+CREATE INDEX IF NOT EXISTS idx_matches_started_at ON matches(started_at);
+
+-- =========================================================
+-- 5) TEAMS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS teams (
+  team_id     BIGSERIAL PRIMARY KEY,
+  match_id    BIGINT      NOT NULL REFERENCES matches(match_id) ON DELETE CASCADE,
+  team_name   VARCHAR(50) NOT NULL,
+  final_score INT         NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_teams_match_id ON teams(match_id);
+
+-- Add the FK for winning_team_id now that teams exists
+ALTER TABLE matches
+  ADD CONSTRAINT fk_matches_winning_team
+  FOREIGN KEY (winning_team_id) REFERENCES teams(team_id)
+  ON DELETE SET NULL;
+
+-- =========================================================
+-- 6) TEAM MEMBERS (Option A)
+--    (Assign users to teams per match via team_id -> teams)
+-- =========================================================
+CREATE TABLE team_members (
+  team_id      BIGINT      NOT NULL REFERENCES teams(team_id) ON DELETE CASCADE,
+  match_id     BIGINT      NOT NULL REFERENCES matches(match_id) ON DELETE CASCADE,
+  user_id      BIGINT      NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  team_role_id VARCHAR(50),
+  assigned_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  PRIMARY KEY (team_id, user_id),
+
+  -- 🔒 Core constraint: user cannot join multiple teams in the same match
+  CONSTRAINT uq_team_members_match_user UNIQUE (match_id, user_id)
+);
+
+CREATE INDEX idx_team_members_user_id ON team_members(user_id);
+CREATE INDEX idx_team_members_match_id ON team_members(match_id);
+-- =========================================================
+-- 7) QUESTION SETS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS question_sets (
+  question_set_id    BIGSERIAL PRIMARY KEY,
+  created_by_user_id BIGINT      NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+  topic              VARCHAR(100),
+  difficulty_policy  VARCHAR(50),
+  generated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  source             VARCHAR(30) -- e.g. ai_generated, teacher_custom
+);
+
+CREATE INDEX IF NOT EXISTS idx_question_sets_created_by ON question_sets(created_by_user_id);
+
+-- =========================================================
+-- 8) QUESTIONS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS questions (
+  question_id     BIGSERIAL PRIMARY KEY,
+  question_set_id BIGINT NOT NULL REFERENCES question_sets(question_set_id) ON DELETE CASCADE,
+  question_text   TEXT   NOT NULL,
+  answer_key      TEXT   NOT NULL,
+  options_json    JSONB,
+  explanation     TEXT,
+  tags_json       JSONB
+);
+
+CREATE INDEX IF NOT EXISTS idx_questions_question_set_id ON questions(question_set_id);
+
+-- =========================================================
+-- 9) QUESTION ATTEMPTS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS question_attempts (
+  attempt_id      BIGSERIAL PRIMARY KEY,
+  match_id        BIGINT      NOT NULL REFERENCES matches(match_id) ON DELETE CASCADE,
+  user_id         BIGINT      NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  question_id     BIGINT      NOT NULL REFERENCES questions(question_id) ON DELETE RESTRICT,
+  selected_answer TEXT,
+  is_correct      BOOLEAN     NOT NULL,
+  points_awarded  INT         NOT NULL DEFAULT 0,
+  started_at      TIMESTAMPTZ,
+  answered_at     TIMESTAMPTZ,
+
+  CONSTRAINT chk_attempt_times CHECK (
+    answered_at IS NULL OR started_at IS NULL OR answered_at >= started_at
+  )
+);
+
+CREATE INDEX IF NOT EXISTS idx_question_attempts_match_id ON question_attempts(match_id);
+CREATE INDEX IF NOT EXISTS idx_question_attempts_user_id ON question_attempts(user_id);
+CREATE INDEX IF NOT EXISTS idx_question_attempts_question_id ON question_attempts(question_id);
+
+-- =========================================================
+-- 10) MINIGAME RESULTS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS minigame_results (
+  result_id      BIGSERIAL PRIMARY KEY,
+  match_id       BIGINT      NOT NULL REFERENCES matches(match_id) ON DELETE CASCADE,
+  user_id        BIGINT      NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  minigame_type  VARCHAR(50) NOT NULL,
+  outcome        VARCHAR(50) NOT NULL,
+  points_awarded INT         NOT NULL DEFAULT 0,
+  played_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_minigame_results_match_id ON minigame_results(match_id);
+CREATE INDEX IF NOT EXISTS idx_minigame_results_user_id ON minigame_results(user_id);
+
+-- =========================================================
+-- 11) POWERUP EVENTS
+--    Supports: user-triggered and team-based powerups
+-- =========================================================
+CREATE TABLE IF NOT EXISTS powerup_events (
+  event_id        BIGSERIAL PRIMARY KEY,
+  match_id        BIGINT      NOT NULL REFERENCES matches(match_id) ON DELETE CASCADE,
+  user_id         BIGINT      REFERENCES users(user_id) ON DELETE SET NULL,
+  source_team_id  BIGINT      REFERENCES teams(team_id) ON DELETE SET NULL,
+  target_team_id  BIGINT      REFERENCES teams(team_id) ON DELETE SET NULL,
+  powerup_type    VARCHAR(50) NOT NULL,
+  applied_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at      TIMESTAMPTZ,
+
+  CONSTRAINT chk_powerup_actor CHECK (user_id IS NOT NULL OR source_team_id IS NOT NULL),
+  CONSTRAINT chk_powerup_times CHECK (expires_at IS NULL OR expires_at >= applied_at)
+);
+
+CREATE INDEX IF NOT EXISTS idx_powerup_events_match_id ON powerup_events(match_id);
+
+-- =========================================================
+-- 12) PLAYER STATS (SUMMARY TABLE)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS player_stats (
+  user_id                BIGINT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+  total_playtime_seconds BIGINT      NOT NULL DEFAULT 0,
+  total_attempts         BIGINT      NOT NULL DEFAULT 0,
+  correct_attempts       BIGINT      NOT NULL DEFAULT 0,
+  accuracy_percent       NUMERIC(5,2),
+  last_played_at         TIMESTAMPTZ
+);
+
+-- =========================================================
+-- OPTIONAL: A view for quick scoreboard totals per match/user
+-- (Questions + minigames; powerups can be added if they grant points)
+-- =========================================================
+CREATE OR REPLACE VIEW v_match_user_total_points AS
+SELECT
+  m.match_id,
+  u.user_id,
+  u.username,
+  COALESCE(SUM(qa.points_awarded), 0) +
+  COALESCE(SUM(mr.points_awarded), 0) AS total_points
+FROM matches m
+JOIN room_memberships rm ON rm.room_id = m.room_id
+JOIN users u ON u.user_id = rm.user_id
+LEFT JOIN question_attempts qa ON qa.match_id = m.match_id AND qa.user_id = u.user_id
+LEFT JOIN minigame_results mr ON mr.match_id = m.match_id AND mr.user_id = u.user_id
+GROUP BY m.match_id, u.user_id, u.username;
