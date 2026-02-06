@@ -124,7 +124,7 @@ body{
   border: 4px solid #000;
   background: rgba(173, 220, 255, .85);
   max-width: 640px;
-  margin: 150px auto 0;   /* 👈 pushes it BELOW the title */
+  margin: 150px auto 0;  
   padding: 20px;
   text-align: center;
 

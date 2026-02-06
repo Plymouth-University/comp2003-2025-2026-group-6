@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Choose Team & Role – Capture the Flag</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    
+    .team-select {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin: 30px 0;
+    }
+    .team-card {
+      background: rgba(255,255,255,0.9);
+      border: 4px solid #000;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 280px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .team-card:hover {
+      transform: scale(1.05);
+    }
+    .team-a { background: linear-gradient(135deg, #19b83d, #00ff88); }
+    .team-b { background: linear-gradient(135deg, #ff4444, #ff8888); }
+    .team-title {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: #000;
+    }
+    .role-btn {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 16px;
+      border: 3px solid #000;
+      background: rgba(255,255,255,0.8);
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-btn:hover, .role-btn.selected {
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .confirm-btn {
+      display: block;
+      margin: 30px auto 0;
+      font-size: 22px;
+      padding: 18px 40px;
+    }
+    @media (max-width: 700px) {
+      .team-select { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="tabs" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="windowBtns" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+    </header>
+
+    <main class="screen">
+      <section class="welcomeCard" style="max-width: 900px; margin: 100px auto 0;">
+        <h2 style="margin-top:0; font-size:36px; font-weight:900; text-align:center;">
+          Choose Your Team & Role
+        </h2>
+
+        <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
+          Pick your team and role for this session!
+        </p>
+
+        <div class="team-select">
+          <!-- Team A -->
+          <div class="team-card team-a" data-team="A">
+            <div class="team-title">TEAM A</div>
+            <button class="role-btn" data-role="scout">🕵️ Role 1</button>
+            <button class="role-btn" data-role="warrior">⚔️ Role 2</button>
+            <button class="role-btn" data-role="carrier">🏃 Role 3</button>
+            <button class="role-btn" data-role="defender">🛡️ Role 4</button>
+          </div>
+
+          <!-- Team B -->
+          <div class="team-card team-b" data-team="B">
+            <div class="team-title">TEAM B</div>
+            <button class="role-btn" data-role="scout">🕵️ Role 1</button>
+            <button class="role-btn" data-role="warrior">⚔️ Role 2</button>
+            <button class="role-btn" data-role="carrier">🏃 Role 3</button>
+            <button class="role-btn" data-role="defender">🛡️ Role 4</button>
+          </div>
+        </div>
+
+        <button id="confirmTeam" class="startBig confirm-btn" disabled>
+          Join Game!
+        </button>
+
+        <p style="margin-top: 24px; font-size: 16px; color: #333; text-align:center;">
+          <a href="join.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Back to PIN</a>
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let selectedTeam = null;
+    let selectedRole = null;
+
+    // Role button clicks
+    document.querySelectorAll('.role-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const teamCard = btn.closest('.team-card');
+        selectedTeam = teamCard.dataset.team;
+        selectedRole = btn.dataset.role;
+
+        // Visual feedback: reset all, select this one
+        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        // Enable confirm
+        document.getElementById('confirmTeam').disabled = false;
+      });
+    });
+
+    // Confirm & save choices
+    document.getElementById('confirmTeam').addEventListener('click', () => {
+      if (!selectedTeam || !selectedRole) return;
+
+      // Save to localStorage
+      localStorage.setItem('team', selectedTeam);
+      localStorage.setItem('role', selectedRole);
+
+      // Go to game
+      window.location.href = 'game.html';
+    });
+  </script>
+</body>
+</html>

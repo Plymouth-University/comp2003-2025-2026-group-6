@@ -70,11 +70,9 @@
         return;
       }
 
-      // Save PIN to localStorage (simple for now)
+      // Save PIN to localStorageSS
       localStorage.setItem("sessionPin", pin);
-
-      // For now: just go to game (later validate against real sessions)
-      window.location.href = "game.html";
+      window.location.href = "team-select.html";
     });
   </script>
 </body>
