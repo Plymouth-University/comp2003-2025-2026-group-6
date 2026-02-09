@@ -1,35 +1,51 @@
-const canvas = document.getElementById("game");
+document.addEventListener("DOMContentLoaded", () => {
+  const canvas = document.getElementById("game");
+  if (!canvas) {
+    console.log("Game canvas not loaded yet");
+    return;
+  }
+  
+  const ctx = canvas.getContext("2d");
+  
+  const startBtn = document.getElementById("startBtnGame");
+  const resetBtn = document.getElementById("resetBtn");
+  const pauseBtn = document.getElementById("pauseBtn");
+  
+  const timeLeftEl = document.getElementById("timeLeft");
+  const statusEl = document.getElementById("status");
+  
+  const scoreAEl = document.getElementById("scoreA");
+  const scoreBEl = document.getElementById("scoreB");
+  const lbA = document.querySelector('[data-player="Aarju"]');
+  const lbB = document.querySelector('[data-player="BotB"]');
+  
+  const staminaEl = document.getElementById("stamina");
+  const targetScoreEl = document.getElementById("targetScore");
+  const playerName = localStorage.getItem("playerName") || "Player";
+  
+  let running = false;
+  let paused = false;
+  let timeLeft = 60;
+  let timerId = null;
+  
+  const TARGET_SCORE = 5;
+  
+  // Questions bank
+  const questionsPool = [
+  { q: "What is 12 × 9?", options: ["98", "108", "112", "120"], correct: 1 },
+  { q: "Which planet is closest to the Sun?", options: ["Venus", "Mercury", "Earth", "Mars"], correct: 1 },
+  { q: "What is the chemical symbol for water?", options: ["H2O", "CO2", "O2", "NaCl"], correct: 0 },
+  { q: "How many continents are there?", options: ["5", "6", "7", "8"], correct: 2 },
+  { q: "What is 45 ÷ 5?", options: ["7", "8", "9", "10"], correct: 3 },
+  { q: "Who painted the Mona Lisa?", options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"], correct: 2 },
+  { q: "What is the largest mammal?", options: ["Elephant", "Blue Whale", "Giraffe", "Hippopotamus"], correct: 1 },
+  { q: "How many sides does a hexagon have?", options: ["5", "6", "7", "8"], correct: 1 }
+  // Add more questions here if necessary
+];
 
-if (!canvas) {
-  console.log("Game canvas not loaded yet");
-  return;
-}
-
-const ctx = canvas.getContext("2d");
-
-const startBtn = document.getElementById("startBtnGame");
-const resetBtn = document.getElementById("resetBtn");
-const pauseBtn = document.getElementById("pauseBtn");
-
-const timeLeftEl = document.getElementById("timeLeft");
-const statusEl = document.getElementById("status");
-
-const scoreAEl = document.getElementById("scoreA");
-const scoreBEl = document.getElementById("scoreB");
-const lbA = document.querySelector('[data-player="Aarju"]');
-const lbB = document.querySelector('[data-player="BotB"]');
-
-const staminaEl = document.getElementById("stamina");
-const targetScoreEl = document.getElementById("targetScore");
-const playerName = localStorage.getItem("playerName") || "Player";
-
-let running = false;
-let paused = false;
-
-let timeLeft = 60;
-let timerId = null;
-
-const TARGET_SCORE = 5;
+let questionCount = 0;           // Track how many questions have appeared
+let isQuestionActive = false;
+let isQuizBurstActive = false;
 
 const state = {
   scoreA: 0,
@@ -79,6 +95,82 @@ function setStatus(msg){
   statusEl.textContent = msg;
 }
 
+function showQuestion() {
+  if (isQuestionActive || !running || paused) return;
+
+  // Limit to exactly 4 questions per game
+  if (questionCount >= 4) return;
+
+  questionCount++;
+  isQuestionActive = true;
+  paused = true;
+
+  // If this is the first question, start the burst mode
+  if (questionCount === 1) {
+    isQuizBurstActive = true;
+  }
+
+  const q = questionsPool[Math.floor(Math.random() * questionsPool.length)];
+
+  document.getElementById('questionText').textContent = `Question ${questionCount}: ${q.q}`;
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.className = 'option-btn';
+    btn.onclick = () => handleAnswer(idx, q.correct);
+    container.appendChild(btn);
+  });
+
+  document.getElementById('questionModal').style.display = 'flex';
+  setStatus(`Quick question #${questionCount}! Answer for bonus points!`);
+}
+
+function handleAnswer(selected, correct) {
+  const feedbackEl = document.getElementById('feedback');
+  const closeBtn = document.getElementById('closeQuestion');
+
+  const playerTeam = localStorage.getItem("team") || "A";
+
+  if (selected === correct) {
+    feedbackEl.textContent = "✅ Correct! +20 stamina & +1 point for your team!";
+    feedbackEl.style.color = "#4caf50";
+    if (playerTeam === "A") state.scoreA += 1;
+    else state.scoreB += 1;
+    state.player.stamina = Math.min(100, state.player.stamina + 20);
+  } else {
+    feedbackEl.textContent = `❌ Wrong! -10 stamina`;
+    feedbackEl.style.color = "#f44336";
+    state.player.stamina = Math.max(0, state.player.stamina - 10);
+  }
+
+  feedbackEl.style.display = 'block';
+  closeBtn.style.display = 'block';
+
+  syncUI();
+
+  // If in burst mode and not the last question, show next one after a short delay
+  if (isQuizBurstActive && questionCount < 4) {
+    closeBtn.disabled = true;
+    setTimeout(() => {
+      closeBtn.disabled = false;
+      document.getElementById('questionModal').style.display = 'none';
+      feedbackEl.style.display = 'none';
+      closeBtn.style.display = 'none';
+      isQuestionActive = false;
+      paused = false; // resume briefly before next question
+      showQuestion(); // trigger next question immediately
+    }, 1800); // 1.8 seconds delay after answer (shows feedback longer)
+  } else {
+    // Last question or not in burst mode to normal close behavior
+    closeBtn.disabled = false;
+  }
+}
+
+
 function resetRound(){
   const p = state.player;
   p.x = 60; p.y = 60;
@@ -104,6 +196,8 @@ function resetGame(){
   resetRound();
   syncUI();
   draw();
+
+  questionCount = 0;
 }
 
 function moveFlag(){
@@ -122,6 +216,10 @@ function start(){
   if (!timerId){
     timerId = setInterval(() => {
       if (!running || paused) return;
+
+      if (running && !paused && !isQuestionActive && timeLeft > 20 && questionCount === 0 && Math.random() < 0.04) {
+        showQuestion(); // only triggers Question 1
+        }
 
       timeLeft -= 1;
 
@@ -334,3 +432,4 @@ pauseBtn?.addEventListener("click", togglePause);
 
 // Init
 resetGame();
+});

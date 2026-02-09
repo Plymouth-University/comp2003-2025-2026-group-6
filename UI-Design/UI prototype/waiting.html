@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Waiting for Game – Capture the Flag</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; }
+    .waiting-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0a1f3a 0%, #1a3a5a 100%);
+      color: white;
+      text-align: center;
+    }
+    .loading-spinner {
+      width: 90px;
+      height: 90px;
+      border: 10px solid rgba(255,255,255,0.15);
+      border-top: 10px solid #00e5ff;
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      margin-bottom: 40px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .waiting-message {
+      font-size: 36px;
+      font-weight: 900;
+      margin-bottom: 20px;
+    }
+    .small-hint {
+      font-size: 20px;
+      opacity: 0.85;
+      margin-top: 20px;
+    }
+    .countdown-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    .countdown-number {
+      font-size: 180px;
+      font-weight: bold;
+      color: #ffeb3b;
+      margin: 0;
+      line-height: 1;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.6s ease-out;
+    }
+    .countdown-number.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .go-text {
+      font-size: 220px;
+      font-weight: bold;
+      color: #4caf50;
+      margin: 0;
+      opacity: 0;
+      transform: scale(0.7);
+      transition: all 0.8s ease-out;
+      animation: pulse 1.2s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(0.95); }
+      to   { transform: scale(1.08); }
+    }
+    .starting-text {
+      font-size: 42px;
+      font-weight: 800;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="waiting-screen">
+    <!-- Phase 1: Waiting -->
+    <div id="waitingPhase">
+      <div class="loading-spinner"></div>
+      <div class="waiting-message">Waiting for the game to start...</div>
+      <div class="small-hint">Your teacher will begin the session soon. Stay ready!</div>
+    </div>
+
+    <!-- Phase 2: Countdown -->
+    <div id="countdownPhase" class="countdown-container">
+      <div class="starting-text">Starting in...</div>
+      <div class="countdown-number" id="countdownNumber">3</div>
+    </div>
+
+    <!-- Phase 3: GO! -->
+    <div id="goPhase" style="display: none;">
+      <div class="go-text">GO!</div>
+      <div class="starting-text">Game starting now!</div>
+    </div>
+  </div>
+
+  <script>
+    const waitingPhase = document.getElementById('waitingPhase');
+    const countdownPhase = document.getElementById('countdownPhase');
+    const goPhase = document.getElementById('goPhase');
+    const countdownNumber = document.getElementById('countdownNumber');
+
+    // Step 1: Show waiting for 3–4 seconds (adjust as needed)
+    setTimeout(() => {
+      waitingPhase.style.display = 'none';
+      countdownPhase.style.display = 'flex';
+
+      // Start countdown: 3 → 2 → 1
+      let count = 3;
+      countdownNumber.textContent = count;
+      countdownNumber.classList.add('visible');
+
+      const countdownInterval = setInterval(() => {
+        count--;
+        if (count >= 1) {
+          countdownNumber.classList.remove('visible');
+          setTimeout(() => {
+            countdownNumber.textContent = count;
+            countdownNumber.classList.add('visible');
+          }, 400); // quick fade out / in
+        } else {
+          clearInterval(countdownInterval);
+          countdownPhase.style.display = 'none';
+          goPhase.style.display = 'flex';
+
+          // Show GO for 1.8 seconds then redirect
+          setTimeout(() => {
+            window.location.href = 'game.html';
+          }, 1800);
+        }
+      }, 1200); // each number visible for ~1.2 seconds
+
+    }, 3500); // waiting time before countdown starts
+  </script>
+</body>
+</html>

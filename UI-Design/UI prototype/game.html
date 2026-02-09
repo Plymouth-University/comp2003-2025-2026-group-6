@@ -71,6 +71,16 @@
           <div data-player="BotB">0</div>
         </div>
       </div>
+
+      <!-- Question Modal -->
+       <div id="questionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:white; padding:30px; border:5px solid #000; border-radius:16px; max-width:520px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+            <h3 id="questionText" style="margin:0 0 25px; font-size:26px; color:#333;">Question</h3>
+            <div id="optionsContainer" style="display:flex; flex-direction:column; gap:14px; margin-bottom:25px;"></div>
+            <p id="feedback" style="display:none; font-size:20px; font-weight:bold; margin:15px 0; min-height:30px;"></p>
+            <button id="closeQuestion" style="display:none; padding:14px 40px; font-size:20px; background:#4caf50; color:white; border:4px solid #000; border-radius:10px; cursor:pointer;">Continue Game</button>
+        </div>
+       </div>
     </main>
   </div>
 
@@ -93,6 +103,22 @@
     
     if (teamDisplay) teamDisplay.textContent = team;
     if (roleDisplay) roleDisplay.textContent = role;
+
+    document.getElementById('closeQuestion').addEventListener('click', () => {
+      document.getElementById('questionModal').style.display = 'none';
+      isQuestionActive = false;
+      paused = false;
+
+      // Only reset burst if all 4 questions are done
+      if (questionCount >= 4) {
+        isQuizBurstActive = false;
+      }
+      
+      document.getElementById('feedback').style.display = 'none';
+      document.getElementById('closeQuestion').style.display = 'none';
+      setStatus("Game resumed!");
+      syncUI();
+    });
   </script>
   
 </body>
