@@ -25,27 +25,35 @@
         </h2>
 
         <form id="signinForm">
-          <p class="welcomeText">Enter your player name</p>
-
-          <input
+            <p class="welcomeText">Create your account</p>
+            
+            <input
+            type="email"
+            id="email"
+            placeholder="Email address"
+            required
+            style="font-size:18px; padding:10px; border:4px solid #000; width:100%; max-width:300px; margin:10px auto; display:block;"
+            />
+            
+            <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+            style="font-size:18px; padding:10px; border:4px solid #000; width:100%; max-width:300px; margin:10px auto; display:block;"
+            />
+            
+            <input
             type="text"
             id="playerName"
-            placeholder="Player name"
+            placeholder="Player name (display name)"
             required
-            style="
-              font-size:18px;
-              padding:10px;
-              border:4px solid #000;
-              width:100%;
-              max-width:300px;
-              margin:10px auto;
-              display:block;
-            "
-          />
-
-          <button class="startBig" type="submit">
-            Enter Game
-          </button>
+            style="font-size:18px; padding:10px; border:4px solid #000; width:100%; max-width:300px; margin:10px auto; display:block;"
+            />
+            
+            <button class="startBig" type="submit">
+                Sign Up & Enter Game
+            </button>
         </form>
 
         <p style="margin-top: 24px; font-size: 16px; color: #333;">
@@ -55,6 +63,69 @@
       </section>
     </main>
   </div>
+
+  <!-- Firebase SDK - latest modular version via CDN -->
+<script type="module">
+  // Import Firebase modules
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
+    authDomain: "ctf-game-06.firebaseapp.com",
+    projectId: "ctf-game-06",
+    storageBucket: "ctf-game-06.firebasestorage.app",
+    messagingSenderId: "509318018925",
+    appId: "1:509318018925:web:a91ddc9f7fc130dfe54c64",
+    measurementId: "G-L4WP0E0V6S"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Handle form submission (signup)
+  document.getElementById("signinForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const playerName = document.getElementById("playerName").value.trim();
+
+    if (!email || !password || !playerName) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    try {
+      // Create user with email/password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      console.log("User signed up:", user.uid);
+
+      // Save player name (and optionally user ID) to localStorage
+      localStorage.setItem("playerName", playerName);
+      localStorage.setItem("userEmail", user.email); // optional
+
+      // Redirect to next page
+      window.location.href = "join.html";
+    } catch (error) {
+      // Show friendly error messages
+      let msg = "Signup failed. Please try again.";
+      if (error.code === "auth/email-already-in-use") {
+        msg = "This email is already in use. Try logging in instead.";
+      } else if (error.code === "auth/weak-password") {
+        msg = "Password is too weak. Use at least 6 characters.";
+      } else if (error.code === "auth/invalid-email") {
+        msg = "Invalid email format.";
+      }
+      alert(msg);
+      console.error(error);
+    }
+  });
+</script>
 
   <script>
     document.getElementById("signinForm").addEventListener("submit", (e) => {

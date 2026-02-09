@@ -28,9 +28,41 @@
           <p class="welcomeText">Enter your player name</p>
 
           <input
+            type="email"
+            id="email"
+            placeholder="Email address"
+            required
+            style="
+              font-size:18px;
+              padding:10px;
+              border:4px solid #000;
+              width:100%;
+              max-width:300px;
+              margin:10px auto;
+              display:block;
+            "
+           />
+
+           <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+            style="
+              font-size:18px;
+              padding:10px;
+              border:4px solid #000;
+              width:100%;
+              max-width:300px;
+              margin:10px auto;
+              display:block;
+            "
+           />
+
+           <input
             type="text"
             id="loginName"
-            placeholder="Your player name"
+            placeholder="Player name (display name)"
             required
             style="
               font-size:18px;
@@ -43,8 +75,6 @@
             "
           />
 
-          <!-- You can add password field later -->
-          <!-- <input type="password" placeholder="Password" style="..."> -->
 
           <button class="startBig" type="submit">
             Log In
@@ -60,16 +90,63 @@
     </main>
   </div>
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
+  <!-- Firebase SDK + Login Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
+      authDomain: "ctf-game-06.firebaseapp.com",
+      projectId: "ctf-game-06",
+      storageBucket: "ctf-game-06.firebasestorage.app",
+      messagingSenderId: "509318018925",
+      appId: "1:509318018925:web:a91ddc9f7fc130dfe54c64",
+      measurementId: "G-L4WP0E0V6S"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Handle login form submission
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("loginName").value.trim();
-      if (!name) return;
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const playerName = document.getElementById("loginName").value.trim();
 
-      // For now: just use the name (same as sign in)
-      localStorage.setItem("playerName", name);
-      window.location.href = "join.html";  // or wherever your game lives
+      if (!email || !password || !playerName) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      try {
+        // Log in with Firebase
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        console.log("Logged in successfully:", user.uid);
+
+        // Save player name for the game
+        localStorage.setItem("playerName", playerName);
+        // Optional: save user info
+        localStorage.setItem("userEmail", user.email);
+
+        // Redirect to next page
+        window.location.href = "join.html";
+      } catch (error) {
+        let msg = "Login failed. Please try again.";
+        if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+          msg = "Incorrect email or password.";
+        } else if (error.code === "auth/invalid-email") {
+          msg = "Invalid email format.";
+        } else if (error.code === "auth/too-many-requests") {
+          msg = "Too many attempts. Try again later.";
+        }
+        alert(msg);
+        console.error(error);
+      }
     });
   </script>
 </body>
