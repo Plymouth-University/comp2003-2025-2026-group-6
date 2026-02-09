@@ -84,6 +84,15 @@
     const pin = localStorage.getItem("sessionPin") || "N/A";
     const pinDisplay = document.getElementById("sessionPinDisplay");
     if (pinDisplay) pinDisplay.textContent = pin;
+
+    const team = localStorage.getItem("team") || "A";
+    const role = localStorage.getItem("role") || "Scout";
+
+    const teamDisplay = document.getElementById("teamDisplay");
+    const roleDisplay = document.getElementById("roleDisplay");
+    
+    if (teamDisplay) teamDisplay.textContent = team;
+    if (roleDisplay) roleDisplay.textContent = role;
   </script>
   
 </body>

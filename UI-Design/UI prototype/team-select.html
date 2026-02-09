@@ -88,19 +88,19 @@
           <!-- Team A -->
           <div class="team-card team-a" data-team="A">
             <div class="team-title">TEAM A</div>
-            <button class="role-btn" data-role="scout">🕵️ Role 1</button>
-            <button class="role-btn" data-role="warrior">⚔️ Role 2</button>
-            <button class="role-btn" data-role="carrier">🏃 Role 3</button>
-            <button class="role-btn" data-role="defender">🛡️ Role 4</button>
+            <button class="role-btn" data-role="scout">🕵️ Scout</button>
+            <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
+            <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
+            <button class="role-btn" data-role="defender">🛡️ Defender</button>
           </div>
 
           <!-- Team B -->
           <div class="team-card team-b" data-team="B">
             <div class="team-title">TEAM B</div>
-            <button class="role-btn" data-role="scout">🕵️ Role 1</button>
-            <button class="role-btn" data-role="warrior">⚔️ Role 2</button>
-            <button class="role-btn" data-role="carrier">🏃 Role 3</button>
-            <button class="role-btn" data-role="defender">🛡️ Role 4</button>
+            <button class="role-btn" data-role="scout">🕵️ Scout</button>
+            <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
+            <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
+            <button class="role-btn" data-role="defender">🛡️ Defender</button>
           </div>
         </div>
 
@@ -119,32 +119,26 @@
     let selectedTeam = null;
     let selectedRole = null;
 
-    // Role button clicks
     document.querySelectorAll('.role-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const teamCard = btn.closest('.team-card');
         selectedTeam = teamCard.dataset.team;
         selectedRole = btn.dataset.role;
 
-        // Visual feedback: reset all, select this one
         document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
 
-        // Enable confirm
         document.getElementById('confirmTeam').disabled = false;
       });
     });
 
-    // Confirm & save choices
     document.getElementById('confirmTeam').addEventListener('click', () => {
       if (!selectedTeam || !selectedRole) return;
 
-      // Save to localStorage
       localStorage.setItem('team', selectedTeam);
       localStorage.setItem('role', selectedRole);
 
-      // Go to game
-      window.location.href = 'game.html';
+      window.location.href = 'confirm-team.html';
     });
   </script>
 </body>

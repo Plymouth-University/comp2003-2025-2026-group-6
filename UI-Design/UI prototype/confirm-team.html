@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Confirm Your Team & Role – Capture the Flag</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .confirmation-card {
+      max-width: 500px;
+      margin: 120px auto 0;
+      padding: 40px 30px;
+      background: rgba(255,255,255,0.92);
+      border: 5px solid #000;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+    .team-badge {
+      font-size: 48px;
+      font-weight: 900;
+      margin: 20px 0;
+      padding: 12px 30px;
+      border-radius: 50px;
+      display: inline-block;
+    }
+    .team-a .team-badge { background: #19b83d; color: white; }
+    .team-b .team-badge { background: #ff4444; color: white; }
+    .role-name {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 20px 0 30px;
+      color: #333;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 16px 40px;
+      font-size: 20px;
+      font-weight: 800;
+      border: 4px solid #000;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-confirm {
+      background: #4caf50;
+      color: white;
+    }
+    .btn-change {
+      background: #ff9800;
+      color: white;
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="tabs" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="windowBtns" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+    </header>
+
+    <main class="screen">
+      <div class="confirmation-card" id="confirmCard">
+        <h2 style="font-size: 34px; margin: 0 0 30px;">Confirm Your Choice</h2>
+
+        <div id="teamDisplayWrapper">
+          <div class="team-badge" id="teamBadge">TEAM ?</div>
+        </div>
+
+        <div class="role-name">
+          Role: <span id="roleDisplay">—</span>
+        </div>
+
+        <div class="buttons">
+          <button class="btn btn-confirm" id="confirmBtn">Yes, Join Game!</button>
+          <button class="btn btn-change" id="changeBtn">Change Team/Role</button>
+        </div>
+
+        <p style="margin-top: 40px; font-size: 16px; color: #555;">
+          <a href="join.html" style="color: #6c2bd9; text-decoration: underline;">Back to PIN</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const team = localStorage.getItem("team") || "A";
+    const role = localStorage.getItem("role") || "Scout";
+
+    const roleNames = {
+      scout: "Scout – Fast & Sneaky",
+      warrior: "Warrior – Strong & Tough",
+      carrier: "Flag Carrier – Speed Boost",
+      defender: "Defender – Base Guard"
+    };
+
+    document.getElementById("teamBadge").textContent = `TEAM ${team}`;
+    document.getElementById("roleDisplay").textContent = roleNames[role] || role;
+
+    const card = document.getElementById("confirmCard");
+    if (team === "A") {
+      card.classList.add("team-a");
+    } else {
+      card.classList.add("team-b");
+    }
+
+    document.getElementById("confirmBtn").addEventListener("click", () => {
+      window.location.href = "game.html";
+    });
+
+    document.getElementById("changeBtn").addEventListener("click", () => {
+      window.location.href = "team-select.html";
+    });
+  </script>
+</body>
+</html>
