@@ -241,3 +241,13 @@ a:hover {
   background: #e8f4ff;
   transform: scale(1.03);
 }
+
+#miniGameModal button:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+#miniGameContent {
+  border: 2px dashed #ffd700;
+  color: #e0f7ff;
+}

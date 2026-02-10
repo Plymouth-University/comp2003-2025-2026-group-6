@@ -25,10 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
   
   let running = false;
   let paused = false;
-  let timeLeft = 60;
+  let timeLeft = 50;
   let timerId = null;
+  let extensionApplied = false;  
   
-  const TARGET_SCORE = 5;
+  const TARGET_SCORE = 50;
   
   // Questions bank
   const questionsPool = [
@@ -46,6 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
 let questionCount = 0;           // Track how many questions have appeared
 let isQuestionActive = false;
 let isQuizBurstActive = false;
+let miniGameCount = 0;
+let isMiniGameActive = false;
+let nextMiniGameTimer = null;
+let questionsFinished = false;  
 
 const state = {
   scoreA: 0,
@@ -129,6 +134,23 @@ function showQuestion() {
   setStatus(`Quick question #${questionCount}! Answer for bonus points!`);
 }
 
+function showMiniGame() {
+  if (isMiniGameActive || !running || paused || isQuestionActive) return;
+  if (miniGameCount >= 2) return; 
+
+  miniGameCount++;
+  isMiniGameActive = true;
+  paused = true;
+
+  // Reset result display
+  document.getElementById('miniGameResult').style.display = 'none';
+  document.getElementById('closeMiniGame').style.display = 'block';
+
+  document.getElementById('miniGameModal').style.display = 'flex';
+  
+  setStatus(`Mini-Game #${miniGameCount} – Chance for bonus or sabotage!`);
+}
+
 function handleAnswer(selected, correct) {
   const feedbackEl = document.getElementById('feedback');
   const closeBtn = document.getElementById('closeQuestion');
@@ -152,7 +174,20 @@ function handleAnswer(selected, correct) {
 
   syncUI();
 
-  // If in burst mode and not the last question, show next one after a short delay
+  if (questionCount >= 4 && !questionsFinished) {
+    questionsFinished = true;
+    
+    setTimeout(() => {
+      document.getElementById('questionModal').style.display = 'none';
+      feedbackEl.style.display = 'none';
+      closeBtn.style.display = 'none';
+      isQuestionActive = false;
+      paused = false;
+      
+      showMiniGame();
+      }, 1800); 
+    }
+
   if (isQuizBurstActive && questionCount < 4) {
     closeBtn.disabled = true;
     setTimeout(() => {
@@ -161,11 +196,11 @@ function handleAnswer(selected, correct) {
       feedbackEl.style.display = 'none';
       closeBtn.style.display = 'none';
       isQuestionActive = false;
-      paused = false; // resume briefly before next question
-      showQuestion(); // trigger next question immediately
-    }, 1800); // 1.8 seconds delay after answer (shows feedback longer)
+      paused = false;
+      showQuestion();
+    }, 1800);
   } else {
-    // Last question or not in burst mode to normal close behavior
+    
     closeBtn.disabled = false;
   }
 }
@@ -187,7 +222,7 @@ function resetGame(){
   clearInterval(timerId);
   timerId = null;
 
-  timeLeft = 60;
+  timeLeft = 50;
   state.scoreA = 0;
   state.scoreB = 0;
 
@@ -198,6 +233,14 @@ function resetGame(){
   draw();
 
   questionCount = 0;
+  questionsFinished = false;
+
+  miniGameCount = 0;
+  isMiniGameActive = false;
+  if (nextMiniGameTimer) {
+    clearTimeout(nextMiniGameTimer);
+    nextMiniGameTimer = null;
+  }
 }
 
 function moveFlag(){
@@ -216,27 +259,31 @@ function start(){
   if (!timerId){
     timerId = setInterval(() => {
       if (!running || paused) return;
-
+      
       if (running && !paused && !isQuestionActive && timeLeft > 20 && questionCount === 0 && Math.random() < 0.04) {
         showQuestion(); // only triggers Question 1
         }
 
+        //if (running && !paused && !isMiniGameActive && !isQuestionActive && timeLeft > 30 && Math.random() < 0.015) {
+          //showMiniGame();
+        //}
+
       timeLeft -= 1;
 
       // Demo bot scoring (Team B)
-      if (timeLeft % 8 === 0) state.scoreB += 1;
-
-      // Win check
-      if (state.scoreA >= TARGET_SCORE || state.scoreB >= TARGET_SCORE){
-        running = false;
-        const winner = state.scoreA >= TARGET_SCORE ? "Team A" : "Team B";
-        setStatus(`${winner} wins! Press Reset to play again.`);
-      }
-
-      if (timeLeft <= 0){
-        timeLeft = 0;
-        running = false;
-        setStatus(`Time! Final score A:${state.scoreA} B:${state.scoreB}`);
+      if (timeLeft <= 0) {
+        if (!extensionApplied) {
+          // First time time hits 0 → add 5 minutes extension
+          timeLeft = 300;  // 5 minutes
+          extensionApplied = true;
+          setStatus("Main time up! Extending session by 5 minutes — keep playing!");
+          syncUI();
+        } else {
+          // Second time time hits 0 → game really ends
+          timeLeft = 0;
+          running = false;
+          setStatus(`Time fully up! Final score A:${state.scoreA} B:${state.scoreB}`);
+        }
       }
 
       syncUI();
