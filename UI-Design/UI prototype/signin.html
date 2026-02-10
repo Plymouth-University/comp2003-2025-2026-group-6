@@ -126,17 +126,5 @@
     }
   });
 </script>
-
-  <script>
-    document.getElementById("signinForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById("playerName").value.trim();
-      if (!name) return;
-
-      localStorage.setItem("playerName", name);
-      window.location.href = "join.html";
-    });
-  </script>
 </body>
 </html>
