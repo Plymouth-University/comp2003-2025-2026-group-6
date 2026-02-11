@@ -1,0 +1,12 @@
+----TO RUN THIS----
+1. Download and run Ollama locally - Gemma3:1b
+2. Download home.html and server.js files into empty directory
+3. Open command prompt:
+	- cd {directory of folder}
+	- npm init -y
+	- npm install express cors node-fetch
+	- node server.js
+(this should have created package.json/package-lock.json files in folder. node server.js should display 'backend running at http://localhost:3000')
+4. Open html file in folder to run
+5. Enter topic into text box
+6. Click generate
