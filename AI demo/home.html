@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemma3 Generator</title>
+</head>
+<body>
+  <h1>Generate Questions</h1>
+
+  <textarea id="topic" rows="4" cols="50" placeholder="Enter topic..."></textarea><br>
+  <button onclick="sendTopic()">Generate</button>
+
+  <h2>Response:</h2>
+  <pre id="response"></pre>
+
+<script>
+async function sendTopic() {
+  const topic = document.getElementById("topic").value;
+  const responseBox = document.getElementById("response");
+  responseBox.textContent = ""; // Clear previous output
+
+  const res = await fetch("http://localhost:3000/api/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic })
+  });
+
+  // STREAM the AI output
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    responseBox.textContent += decoder.decode(value);
+  }
+}
+</script>
+
+</body>
+</html>
