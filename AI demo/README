@@ -1,5 +1,5 @@
 ----TO RUN THIS----
-1. Download and run Ollama locally - Gemma3:1b
+1. Download and run Ollama locally - Gemma3:4b
 2. Download home.html and server.js files into empty directory
 3. Open command prompt:
 	- cd {directory of folder}
