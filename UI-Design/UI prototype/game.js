@@ -10,6 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const startBtn = document.getElementById("startBtnGame");
   const resetBtn = document.getElementById("resetBtn");
   const pauseBtn = document.getElementById("pauseBtn");
+
+  document.getElementById('newGameBtn')?.addEventListener('click', () => {
+  document.getElementById('resultsScreen').style.display = 'none';
+  gameOverShown = false;
+
+  resetGame();
+});
   
   const timeLeftEl = document.getElementById("timeLeft");
   const statusEl = document.getElementById("status");
@@ -44,13 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add more questions here if necessary
 ];
 
-let questionCount = 0;           // Track how many questions have appeared
+let questionCount = 0;  
 let isQuestionActive = false;
 let isQuizBurstActive = false;
 let miniGameCount = 0;
 let isMiniGameActive = false;
 let nextMiniGameTimer = null;
 let questionsFinished = false;  
+let gameOverShown = false;
 
 const state = {
   scoreA: 0,
@@ -243,6 +251,49 @@ function resetGame(){
   }
 }
 
+function endGame() {
+  if (gameOverShown) return;
+  gameOverShown = true;
+
+  running = false;
+  paused = true;
+  clearInterval(timerId);
+  timerId = null;
+
+  document.getElementById('questionModal').style.display = 'none';
+  document.getElementById('miniGameModal').style.display = 'none';
+  isQuestionActive = false;
+  isMiniGameActive = false;
+
+  const resultsScreen = document.getElementById('resultsScreen');
+  if (resultsScreen) {
+    resultsScreen.style.display = 'flex';
+
+    document.getElementById('finalScoreA').textContent = state.scoreA;
+    document.getElementById('finalScoreB').textContent = state.scoreB;
+
+    const statsEl = document.getElementById('playerStats');
+    const team = localStorage.getItem("team") || "A";
+    const role = localStorage.getItem("role") || "Scout";
+
+    statsEl.innerHTML = `
+      <strong>Player:</strong> ${playerName}<br>
+      <strong>Team:</strong> ${team}<br>
+      <strong>Role:</strong> ${role}<br>
+      <strong>Questions answered correctly:</strong> ${questionCount > 0 ?  "some" : "0"}<br>
+      <strong>Flags captured:</strong> ${state.scoreA} (your team's score)<br>
+      <strong>Game duration:</strong> 50s + extension
+    `;
+
+    let winnerMsg = "";
+    if (state.scoreA > state.scoreB) winnerMsg = "Team A Wins!";
+    else if (state.scoreB > state.scoreA) winnerMsg = "Team B Wins!";
+    else winnerMsg = "It's a Tie!";
+  }
+
+  setStatus("Game Over — see results!");
+}
+
 function moveFlag(){
   // keep away from edges and base
   state.flag.x = rand(220, canvas.width - 80);
@@ -270,19 +321,15 @@ function start(){
 
       timeLeft -= 1;
 
-      // Demo bot scoring (Team B)
       if (timeLeft <= 0) {
         if (!extensionApplied) {
-          // First time time hits 0 → add 5 minutes extension
-          timeLeft = 300;  // 5 minutes
+          timeLeft = 120;
           extensionApplied = true;
-          setStatus("Main time up! Extending session by 5 minutes — keep playing!");
+          setStatus("Main time up! Extending by 2 minutes — keep going!");
           syncUI();
         } else {
-          // Second time time hits 0 → game really ends
           timeLeft = 0;
-          running = false;
-          setStatus(`Time fully up! Final score A:${state.scoreA} B:${state.scoreB}`);
+          endGame();
         }
       }
 

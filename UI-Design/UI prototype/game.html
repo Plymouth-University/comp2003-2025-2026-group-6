@@ -108,8 +108,43 @@
                 </button>
             </div>
         </div>
-    </main>
-  </div>
+
+         <div id="resultsScreen" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; color: white; font-family: system-ui; text-align: center; padding: 40px; overflow-y: auto;">
+          <div style="max-width: 700px; margin: 0 auto; background: rgba(20,20,50,0.9); border: 6px solid #ffd700; border-radius: 16px; padding: 40px; box-shadow: 0 10px 50px rgba(0,0,0,0.7);">
+            
+            <h1 style="font-size: 48px; margin: 0 0 20px; color: #ffd700; text-shadow: 0 2px 10px #000;">
+              GAME OVER
+            </h1>
+            
+            <h2 style="font-size: 36px; margin: 30px 0 10px; color: #fff;">
+              Final Results
+            </h2>
+            
+            <div style="display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; margin: 30px 0;">
+              <div style="min-width: 220px;">
+                <div style="font-size: 28px; font-weight: bold; color: #19b83d;">Team A Score</div>
+                <div id="finalScoreA" style="font-size: 64px; font-weight: 900; color: #19b83d; margin: 10px 0;">0</div>
+              </div>
+              
+              <div style="min-width: 220px;">
+                <div style="font-size: 28px; font-weight: bold; color: #ff4444;">Team B Score</div>
+                <div id="finalScoreB" style="font-size: 64px; font-weight: 900; color: #ff4444; margin: 10px 0;">0</div>
+              </div>
+            </div>
+            
+            <div style="margin: 40px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px;">
+              <h3 style="font-size: 28px; margin: 0 0 20px; color: #ffd700;">Player Stats</h3>
+              <div id="playerStats" style="font-size: 20px; line-height: 1.6; color: #e0f7ff;">
+                </div>
+              </div>
+              
+              <button id="newGameBtn" style="margin-top: 30px; padding: 18px 50px; font-size: 24px; font-weight: 900; background: #6c2bd9; color: white; border: 5px solid #000; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
+                New Game
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
 
   <script src="game.js"></script>
 
