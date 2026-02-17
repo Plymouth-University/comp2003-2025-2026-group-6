@@ -25,46 +25,47 @@
       </div>
 
       <div style="max-width:840px; margin:0 auto; padding:20px;">
-        <!-- Controls -->
-        <div style="margin-bottom:15px;">
+        
+        <div style="margin-bottom:15px; text-align:center;">
           <button id="startBtnGame">Start</button>
           <button id="pauseBtn">Pause</button>
           <button id="resetBtn">Reset</button>
         </div>
 
-      <div style="text-align:center; color:#e0f7ff; margin:10px; font-size:1.2em;">
-        Team: <strong id="teamDisplay">A</strong> | 
-        Role: <strong id="roleDisplay">Scout</strong>
-    </div>
+        <div style="text-align:center; color:#e0f7ff; margin:10px; font-size:1.2em;">
+          Team: <strong id="teamDisplay">A</strong> | 
+          Role: <strong id="roleDisplay">Scout</strong>
+        </div>
 
-        <!-- Canvas -->
-        <canvas id="game" width="800" height="500" style="border:4px solid #000; background:#222;"></canvas>
+        <canvas id="game" style="display:none;"></canvas>
 
-        <!-- Info -->
+        <div style="text-align:center;">
+          <iframe id="unityIframe" src="stacker_game/index.html" width="800" height="500" scrolling="no" style="border:4px solid #000; background:#222; border-radius:8px; display:block; margin:0 auto;"></iframe>
+        </div>
+
         <div style="margin-top: 20px; padding: 15px; background: rgba(20, 20, 40, 0.7); border-radius: 10px; color: #e0f7ff; max-width: 800px; margin-left: auto; margin-right: auto;">
-        <p style="margin: 8px 0; font-size: 1.2em;">
-          Time left: <span id="timeLeft" style="color: #fffb99; font-weight: bold;">60</span>s
-        </p>
-        
-        <p id="status" style="color: #ffd700; font-weight: bold; font-size: 1.3em; margin: 12px 0;">
-          Press Start to begin!
-        </p>
-        
-        <p style="margin: 8px 0;">
-          Team A: <span id="scoreA" style="color: #00ff9d;">0</span> 
-          – Team B: <span id="scoreB" style="color: #ff5e5e;">0</span>
-        </p>
-        
-        <p style="margin: 12px 0;">
-          Stamina: 
-          <progress id="stamina" max="100" value="100" style="width: 220px; height: 18px;"></progress>
-        </p>
-        
-        <p style="margin: 8px 0;">
-          Target score: <span id="targetScore" style="color: #d19cff; font-weight: bold;">5</span>!
-        </p>
-      </div>
-
+          <p style="margin: 8px 0; font-size: 1.2em;">
+            Time left: <span id="timeLeft" style="color: #fffb99; font-weight: bold;">60</span>s
+          </p>
+          
+          <p id="status" style="color: #ffd700; font-weight: bold; font-size: 1.3em; margin: 12px 0;">
+            Press Start to begin!
+          </p>
+          
+          <p style="margin: 8px 0;">
+            Team A: <span id="scoreA" style="color: #00ff9d;">0</span> 
+            – Team B: <span id="scoreB" style="color: #ff5e5e;">0</span>
+          </p>
+          
+          <p style="margin: 12px 0;">
+            Stamina: 
+            <progress id="stamina" max="100" value="100" style="width: 220px; height: 18px;"></progress>
+          </p>
+          
+          <p style="margin: 8px 0;">
+            Target score: <span id="targetScore" style="color: #d19cff; font-weight: bold;">5</span>!
+          </p>
+        </div>
 
         <div style="display:none;">
           <div data-player="Aarju">0</div>
@@ -72,84 +73,64 @@
         </div>
       </div>
 
-      <!-- Question Modal -->
-       <div id="questionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center;">
+      <div id="questionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center;">
         <div style="background:white; padding:30px; border:5px solid #000; border-radius:16px; max-width:520px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
             <h3 id="questionText" style="margin:0 0 25px; font-size:26px; color:#333;">Question</h3>
             <div id="optionsContainer" style="display:flex; flex-direction:column; gap:14px; margin-bottom:25px;"></div>
             <p id="feedback" style="display:none; font-size:20px; font-weight:bold; margin:15px 0; min-height:30px;"></p>
             <button id="closeQuestion" style="display:none; padding:14px 40px; font-size:20px; background:#4caf50; color:white; border:4px solid #000; border-radius:10px; cursor:pointer;">Continue Game</button>
         </div>
-       </div>
+      </div>
 
-       <!-- Mini-Game Modal -->
-        <div id="miniGameModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1001; align-items:center; justify-content:center;">
-            <div style="background:linear-gradient(135deg, #1e3a5f, #2c5282); color:white; padding:40px; border:5px solid #ffd700; border-radius:20px; max-width:600px; width:90%; text-align:center; box-shadow:0 15px 50px rgba(0,0,0,0.7);">
-                
-                <h2 style="margin:0 0 25px; font-size:36px; color:#ffd700; text-shadow:0 2px 10px rgba(0,0,0,0.6);">
-                    Mini-Game Time!
-                </h2>
-                
-                <p id="miniGameMessage" style="font-size:22px; margin:0 0 30px; line-height:1.5;">
-                    A special challenge has appeared!<br>
-                    <span style="font-size:26px; font-weight:bold;">Complete it to earn bonus points for your team<br>or disadvantage the other team!</span>
-                </p>
-    
-                <!-- Placeholder space for the actual mini-game content later -->
-                 <div id="miniGameContent" style="min-height:200px; background:rgba(255,255,255,0.1); border-radius:12px; margin:20px 0; padding:20px; font-size:18px;">
-                    [Mini-game will appear here – to be implemented later]
-                </div>
-                
-                <!-- Result / continue area -->
-                 <p id="miniGameResult" style="display:none; font-size:24px; font-weight:bold; margin:25px 0; min-height:40px;"></p>
-                 
-                 <button id="closeMiniGame" style="padding:16px 50px; font-size:22px; background:#4caf50; color:white; border:4px solid #000; border-radius:12px; cursor:pointer; font-weight:bold;">
-                    Continue Game
-                </button>
-            </div>
-        </div>
-
-         <div id="resultsScreen" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; color: white; font-family: system-ui; text-align: center; padding: 40px; overflow-y: auto;">
-          <div style="max-width: 700px; margin: 0 auto; background: rgba(20,20,50,0.9); border: 6px solid #ffd700; border-radius: 16px; padding: 40px; box-shadow: 0 10px 50px rgba(0,0,0,0.7);">
-            
-            <h1 style="font-size: 48px; margin: 0 0 20px; color: #ffd700; text-shadow: 0 2px 10px #000;">
-              GAME OVER
-            </h1>
-            
-            <h2 style="font-size: 36px; margin: 30px 0 10px; color: #fff;">
-              Final Results
-            </h2>
-            
-            <div style="display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; margin: 30px 0;">
-              <div style="min-width: 220px;">
-                <div style="font-size: 28px; font-weight: bold; color: #19b83d;">Team A Score</div>
-                <div id="finalScoreA" style="font-size: 64px; font-weight: 900; color: #19b83d; margin: 10px 0;">0</div>
-              </div>
-              
-              <div style="min-width: 220px;">
-                <div style="font-size: 28px; font-weight: bold; color: #ff4444;">Team B Score</div>
-                <div id="finalScoreB" style="font-size: 64px; font-weight: 900; color: #ff4444; margin: 10px 0;">0</div>
-              </div>
-            </div>
-            
-            <div style="margin: 40px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px;">
-              <h3 style="font-size: 28px; margin: 0 0 20px; color: #ffd700;">Player Stats</h3>
-              <div id="playerStats" style="font-size: 20px; line-height: 1.6; color: #e0f7ff;">
-                </div>
-              </div>
-              
-              <button id="newGameBtn" style="margin-top: 30px; padding: 18px 50px; font-size: 24px; font-weight: 900; background: #6c2bd9; color: white; border: 5px solid #000; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
-                New Game
+      <div id="miniGameModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1001; align-items:center; justify-content:center;">
+          <div style="background:linear-gradient(135deg, #1e3a5f, #2c5282); color:white; padding:40px; border:5px solid #ffd700; border-radius:20px; max-width:600px; width:90%; text-align:center; box-shadow:0 15px 50px rgba(0,0,0,0.7);">
+              <h2 style="margin:0 0 25px; font-size:36px; color:#ffd700; text-shadow:0 2px 10px rgba(0,0,0,0.6);">
+                  System Alert
+              </h2>
+              <p id="miniGameMessage" style="font-size:22px; margin:0 0 30px; line-height:1.5;">
+                  A special event has triggered!
+              </p>
+               <button id="closeMiniGame" style="padding:16px 50px; font-size:22px; background:#4caf50; color:white; border:4px solid #000; border-radius:12px; cursor:pointer; font-weight:bold;">
+                  Acknowledge
               </button>
+          </div>
+      </div>
+
+      <div id="resultsScreen" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; color: white; font-family: system-ui; text-align: center; padding: 40px; overflow-y: auto;">
+        <div style="max-width: 700px; margin: 0 auto; background: rgba(20,20,50,0.9); border: 6px solid #ffd700; border-radius: 16px; padding: 40px; box-shadow: 0 10px 50px rgba(0,0,0,0.7);">
+          <h1 style="font-size: 48px; margin: 0 0 20px; color: #ffd700; text-shadow: 0 2px 10px #000;">
+            GAME OVER
+          </h1>
+          <h2 style="font-size: 36px; margin: 30px 0 10px; color: #fff;">
+            Final Results
+          </h2>
+          <div style="display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; margin: 30px 0;">
+            <div style="min-width: 220px;">
+              <div style="font-size: 28px; font-weight: bold; color: #19b83d;">Team A Score</div>
+              <div id="finalScoreA" style="font-size: 64px; font-weight: 900; color: #19b83d; margin: 10px 0;">0</div>
+            </div>
+            <div style="min-width: 220px;">
+              <div style="font-size: 28px; font-weight: bold; color: #ff4444;">Team B Score</div>
+              <div id="finalScoreB" style="font-size: 64px; font-weight: 900; color: #ff4444; margin: 10px 0;">0</div>
             </div>
           </div>
-        </main>
+          <div style="margin: 40px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px;">
+            <h3 style="font-size: 28px; margin: 0 0 20px; color: #ffd700;">Player Stats</h3>
+            <div id="playerStats" style="font-size: 20px; line-height: 1.6; color: #e0f7ff;">
+            </div>
+          </div>
+          <button id="newGameBtn" style="margin-top: 30px; padding: 18px 50px; font-size: 24px; font-weight: 900; background: #6c2bd9; color: white; border: 5px solid #000; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
+            New Game
+          </button>
+        </div>
       </div>
+    </main>
+  </div>
 
   <script src="game.js"></script>
 
   <script>
-    // Show saved player name
+    // Initializes UI from local storage
     const savedName = localStorage.getItem("playerName") || "Player";
     document.getElementById("playerNameDisplay").textContent = savedName;
 
@@ -166,30 +147,73 @@
     if (teamDisplay) teamDisplay.textContent = team;
     if (roleDisplay) roleDisplay.textContent = role;
 
+    // Closes question modal
     document.getElementById('closeQuestion').addEventListener('click', () => {
       document.getElementById('questionModal').style.display = 'none';
       isQuestionActive = false;
       paused = false;
 
-      // Only reset burst if all 4 questions are done
-      if (questionCount >= 4) {
-        isQuizBurstActive = false;
+      if (typeof questionCount !== 'undefined' && questionCount >= 4) {
+        if (typeof isQuizBurstActive !== 'undefined') isQuizBurstActive = false;
       }
 
       document.getElementById('feedback').style.display = 'none';
       document.getElementById('closeQuestion').style.display = 'none';
-      setStatus("Game resumed!");
-      syncUI();
+      if (typeof setStatus === 'function') setStatus("Game resumed!");
+      if (typeof syncUI === 'function') syncUI();
     });
 
+    // Closes mini-game modal
     document.getElementById('closeMiniGame').addEventListener('click', () => {
         document.getElementById('miniGameModal').style.display = 'none';
-        isMiniGameActive = false;
+        if (typeof isMiniGameActive !== 'undefined') isMiniGameActive = false;
         paused = false;
-        setStatus("Game resumed!");
-        syncUI();
+        if (typeof setStatus === 'function') setStatus("Game resumed!");
+        if (typeof syncUI === 'function') syncUI();
+    });
+
+    // Manages hack timer and UI states
+    let hackTimer;
+    let timeLeft = 60;
+    const statusEl = document.getElementById("status");
+    const timerEl = document.getElementById("timeLeft");
+    const iframe = document.getElementById("unityIframe");
+
+    // Starts game and timer on click
+    document.getElementById("startBtnGame").addEventListener("click", function() {
+      clearInterval(hackTimer);
+      timeLeft = 60;
+      timerEl.textContent = timeLeft;
+      statusEl.textContent = "HACK IN PROGRESS...";
+      statusEl.style.color = "#ffd700";
+      
+      iframe.focus();
+      
+      hackTimer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(hackTimer);
+          statusEl.textContent = "TIME EXPIRED!";
+          statusEl.style.color = "#ff5e5e";
+        }
+      }, 1000);
+    });
+
+    // Listens for Unity game over message
+    window.addEventListener("message", function(event) {
+      if (event.data && event.data.type === "STACKER_GAME_OVER") {
+        clearInterval(hackTimer);
+        let finalScore = event.data.score;
+        
+        document.getElementById("scoreA").textContent = finalScore;
+        
+        statusEl.textContent = "HACK COMPLETE: " + finalScore + " POINTS!";
+        statusEl.style.color = "#00ff9d";
+        
+        document.dispatchEvent(new CustomEvent('unityGameOver', { detail: { score: finalScore } }));
+      }
     });
   </script>
-  
 </body>
 </html>
