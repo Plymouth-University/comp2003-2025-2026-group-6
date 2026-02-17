@@ -1,0 +1,18 @@
+{
+  "name": "plymouth-university-comp2003-2025-2026-group-6-main-ui-design-ui-prototype",
+  "version": "1.0.0",
+  "description": "This is a Semester 1 prototype demonstrating how a Figma UI design\r was translated into a working web-based game prototype.",
+  "main": "firebase.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2"
+  }
+}

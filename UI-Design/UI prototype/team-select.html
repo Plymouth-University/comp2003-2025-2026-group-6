@@ -75,43 +75,51 @@
     </header>
 
     <main class="screen">
-      <section class="welcomeCard" style="max-width: 900px; margin: 100px auto 0;">
-        <h2 style="margin-top:0; font-size:36px; font-weight:900; text-align:center;">
-          Choose Your Team & Role
-        </h2>
+        <section class="welcomeCard" style="max-width: 900px; margin: 100px auto 0;">
+            <h2 style="margin-top:0; font-size:36px; font-weight:900; text-align:center;">
+                Choose Your Team & Role
+            </h2>
 
-        <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
-          Pick your team and role for this session!
-        </p>
+            <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
+                Pick your team and role for this session!
+            </p>
 
-        <div class="team-select">
-          <!-- Team A -->
-          <div class="team-card team-a" data-team="A">
-            <div class="team-title">TEAM A</div>
-            <button class="role-btn" data-role="scout">🕵️ Scout</button>
-            <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
-            <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
-            <button class="role-btn" data-role="defender">🛡️ Defender</button>
-          </div>
+            <div class="team-select">
+                <!-- Team A -->
+                <div class="team-card team-a" data-team="A">
+                    <div class="team-title">TEAM A</div>
+                    <button class="role-btn" data-role="scout">🕵️ Scout</button>
+                    <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
+                    <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
+                    <button class="role-btn" data-role="defender">🛡️ Defender</button>
+                </div>
 
-          <!-- Team B -->
-          <div class="team-card team-b" data-team="B">
-            <div class="team-title">TEAM B</div>
-            <button class="role-btn" data-role="scout">🕵️ Scout</button>
-            <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
-            <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
-            <button class="role-btn" data-role="defender">🛡️ Defender</button>
-          </div>
-        </div>
+                <!-- Team B -->
+                <div class="team-card team-b" data-team="B">
+                    <div class="team-title">TEAM B</div>
+                    <button class="role-btn" data-role="scout">🕵️ Scout</button>
+                    <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
+                    <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
+                    <button class="role-btn" data-role="defender">🛡️ Defender</button>
+                </div>
+            </div>
 
-        <button id="confirmTeam" class="startBig confirm-btn" disabled>
-          Join Game!
-        </button>
+            <button id="confirmTeam" class="startBig confirm-btn" disabled>
+                Join Game!
+            </button>
 
-        <p style="margin-top: 24px; font-size: 16px; color: #333; text-align:center;">
-          <a href="join.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Back to PIN</a>
-        </p>
-      </section>
+            <p style="margin-top: 24px; font-size: 16px; color: #333; text-align:center;">
+                <a href="join.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Back to PIN</a>
+            </p>
+        </section>
+        <!-- Temporery Question Generation -->
+        <h1>Generate Questions</h1>
+
+        <textarea id="topic" rows="4" cols="50" placeholder="Enter topic..."></textarea><br>
+                <button onclick="sendTopic()">Generate</button>
+
+                <h2>Response:</h2>
+        <pre id="response"></pre>
     </main>
   </div>
 
@@ -140,6 +148,28 @@
 
       window.location.href = 'confirm-team.html';
     });
+
+      async function sendTopic() {
+          const topic = document.getElementById("topic").value;
+          const responseBox = document.getElementById("response");
+          responseBox.textContent = ""; // Clear previous output
+
+          const res = await fetch("http://localhost:3000/api/ask", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ topic })
+          });
+
+          // STREAM the AI output
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+
+          while (true) {
+              const { value, done } = await reader.read();
+              if (done) break;
+              responseBox.textContent += decoder.decode(value);
+          }
+      }
   </script>
 </body>
 </html>
