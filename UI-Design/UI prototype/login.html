@@ -5,6 +5,38 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Log In – Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 8px;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 20px auto;
+      transition: all 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+    .google-btn img {
+      width: 26px;
+      height: 26px;
+    }
+    #statusMsg {
+      font-size: 15px;
+      color: #c00;
+      min-height: 22px;
+      margin: 8px 0;
+    }
+  </style>
 </head>
 
 <body>
@@ -24,76 +56,30 @@
           Log In
         </h2>
 
-        <form id="loginForm">
-          <p class="welcomeText">Enter your player name</p>
+        <p class="welcomeText">Welcome back! Sign in to continue.</p>
 
-          <input
-            type="email"
-            id="email"
-            placeholder="Email address"
-            required
-            style="
-              font-size:18px;
-              padding:10px;
-              border:4px solid #000;
-              width:100%;
-              max-width:300px;
-              margin:10px auto;
-              display:block;
-            "
-           />
+        <button class="google-btn" id="googleBtn">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" />
+          Continue with Google
+        </button>
 
-           <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            required
-            style="
-              font-size:18px;
-              padding:10px;
-              border:4px solid #000;
-              width:100%;
-              max-width:300px;
-              margin:10px auto;
-              display:block;
-            "
-           />
+        <p id="statusMsg"></p>
 
-           <input
-            type="text"
-            id="loginName"
-            placeholder="Player name (display name)"
-            required
-            style="
-              font-size:18px;
-              padding:10px;
-              border:4px solid #000;
-              width:100%;
-              max-width:300px;
-              margin:10px auto;
-              display:block;
-            "
-          />
+        <p style="margin-top: 24px; font-size: 14px; color: #555;">
+          Your Google display name will be used as your player name.
+        </p>
 
-
-          <button class="startBig" type="submit">
-            Log In
-          </button>
-        </form>
-
-        <!-- Link back to sign in / create account -->
-        <p style="margin-top: 24px; font-size: 16px; color: #333;">
-          Don't have an account? 
-          <a href="signin.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Sign in</a>
+        <p style="margin-top: 16px; font-size: 16px; color: #333;">
+          New here?
+          <a href="signin.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Sign up</a>
         </p>
       </section>
     </main>
   </div>
 
-  <!-- Firebase SDK + Login Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
@@ -107,53 +93,31 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const statusMsg = document.getElementById("statusMsg");
 
-    // Handle login form submission
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const playerName = document.getElementById("loginName").value.trim();
-
-      if (!email || !password || !playerName) {
-        alert("Please fill all fields!");
-        return;
-      }
-
+    document.getElementById("googleBtn").addEventListener("click", async () => {
+      statusMsg.textContent = "";
       try {
-        // Log in with Firebase
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-        console.log("Logged in successfully:", user.uid);
-
-        // Save player name for the game
+        const playerName = user.displayName || user.email.split("@")[0];
         localStorage.setItem("playerName", playerName);
-        // Optional: save user info
         localStorage.setItem("userEmail", user.email);
 
-        // Redirect to next page
+        console.log("Logged in as:", playerName, user.uid);
         window.location.href = "join.html";
+
       } catch (error) {
-        let msg = "Login failed. Please try again.";
-        // Firebase SDK v10+ uses auth/invalid-credential instead of
-        // auth/user-not-found and auth/wrong-password
-        if (
-          error.code === "auth/invalid-credential" ||
-          error.code === "auth/user-not-found" ||
-          error.code === "auth/wrong-password"
-        ) {
-          msg = "Incorrect email or password.";
-        } else if (error.code === "auth/invalid-email") {
-          msg = "Invalid email format.";
-        } else if (error.code === "auth/too-many-requests") {
-          msg = "Too many attempts. Try again later.";
-        } else if (error.code === "auth/user-disabled") {
-          msg = "This account has been disabled.";
+        if (error.code === "auth/popup-closed-by-user") {
+          statusMsg.textContent = "Sign-in cancelled. Please try again.";
+        } else if (error.code === "auth/popup-blocked") {
+          statusMsg.textContent = "Popup was blocked. Please allow popups for this site.";
+        } else {
+          statusMsg.textContent = "Sign-in failed. Please try again.";
+          console.error("Google sign-in error:", error.code, error.message);
         }
-        alert(msg);
-        console.error("Firebase error code:", error.code, error.message);
       }
     });
   </script>

@@ -5,6 +5,43 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Sign In – Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 8px;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 20px auto;
+      transition: all 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+    .google-btn img {
+      width: 26px;
+      height: 26px;
+    }
+    .divider {
+      color: #666;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+    #statusMsg {
+      font-size: 15px;
+      color: #c00;
+      min-height: 22px;
+      margin: 8px 0;
+    }
+  </style>
 </head>
 
 <body>
@@ -24,107 +61,66 @@
           Sign In
         </h2>
 
-        <form id="signinForm">
-            <p class="welcomeText">Create your account</p>
-            
-            <input
-            type="email"
-            id="email"
-            placeholder="Email address"
-            required
-            style="font-size:18px; padding:10px; border:4px solid #000; width:100%; max-width:300px; margin:10px auto; display:block;"
-            />
-            
-            <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            required
-            style="font-size:18px; padding:10px; border:4px solid #000; width:100%; max-width:300px; margin:10px auto; display:block;"
-            />
-            
-            <input
-            type="text"
-            id="playerName"
-            placeholder="Player name (display name)"
-            required
-            style="font-size:18px; padding:10px; border:4px solid #000; width:100%; max-width:300px; margin:10px auto; display:block;"
-            />
-            
-            <button class="startBig" type="submit">
-                Sign Up & Enter Game
-            </button>
-        </form>
+        <p class="welcomeText">Sign in to play Capture the Flag!</p>
 
-        <p style="margin-top: 24px; font-size: 16px; color: #333;">
-          Already have an account? 
-          <a href="login.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Log in</a>
+        <button class="google-btn" id="googleBtn">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" />
+          Continue with Google
+        </button>
+
+        <p id="statusMsg"></p>
+
+        <p style="margin-top: 24px; font-size: 14px; color: #555;">
+          Your Google display name will be used as your player name.
         </p>
       </section>
     </main>
   </div>
 
-  <!-- Firebase SDK - latest modular version via CDN -->
-<script type="module">
-  // Import Firebase modules
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
-    authDomain: "ctf-game-06.firebaseapp.com",
-    projectId: "ctf-game-06",
-    storageBucket: "ctf-game-06.firebasestorage.app",
-    messagingSenderId: "509318018925",
-    appId: "1:509318018925:web:a91ddc9f7fc130dfe54c64",
-    measurementId: "G-L4WP0E0V6S"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
+      authDomain: "ctf-game-06.firebaseapp.com",
+      projectId: "ctf-game-06",
+      storageBucket: "ctf-game-06.firebasestorage.app",
+      messagingSenderId: "509318018925",
+      appId: "1:509318018925:web:a91ddc9f7fc130dfe54c64",
+      measurementId: "G-L4WP0E0V6S"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const statusMsg = document.getElementById("statusMsg");
 
-  // Handle form submission (signup)
-  document.getElementById("signinForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    document.getElementById("googleBtn").addEventListener("click", async () => {
+      statusMsg.textContent = "";
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const playerName = document.getElementById("playerName").value.trim();
+        const playerName = user.displayName || user.email.split("@")[0];
 
-    if (!email || !password || !playerName) {
-      alert("Please fill all fields!");
-      return;
-    }
+        localStorage.setItem("playerName", playerName);
+        localStorage.setItem("userEmail", user.email);
 
-    try {
-      // Create user with email/password
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+        console.log("Signed in as:", playerName, user.uid);
+        window.location.href = "join.html";
 
-      console.log("User signed up:", user.uid);
-
-      // Save player name (and optionally user ID) to localStorage
-      localStorage.setItem("playerName", playerName);
-      localStorage.setItem("userEmail", user.email); // optional
-
-      // Redirect to next page
-      window.location.href = "join.html";
-    } catch (error) {
-      // Show friendly error messages
-      let msg = "Signup failed. Please try again.";
-      if (error.code === "auth/email-already-in-use") {
-        msg = "This email is already in use. Try logging in instead.";
-      } else if (error.code === "auth/weak-password") {
-        msg = "Password is too weak. Use at least 6 characters.";
-      } else if (error.code === "auth/invalid-email") {
-        msg = "Invalid email format.";
+      } catch (error) {
+        if (error.code === "auth/popup-closed-by-user") {
+          statusMsg.textContent = "Sign-in cancelled. Please try again.";
+        } else if (error.code === "auth/popup-blocked") {
+          statusMsg.textContent = "Popup was blocked. Please allow popups for this site.";
+        } else {
+          statusMsg.textContent = "Sign-in failed. Please try again.";
+          console.error("Google sign-in error:", error.code, error.message);
+        }
       }
-      alert(msg);
-      console.error(error);
-    }
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
