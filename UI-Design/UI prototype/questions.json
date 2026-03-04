@@ -1,0 +1,90 @@
+[
+  {
+    "questionID": 0,
+    "question": "What is the name of Harry Potter's pet owl?",
+    "answers": [
+      "Hedwig",
+      "Scabbers",
+      "Fang",
+      "Persis"
+    ],
+    "correctAns": "Hedwig"
+  },
+  {
+    "questionID": 1,
+    "question": "Which Hogwarts house does Harry Potter belong to?",
+    "answers": [
+      "Gryffindor",
+      "Hufflepuff",
+      "Slytherin",
+      "Ravenclaw"
+    ],
+    "correctAns": "Gryffindor"
+  },
+  {
+    "questionID": 2,
+    "question": "What does the Elder Wand belong to?",
+    "answers": [
+      "Luna Lovegood",
+      "Hermione Granger",
+      "Ron Weasley",
+      "Albus Dumbledore"
+    ],
+    "correctAns": "Albus Dumbledore"
+  },
+  {
+    "questionID": 3,
+    "question": "What animal is used in the first stage of the Tri Wizzard tournament?",
+    "answers": [
+      "A Sphinx",
+      "A Dragon",
+      "A Griffin",
+      "A Unicorn"
+    ],
+    "correctAns": "A Dragon"
+  },
+  {
+    "questionID": 4,
+    "question": "What is the spell used to cast a patronus?",
+    "answers": [
+      "Alohomora",
+      "Wingardium Leviosa",
+      "Expecto Patronum",
+      "Crucio"
+    ],
+    "correctAns": "Expecto Patronum"
+  },
+  {
+    "questionID": 5,
+    "question": "Which Hogwarts professor is known for his incredibly complex and lengthy lessons?",
+    "answers": [
+      "Professor Snape",
+      "Professor Dumbledore",
+      "Professor McGonagall",
+      "Professor Flitwick"
+    ],
+    "correctAns": "Professor McGonagall"
+  },
+  {
+    "questionID": 6,
+    "question": "What is the name of the magical artifact that protects the wizarding world?",
+    "answers": [
+      "The Sword of Gryffindor",
+      "The Cup of Fire",
+      "The Mirror of Erised",
+      "The Shield of Gryffindor"
+    ],
+    "correctAns": "The Shield of Gryffindor"
+  },
+  {
+    "questionID": 7,
+    "question": "What is the significance of the Mirror of Erised?",
+    "answers": [
+      "It shows the future",
+      "It shows the past",
+      "It shows a specific person",
+      "It shows the persons deepest desires"
+    ],
+    "correctAns": "It shows the persons deepest desires"
+  }
+]
