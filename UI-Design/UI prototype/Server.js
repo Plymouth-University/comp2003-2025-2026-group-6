@@ -11,10 +11,15 @@ app.post("/api/ask", async (req, res) => {
 
   const basePrompt = `
   You are a teacher providing multiple choice questions to students.
-  Generate 8 questions on the following topic, along with:
-  - one correct answer
-  - three incorrect answers
-  Return output in valid JSON ONLY.
+  Generate 8 questions on the following topic, this is should be in a valid JSON format with the following keys:
+  - 'questionID'
+  - 'question'
+  - 'answers'
+  - 'correctAns'
+
+  Rules:
+  - there are four 'answers' with the corresponding 'correctAns' highlighting which one is true
+  - a 'questionID' is provided for each question and starts at 0
 
   Topic: ${topic}
     `.trim();  
