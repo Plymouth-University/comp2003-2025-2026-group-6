@@ -16,20 +16,35 @@ app.post("/api/ask", async (req, res) => {
     You are a teacher providing multiple choice questions to students.
     Generate 8 questions on the following topic, this should be in a valid JSON format using the following question template:
     {
-        "questionID": 0,
-        "question": "What is the answer to this question?",
+    "0": {
+        "question": "Question text here",
         "answers": [
-          "Answer1",
-          "Answer2",
-          "Answer3",
-          "Answer4"
+        "Answer 1",
+        "Answer 2",
+        "Answer 3",
+        "Answer 4"
         ],
-        "correctAns": "Answer3"
+        "correctAns": "The correct answer text here"
     },
+    "1": {
+        "question": "Question text here",
+        "answers": [
+        "Answer 1",
+        "Answer 2",
+        "Answer 3",
+        "Answer 4"
+        ],
+        "correctAns": "The correct answer text here"
+    }
+    // continue with all questions in the same object
+    }
 
     Rules:
-    - there are four 'answers' with the corresponding 'correctAns' highlighting which one is true
-    - a 'questionID' is provided for each question and starts at 0
+    - Do not wrap each question inside a separate array or object.
+    - Use a single JSON object containing all questions keyed by their IDs ("0" to "7").
+    - Each question must have four 'answers' and a 'correctAns'.
+    - Question IDs start at 0 and increment by 1.
+    - Only output valid JSON; no extra text.
 
     Topic: ${topic}
     `.trim();
@@ -70,14 +85,17 @@ app.post("/api/ask", async (req, res) => {
             .replace(/```/g, "")
             .trim();
 
-        const match = cleaned.match(/\[[\s\S]*\]/);
+        let jsonString = cleaned;
 
-        if (!match) {
-            console.error("Could not find full JSON array.");
+        // Optional: remove leading/trailing text outside the first { ... }
+        const firstBrace = cleaned.indexOf("{");
+        const lastBrace = cleaned.lastIndexOf("}");
+        if (firstBrace === -1 || lastBrace === -1) {
+            console.error("Could not find JSON object in response.");
             return;
         }
 
-        const jsonString = match[0];
+        jsonString = cleaned.slice(firstBrace, lastBrace + 1);
 
         //Saves output to JSON file in website directory:
         try {
