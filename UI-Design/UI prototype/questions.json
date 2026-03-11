@@ -1,90 +1,92 @@
-[
-  {
-    "questionID": 0,
-    "question": "What is the name of Harry Potter's pet owl?",
+{
+  "0": {
+    "question": "Which of the following is the primary goal of cybersecurity?",
     "answers": [
-      "Hedwig",
-      "Scabbers",
-      "Fang",
-      "Persis"
+      "Protecting data from unauthorized access.",
+      "Generating revenue through data collection.",
+      "Providing entertainment through interactive content.",
+      "Creating complex algorithms for financial gain."
     ],
-    "correctAns": "Hedwig"
+    "correctAns": "Protecting data from unauthorized access."
   },
-  {
-    "questionID": 1,
-    "question": "Which Hogwarts house does Harry Potter belong to?",
+  "1": {
+    "question": "What is a firewall primarily designed to do?",
     "answers": [
-      "Gryffindor",
-      "Hufflepuff",
-      "Slytherin",
-      "Ravenclaw"
+      "Allow all network traffic without inspection.",
+      "Encrypt data in transit to prevent interception.",
+      "Provide a secure network environment for employees.",
+      "Automatically update software across the entire network."
     ],
-    "correctAns": "Gryffindor"
+    "correctAns": "Protecting data from unauthorized access."
   },
-  {
-    "questionID": 2,
-    "question": "What does the Elder Wand belong to?",
+  "2": {
+    "question": "What is a common method used to identify and mitigate phishing attacks?",
     "answers": [
-      "Luna Lovegood",
-      "Hermione Granger",
-      "Ron Weasley",
-      "Albus Dumbledore"
+      "Sending email with a link to a malicious website.",
+      "Analyzing email content for suspicious patterns.",
+      "Implementing a strict policy of employee training.",
+      "Ignoring potential threats due to lack of awareness."
     ],
-    "correctAns": "Albus Dumbledore"
+    "correctAns": "Analyzing email content for suspicious patterns."
   },
-  {
-    "questionID": 3,
-    "question": "What animal is used in the first stage of the Tri Wizzard tournament?",
+  "3": {
+    "question": "What does 'authentication' refer to in the context of cybersecurity?",
     "answers": [
-      "A Sphinx",
-      "A Dragon",
-      "A Griffin",
-      "A Unicorn"
+      "Providing user accounts for accessing systems.",
+      "Verifying a user's identity before granting access.",
+      "Creating a secure and private data storage system.",
+      "Designing visually appealing user interfaces."
     ],
-    "correctAns": "A Dragon"
+    "correctAns": "Verifying a user's identity before granting access."
   },
-  {
-    "questionID": 4,
-    "question": "What is the spell used to cast a patronus?",
+  "4": {
+    "question": "Which of the following is a critical component of an intrusion detection system?",
     "answers": [
-      "Alohomora",
-      "Wingardium Leviosa",
-      "Expecto Patronum",
-      "Crucio"
+      "Printing documents for casual use.",
+      "Monitoring network traffic for suspicious activity.",
+      "Automatically adjusting computer settings.",
+      "Creating memes for social media."
     ],
-    "correctAns": "Expecto Patronum"
+    "correctAns": "Monitoring network traffic for suspicious activity."
   },
-  {
-    "questionID": 5,
-    "question": "Which Hogwarts professor is known for his incredibly complex and lengthy lessons?",
+  "5": {
+    "question": "What is the purpose of an Access Control List (ACL)?",
     "answers": [
-      "Professor Snape",
-      "Professor Dumbledore",
-      "Professor McGonagall",
-      "Professor Flitwick"
+      "To define the data each user is allowed to access.",
+      "To display a user's profile on the website.",
+      "To manage network permissions.",
+      "To create a daily report of system activity."
     ],
-    "correctAns": "Professor McGonagall"
+    "correctAns": "To manage network permissions."
   },
-  {
-    "questionID": 6,
-    "question": "What is the name of the magical artifact that protects the wizarding world?",
+  "6": {
+    "question": "What does 'threat intelligence' involve?",
     "answers": [
-      "The Sword of Gryffindor",
-      "The Cup of Fire",
-      "The Mirror of Erised",
-      "The Shield of Gryffindor"
+      "Generating new security vulnerabilities.",
+      "Analyzing data to identify potential threats.",
+      "Creating security training materials.",
+      "Automatically patching all software updates."
     ],
-    "correctAns": "The Shield of Gryffindor"
+    "correctAns": "Analyzing data to identify potential threats."
   },
-  {
-    "questionID": 7,
-    "question": "What is the significance of the Mirror of Erised?",
+  "7": {
+    "question": "Which type of security measure focuses on preventing unauthorized access to a system?",
     "answers": [
-      "It shows the future",
-      "It shows the past",
-      "It shows a specific person",
-      "It shows the persons deepest desires"
+      "Lateral movement – moving to a different system.",
+      "Data loss – losing data accidentally or intentionally.",
+      "Malware – harmful software.",
+      "Physical security – protecting the building."
     ],
-    "correctAns": "It shows the persons deepest desires"
+    "correctAns": "Preventing unauthorized access to a system."
+  },
+  "8": {
+    "question": "What is a 'zero-day vulnerability'?",
+    "answers": [
+      "A vulnerability that is known to the vendor.",
+      "A vulnerability that has been discovered and patched by the vendor.",
+      "A vulnerability that exists in a user's software.",
+      "A vulnerability that is widely publicized."
+    ],
+    "correctAns": "A vulnerability that exists in a user's software."
   }
-]
+}
