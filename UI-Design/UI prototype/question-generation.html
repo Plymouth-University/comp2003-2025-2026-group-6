@@ -72,15 +72,13 @@
             <button id="editButton">Edit</button>
 
 
-            <!-- Temporery Question Generation -->
-            <h2>Response:</h2>
-            <pre id="response"></pre>
+            <!-- Temporery Question Generation Loading-->
+            <h2 id="loading">Questions are generating - this could take a minute...</h2>
             
         </main>
     </div>
 
     <script>
-
         //Button activation
         const getTopic = document.getElementById("topic")
         getTopic.addEventListener('input', () => {
@@ -90,27 +88,27 @@
             }
         });
 
+        loading.style.visibility = "hidden";
         async function sendTopic() {
+            loading.style.visibility = "visible";
             const topic = document.getElementById("topic").value;
-            const responseBox = document.getElementById("response");
-            responseBox.textContent = ""; // Clear previous output
 
+            try {
             const res = await fetch("http://localhost:3000/api/ask", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ topic })
             });
+            const data = await res.json();
+            console.log(data);
 
-            // STREAM the AI output
-            const reader = res.body.getReader();
-            const decoder = new TextDecoder();
-
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                responseBox.textContent += decoder.decode(value);
-            }
+            } catch (err) {
+                console.error("Fetch error:", err);
+            } finally {
+                // Always hide the loading message
+                loading.style.visibility = "hidden";
         }
+    } 
     </script>
     <script type="module" src="question-generation.js"></script>
 </body>
