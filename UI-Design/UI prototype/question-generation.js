@@ -22,17 +22,16 @@ fileInput.addEventListener("change", function (event) {
             response.textContent = '';
             QandAs.forEach((q, i) => {
                 addItem();
-                let temp = i+1
-                document.getElementById("Q" + temp).value = q.question;
-                document.getElementById("A" + temp).value = "A";
-                document.getElementById("B" + temp).value = "B";
-                document.getElementById("C" + temp).value = "C";
-                document.getElementById("D" + temp).value = "D";
-                document.getElementById("Correct" + temp).value = q.correctAns;
-                //response.textContent += `Question ${i + 1}: ${q.question}\n`;
-                //response.textContent += `Answers: ${q.answers}\n`;
-                //response.textContent += `CorrectAns: ${q.correctAns}\n\n`;
-
+                let qNumber = i+1
+                document.getElementById("qNum" + qNumber).textContent = "Question " + qNumber + ":";
+                document.getElementById("Q" + qNumber).value = q.question;
+                document.getElementById("aNum" + qNumber).textContent = "Answers:";
+                document.getElementById("A" + qNumber).value = q.answers[0];
+                document.getElementById("B" + qNumber).value = q.answers[1];
+                document.getElementById("C" + qNumber).value = q.answers[2];
+                document.getElementById("D" + qNumber).value = q.answers[3];
+                document.getElementById("cNum" + qNumber).textContent = "Correct answer:";
+                document.getElementById("Correct" + qNumber).value = q.correctAns;
             })
 
         } catch (error) {
@@ -48,11 +47,14 @@ function addItem() {
     const template = document.getElementById("itemTemplate");
     const clone = template.content.cloneNode(true);
 
+    clone.querySelector("#qNum").id = "qNum" + Qcount;
     clone.querySelector("#Q").id = "Q" + Qcount;
+    clone.querySelector("#aNum").id = "aNum" + Qcount;
     clone.querySelector("#A").id = "A" + Qcount;
     clone.querySelector("#B").id = "B" + Qcount;
     clone.querySelector("#C").id = "C" + Qcount;
     clone.querySelector("#D").id = "D" + Qcount;
+    clone.querySelector("#cNum").id = "cNum" + Qcount;
     clone.querySelector("#Correct").id = "Correct" + Qcount;
 
     document.getElementById("container").appendChild(clone);
@@ -60,7 +62,6 @@ function addItem() {
 document.getElementById("addButton").addEventListener("click", addItem);
 
 function editItem() {
-    const entry = document.getElementById("Q"+clicks).value = "Hello";
-    clicks++;
+    
 }
 document.getElementById("editButton").addEventListener("click", editItem);

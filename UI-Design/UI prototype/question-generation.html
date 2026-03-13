@@ -52,13 +52,20 @@
 
 
             <template id="itemTemplate">
-                <div class="item">Question:</div>
-                <textarea id="Q" rows="1" cols="25"></textarea>
-                <textarea id="A" rows="1" cols="25"></textarea>
-                <textarea id="B" rows="1" cols="25"></textarea>
-                <textarea id="C" rows="1" cols="25"></textarea>
-                <textarea id="D" rows="1" cols="25"></textarea>
-                <textarea id="Correct" rows="1" cols="25"></textarea>
+                <div id="qNum">Q</div>
+                <div class="item">
+                    <textarea id="Q" rows="1" cols="100"></textarea>
+                </div>
+                <div id="aNum">A</div>
+                <textarea id="A" rows="2" cols="40"></textarea>
+                <textarea id="B" rows="2" cols="40"></textarea>
+                <textarea id="C" rows="2" cols="40"></textarea>
+                <textarea id="D" rows="2" cols="40"></textarea>
+                <div id="cNum">C</div>
+                <div class="item">
+                    <textarea id="Correct" rows="1" cols="100"></textarea>
+                </div>
+                <br><br>
             </template>
             <div id="container"></div>
             <button id="addButton">Add</button>
