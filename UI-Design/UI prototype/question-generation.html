@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Generate Questions – Capture the Flag</title>
+    <title>Generate Questions ï¿½ Capture the Flag</title>
     <link rel="stylesheet" href="styles.css" />
     <style>
         .confirm-btn {
@@ -42,10 +42,33 @@
                     Generate
                 </button>
 
+                <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
+                    Or upload question pack:
+                </p>
+
+                <input type="file" id="file-input" accept=".json">
+
             </section>
+
+
+            <template id="itemTemplate">
+                <div class="item">Question:</div>
+                <textarea id="Q" rows="1" cols="25"></textarea>
+                <textarea id="A" rows="1" cols="25"></textarea>
+                <textarea id="B" rows="1" cols="25"></textarea>
+                <textarea id="C" rows="1" cols="25"></textarea>
+                <textarea id="D" rows="1" cols="25"></textarea>
+                <textarea id="Correct" rows="1" cols="25"></textarea>
+            </template>
+            <div id="container"></div>
+            <button id="addButton">Add</button>
+            <button id="editButton">Edit</button>
+
+
             <!-- Temporery Question Generation -->
             <h2>Response:</h2>
             <pre id="response"></pre>
+            
         </main>
     </div>
 
@@ -53,7 +76,6 @@
 
         //Button activation
         const getTopic = document.getElementById("topic")
-        const getGnerateButton = document.getElementById("generateBtn")
         getTopic.addEventListener('input', () => {
             generateBtn.disabled = false
             if (getTopic.value.trim() === "") {
@@ -83,5 +105,6 @@
             }
         }
     </script>
+    <script type="module" src="question-generation.js"></script>
 </body>
 </html>
