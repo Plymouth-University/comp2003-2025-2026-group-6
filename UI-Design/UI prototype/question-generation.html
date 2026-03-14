@@ -99,8 +99,11 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ topic })
             });
-            const data = await res.json();
-            console.log(data);
+            const blob = await res.blob();
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = topic + ".json";
+            link.click();
 
             } catch (err) {
                 console.error("Fetch error:", err);

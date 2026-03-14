@@ -65,27 +65,20 @@ app.post("/api/ask", async (req, res) => {
         const str = chunk.toString();
 
         try {
-            const json = JSON.parse(str);
-            const text = json.response || "";
-            res.write(text);
-            fullResponse += text;
+            const json = JSON.parse(str);          
+            fullResponse += json.response;
         } catch {
-            res.write(str);
-            fullResponse += str;
         }
     });
 
     //At the end of the responce:
     ollamaRes.body.on("end", () => {
-        res.end();
 
         const cleaned = fullResponse
             .replace(/\\n/g, "\n")
             .replace(/```json/gi, "")
             .replace(/```/g, "")
             .trim();
-
-        let jsonString = cleaned;
 
         // Optional: remove leading/trailing text outside the first { ... }
         const firstBrace = cleaned.indexOf("{");
@@ -95,16 +88,21 @@ app.post("/api/ask", async (req, res) => {
             return;
         }
 
-        jsonString = cleaned.slice(firstBrace, lastBrace + 1);
+        const jsonString = cleaned.slice(firstBrace, lastBrace + 1);
 
-        //Saves output to JSON file in website directory:
         try {
             const jsonData = JSON.parse(jsonString);
-            fs.writeFileSync("questions.json", JSON.stringify(jsonData, null, 2));
-            console.log("Saved JSON to questions.json");
+
+            res.setHeader("Content-Type", "application/json");
+            res.setHeader(
+                "Content-Disposition",
+                "attachment; filename=questions.json"
+            );
+
+            res.send(JSON.stringify(jsonData, null, 2));
+
         } catch (err) {
             console.error("Failed to parse JSON:", err);
-            console.error("Extracted JSON was:", jsonString);
         }
     });
 });
