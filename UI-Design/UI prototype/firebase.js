@@ -1,8 +1,24 @@
 // firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc, getDoc, setDoc, updateDoc,
+  collection, addDoc, getDocs,
+  query, where, orderBy, limit,
+  increment, serverTimestamp, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+
+// SECTION 1 – CONFIG & INIT
+
+// Firebase project settings - found in firebase console
 const firebaseConfig = {
   apiKey:            "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
   authDomain:        "ctf-game-06.firebaseapp.com",
@@ -13,16 +29,18 @@ const firebaseConfig = {
   measurementId:     "G-L4WP0E0V6S"
 };
 
+// Start up firebase and get auth + database ready to use
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
 export { app, auth, db };
 
-/**
- * Sign in with Google and create/update user doc in Firestore.
- * Returns the Firebase user object.
- */
+
+// SECTION 2 – AUTH & USERS
+
+// Opens google popup so the player can sign in
+// Also saves their info to the database if its their first time
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   const result   = await signInWithPopup(auth, provider);
@@ -31,30 +49,25 @@ export async function signInWithGoogle() {
   return user;
 }
 
-/**
- * Listen for auth state changes.
- * Calls callback(user) when logged in, callback(null) when logged out.
- */
+// Watches if the player is logged in or not
+// Useful for redirecting to sign in page if they arent logged in
 export function listenAuthState(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-/**
- * Sign out the current user.
- */
+// Signs the player out
 export async function logOut() {
   await signOut(auth);
 }
 
-/**
- * Create a new user doc on first sign in.
- * On return visits, just updates lastLoginAt.
- */
+// Saves a new player to the database when they sign in for the first time
+// If they already exist just updates their last login time
 export async function createOrUpdateUser(firebaseUser, role = "student") {
   const userRef = doc(db, "users", firebaseUser.uid);
   const snap    = await getDoc(userRef);
- 
+
   if (!snap.exists()) {
+    // New player - save all their details
     await setDoc(userRef, {
       uid:         firebaseUser.uid,
       username:    firebaseUser.displayName || firebaseUser.email.split("@")[0],
@@ -64,30 +77,27 @@ export async function createOrUpdateUser(firebaseUser, role = "student") {
       lastLoginAt: serverTimestamp()
     });
   } else {
+    // Already exists - just update last login
     await updateDoc(userRef, { lastLoginAt: serverTimestamp() });
   }
 }
 
-/**
- * Get a user document by UID.
- */
+// Gets a players info from the database using their uid
 export async function getUser(uid) {
   const snap = await getDoc(doc(db, "users", uid));
   return snap.exists() ? snap.data() : null;
 }
 
-/**
- * Update a user's role e.g. promote to teacher.
- */
+// Changes a players role e.g. from student to teacher
 export async function updateUserRole(uid, role) {
   await updateDoc(doc(db, "users", uid), { role });
 }
 
-/**
- * Create a new room with an auto-generated 6-digit PIN.
- * Called by a teacher when starting a session.
- * Returns { roomId, joinCode }
- */
+
+// SECTION 3 – ROOMS & PIN SYSTEM
+
+// Creates a new game room and generates a random 6 digit PIN
+// The teacher uses this to start a session
 export async function createRoom(hostUid, settings = {}) {
   const joinCode = generatePin();
   const roomRef  = await addDoc(collection(db, "rooms"), {
@@ -101,11 +111,8 @@ export async function createRoom(hostUid, settings = {}) {
   return { roomId: roomRef.id, joinCode };
 }
 
-/**
- * Find a room by its 6-digit PIN.
- * Used in join.html when a student enters their PIN.
- * Returns room data including roomId, or null if not found.
- */
+// Looks up a room using the PIN the student typed in join.html
+// Returns the room data or null if the PIN doesnt exist
 export async function getRoomByPin(pin) {
   const q    = query(collection(db, "rooms"), where("joinCode", "==", pin), limit(1));
   const snap = await getDocs(q);
@@ -114,16 +121,13 @@ export async function getRoomByPin(pin) {
   return { roomId: d.id, ...d.data() };
 }
 
-/**
- * Update room status: "open" | "in_game" | "closed"
- */
+// Updates the room status e.g. open, in_game or closed
 export async function updateRoomStatus(roomId, status) {
   await updateDoc(doc(db, "rooms", roomId), { status });
 }
- 
-/**
- * Add a player to a room when they join via PIN.
- */
+
+// Adds a player to the room when they join with a PIN
+// Also saves their chosen role like scout or warrior
 export async function joinRoom(roomId, uid, roomRole = null) {
   await setDoc(doc(db, "rooms", roomId, "memberships", uid), {
     uid:      uid,
@@ -133,28 +137,21 @@ export async function joinRoom(roomId, uid, roomRole = null) {
   });
 }
 
-/**
- * Mark a player as having left a room.
- */
+// Marks a player as left when they exit the room
 export async function leaveRoom(roomId, uid) {
   await updateDoc(doc(db, "rooms", roomId, "memberships", uid), {
     leftAt: serverTimestamp()
   });
 }
 
-/**
- * Get all current members of a room (one-time fetch).
- */
+// Gets a list of everyone currently in the room
 export async function getRoomMembers(roomId) {
   const snap = await getDocs(collection(db, "rooms", roomId, "memberships"));
   return snap.docs.map(d => d.data());
 }
 
-/**
- * Listen in real-time to players joining the lobby.
- * Calls callback(members[]) every time someone joins or leaves.
- * Returns unsubscribe function.
- */
+// Listens for players joining or leaving the room in real time
+// Good for showing a live lobby while waiting for the game to start
 export function listenRoomMembers(roomId, callback) {
   return onSnapshot(
     collection(db, "rooms", roomId, "memberships"),
@@ -162,11 +159,11 @@ export function listenRoomMembers(roomId, callback) {
   );
 }
 
-/**
- * Start a new match for a room.
- * Automatically creates Team A and Team B with score 0.
- * Returns matchId.
- */
+
+// SECTION 4 – MATCHES
+
+// Starts a new match for a room
+// Automatically creates team A and team B both starting at 0 points
 export async function createMatch(roomId) {
   const matchRef = await addDoc(collection(db, "matches"), {
     roomId:      roomId,
@@ -175,19 +172,17 @@ export async function createMatch(roomId) {
     winningTeam: null
   });
 
+   // Create both teams at the same time
   await Promise.all([
     setDoc(doc(db, "matches", matchRef.id, "teams", "A"), { teamName: "A", finalScore: 0 }),
     setDoc(doc(db, "matches", matchRef.id, "teams", "B"), { teamName: "B", finalScore: 0 })
   ]);
- 
+
   console.log("Match started:", matchRef.id);
   return matchRef.id;
 }
 
-/**
- * End a match and record the winning team.
- * winningTeam: "A" | "B"
- */
+// Ends the match and saves which team won
 export async function endMatch(matchId, winningTeam) {
   await updateDoc(doc(db, "matches", matchId), {
     endedAt:     serverTimestamp(),
@@ -195,12 +190,8 @@ export async function endMatch(matchId, winningTeam) {
   });
 }
 
-/**
- * Assign a player to a team within a match.
- * Prevents a player from being on two teams at once.
- * team: "A" | "B"
- * teamRole: "scout" | "warrior" | "carrier" | "defender"
- */
+// Puts a player into a team for this match
+// Uses merge so it wont overwrite if called twice by accident
 export async function assignPlayerToTeam(matchId, uid, team, teamRole) {
   await setDoc(
     doc(db, "matches", matchId, "team_members", uid),
@@ -209,21 +200,20 @@ export async function assignPlayerToTeam(matchId, uid, team, teamRole) {
   );
 }
 
-/**
- * Add points to a team score using atomic increment.
- * Safe for multiple players writing at the same time.
- * team: "A" | "B"
- */
+
+// SECTION 5 – TEAMS & SCORES
+
+
+// Adds points to a teams score after the unity game finishes
+// Uses increment so if two players finish at the same time neither score gets lost
 export async function addTeamScore(matchId, team, points) {
   await updateDoc(doc(db, "matches", matchId, "teams", team), {
     finalScore: increment(points)
   });
 }
 
-/**
- * Get both team scores in one call (one-time fetch).
- * Returns { A: number, B: number }
- */
+// Gets the current score for both teams at once
+// Returns something like { A: 500, B: 300 }
 export async function getTeamScores(matchId) {
   const [snapA, snapB] = await Promise.all([
     getDoc(doc(db, "matches", matchId, "teams", "A")),
@@ -235,14 +225,11 @@ export async function getTeamScores(matchId) {
   };
 }
 
-/**
- * Listen to live score updates for both teams.
- * Calls callback({ A: number, B: number }) every time either score changes.
- * Returns a single unsubscribe function.
- */
+// Watches both team scores live so the scoreboard updates automatically
+// Call the returned function to stop listening when the game ends
 export function listenTeamScores(matchId, callback) {
   let scores = { A: 0, B: 0 };
- 
+
   const unsubA = onSnapshot(
     doc(db, "matches", matchId, "teams", "A"),
     snap => {
@@ -257,11 +244,83 @@ export function listenTeamScores(matchId, callback) {
       callback({ ...scores });
     }
   );
- 
+
+  // Stop both listeners with one function call
   return () => { unsubA(); unsubB(); };
 }
 
-// ─── Helper ───────────────────────────────────────────────────
+
+// SECTION 6 – PLAYER STATS & LEADERBOARD
+
+// Sets up a blank stats record for a new player
+// Only runs if they dont already have one
+export async function initPlayerStats(uid) {
+  const statsRef = doc(db, "player_stats", uid);
+  const snap     = await getDoc(statsRef);
+  if (!snap.exists()) {
+    await setDoc(statsRef, {
+      uid:                  uid,
+      totalScore:           0,
+      totalPlaytimeSeconds: 0,
+      totalAttempts:        0,
+      correctAttempts:      0,
+      accuracyPercent:      0,
+      lastPlayedAt:         null
+    });
+  }
+}
+
+// Updates a players stats after a match
+// Adds to their existing totals rather than replacing them
+export async function updatePlayerStats(uid, {
+  score           = 0,
+  playtimeSeconds = 0,
+  attempts        = 0,
+  correctAttempts = 0
+}) {
+  const statsRef = doc(db, "player_stats", uid);
+
+  await setDoc(statsRef, {
+    totalScore:           increment(score),
+    totalPlaytimeSeconds: increment(playtimeSeconds),
+    totalAttempts:        increment(attempts),
+    correctAttempts:      increment(correctAttempts),
+    lastPlayedAt:         serverTimestamp()
+  }, { merge: true });
+
+  // Work out their accuracy percentage and save it
+  const snap = await getDoc(statsRef);
+  if (snap.exists()) {
+    const { totalAttempts: total, correctAttempts: correct } = snap.data();
+    const accuracy = total > 0 ? Math.round((correct / total) * 10000) / 100 : 0;
+    await updateDoc(statsRef, { accuracyPercent: accuracy });
+  }
+}
+
+// Gets a single players stats
+export async function getPlayerStats(uid) {
+  const snap = await getDoc(doc(db, "player_stats", uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+// Gets the top players sorted by score for the leaderboard
+export async function getLeaderboard(topN = 10) {
+  const q    = query(collection(db, "player_stats"), orderBy("totalScore", "desc"), limit(topN));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data());
+}
+
+// Watches the leaderboard live so it updates whenever a score changes
+export function listenLeaderboard(topN = 10, callback) {
+  const q = query(
+    collection(db, "player_stats"),
+    orderBy("totalScore", "desc"),
+    limit(topN)
+  );
+  return onSnapshot(q, snap => callback(snap.docs.map(d => d.data())));
+}
+
+// Generates a random 6 digit PIN for room codes
 function generatePin() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
