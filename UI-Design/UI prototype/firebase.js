@@ -209,6 +209,58 @@ export async function assignPlayerToTeam(matchId, uid, team, teamRole) {
   );
 }
 
+/**
+ * Add points to a team score using atomic increment.
+ * Safe for multiple players writing at the same time.
+ * team: "A" | "B"
+ */
+export async function addTeamScore(matchId, team, points) {
+  await updateDoc(doc(db, "matches", matchId, "teams", team), {
+    finalScore: increment(points)
+  });
+}
+
+/**
+ * Get both team scores in one call (one-time fetch).
+ * Returns { A: number, B: number }
+ */
+export async function getTeamScores(matchId) {
+  const [snapA, snapB] = await Promise.all([
+    getDoc(doc(db, "matches", matchId, "teams", "A")),
+    getDoc(doc(db, "matches", matchId, "teams", "B"))
+  ]);
+  return {
+    A: snapA.exists() ? snapA.data().finalScore : 0,
+    B: snapB.exists() ? snapB.data().finalScore : 0
+  };
+}
+
+/**
+ * Listen to live score updates for both teams.
+ * Calls callback({ A: number, B: number }) every time either score changes.
+ * Returns a single unsubscribe function.
+ */
+export function listenTeamScores(matchId, callback) {
+  let scores = { A: 0, B: 0 };
+ 
+  const unsubA = onSnapshot(
+    doc(db, "matches", matchId, "teams", "A"),
+    snap => {
+      scores.A = snap.exists() ? snap.data().finalScore : 0;
+      callback({ ...scores });
+    }
+  );
+  const unsubB = onSnapshot(
+    doc(db, "matches", matchId, "teams", "B"),
+    snap => {
+      scores.B = snap.exists() ? snap.data().finalScore : 0;
+      callback({ ...scores });
+    }
+  );
+ 
+  return () => { unsubA(); unsubB(); };
+}
+
 // ─── Helper ───────────────────────────────────────────────────
 function generatePin() {
   return Math.floor(100000 + Math.random() * 900000).toString();
