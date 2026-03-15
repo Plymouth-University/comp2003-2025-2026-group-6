@@ -6,7 +6,7 @@ let clicks = 1;
 
 
 
-//Read JSON file and display it on the webpage
+//Read JSON file for upload button
 fileInput.addEventListener("change", function (event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -23,6 +23,9 @@ fileInput.addEventListener("change", function (event) {
     reader.readAsText(file);
 });
 
+
+
+//Load items from QandAs and input each into respective area
 function loadItems(data) {
     QandAs = [];
     if (Qcount > 0) {
@@ -71,13 +74,14 @@ document.getElementById("addButton").addEventListener("click", addItem); //Call 
 
 
 
+//Deletes all exisiting Q and A boxes
 function removeItems() {
     document.getElementById("container").innerHTML = "";
 }
 
 
 
-//Pull each set of questions and upload to JSON
+//Pull each set of edited questions and download to JSON file
 function editItem() {
     const jsonData = {};
 
@@ -107,11 +111,14 @@ function editItem() {
 document.getElementById("editButton").addEventListener("click", editItem); //Call editItem()
 
 
-let generateBtn = document.getElementById("generateBtn").addEventListener("click", sendTopic);
+
+//Recieve data from backend and downloads JSON file
+const generateBtn = document.getElementById("generateBtn");
+generateBtn.addEventListener("click", sendTopic);
 let loading = document.getElementById("loading")
-loading.style.visibility = "hidden";
 async function sendTopic() {
     loading.style.visibility = "visible";
+    generateBtn.disabled = true;
     const topic = document.getElementById("topic").value;
 
     try {
@@ -124,8 +131,9 @@ async function sendTopic() {
         const text = await blob.text();
         const jsonData = JSON.parse(text);
         localStorage.setItem("QandAs", JSON.stringify(jsonData));
+
         if (jsonData){
-            loadItems(jsonData);
+            loadItems(jsonData); //Upload new file to editor
         }
 
         const link = document.createElement("a");
@@ -135,8 +143,9 @@ async function sendTopic() {
         
     } catch (err) {
         console.error("Fetch error:", err);
-    } finally {
+    } finally { //set button and loading to normal
         loading.style.visibility = "hidden";
+        generateBtn.disabled = false;
     }
 } 
         
