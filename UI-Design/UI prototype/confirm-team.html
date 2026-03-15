@@ -97,9 +97,11 @@
     </main>
   </div>
 
-  <script>
+  <script type="module">
+    import { joinRoom, assignPlayerToTeam } from './firebase.js';
+
     const team = localStorage.getItem("team") || "A";
-    const role = localStorage.getItem("role") || "Scout";
+    const role = localStorage.getItem("role") || "scout";
 
     const roleNames = {
       scout: "Scout – Fast & Sneaky",
@@ -118,8 +120,32 @@
       card.classList.add("team-b");
     }
 
-    document.getElementById("confirmBtn").addEventListener("click", () => {
-      window.location.href = "waiting.html";
+    document.getElementById("confirmBtn").addEventListener("click", async () => {
+      const uid     = localStorage.getItem("uid");
+      const roomId  = localStorage.getItem("roomId");
+      const matchId = localStorage.getItem("matchId") || null;
+
+      if (!uid || !roomId) {
+        alert("Something went wrong - please sign in again.");
+        window.location.href = "signin.html";
+        return;
+      }
+
+      try {
+        // Save player into the room membership
+        await joinRoom(roomId, uid, role);
+
+        // If a match is already running save player to the team
+        if (matchId) {
+          await assignPlayerToTeam(matchId, uid, team, role);
+        }
+
+        window.location.href = "waiting.html";
+
+      } catch (error) {
+        console.error("Error joining game:", error);
+        alert("Could not join game. Please try again.");
+      }
     });
 
     document.getElementById("changeBtn").addEventListener("click", () => {

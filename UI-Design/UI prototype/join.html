@@ -60,8 +60,10 @@
     </main>
   </div>
 
-  <script>
-    document.getElementById("joinForm").addEventListener("submit", (e) => {
+  <script type="module">
+    import { getRoomByPin } from './firebase.js';
+
+    document.getElementById("joinForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const pin = document.getElementById("sessionPin").value.trim();
@@ -70,9 +72,23 @@
         return;
       }
 
-      // Save PIN to localStorageSS
-      localStorage.setItem("sessionPin", pin);
-      window.location.href = "team-select.html";
+      try {
+        // Check the PIN exists in Firestore
+        const room = await getRoomByPin(pin);
+        if (!room) {
+          alert("PIN not found! Ask your teacher for the correct PIN.");
+          return;
+        }
+
+        // Save PIN and roomId to localStorage
+        localStorage.setItem("sessionPin", pin);
+        localStorage.setItem("roomId", room.roomId);
+        window.location.href = "team-select.html";
+
+      } catch (error) {
+        console.error("Error looking up PIN:", error);
+        alert("Something went wrong. Please try again.");
+      }
     });
   </script>
 </body>

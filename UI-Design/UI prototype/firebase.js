@@ -45,7 +45,12 @@ export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   const result   = await signInWithPopup(auth, provider);
   const user     = result.user;
-  await createOrUpdateUser(user);
+
+  // Save to Firestore in the background - dont block the redirect if it fails
+  createOrUpdateUser(user).catch(err => {
+    console.warn("Could not save user to Firestore (will retry next time):", err.message);
+  });
+
   return user;
 }
 
