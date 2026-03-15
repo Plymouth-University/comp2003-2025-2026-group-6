@@ -1,5 +1,5 @@
 const fileInput = document.getElementById("file-input"); //Upload JSON button
-const topic = document.getElementById("topic")
+const topic = document.getElementById("topic") //Topic to generate around
 let QandAs = [];
 let Qcount = 0;
 let clicks = 1;
@@ -8,26 +8,31 @@ let clicks = 1;
 
 //Read JSON file and display it on the webpage
 fileInput.addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const jsonData = JSON.parse(e.target.result);
+            localStorage.setItem('QandAs', JSON.stringify(jsonData)); //save array to local storage to be accessed in game
+            loadItems(jsonData);
+        } catch (error) {
+            alert("Error reading JSON file: " + error);
+        }
+    };
+    reader.readAsText(file);
+});
+
+function loadItems(data) {
     QandAs = [];
     if (Qcount > 0) {
         removeItems();
         Qcount = 0;
     }
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-        try {
-            const jsonData = JSON.parse(e.target.result);
-
-            for (const key in jsonData) { //Collect all questions
-                QandAs.push(jsonData[key]);
-            }
-
-            localStorage.setItem('QandAs', JSON.stringify(QandAs)); //save array to local storage to be accessed in game
-            QandAs.forEach((q, i) => { //Replicates for every question -> set text in textarea for each relevant datapoint
+    for (const key in data) { //Collect all questions
+        QandAs.push(data[key]);
+    }
+    QandAs.forEach((q, i) => { //Replicates for every question -> set text in textarea for each relevant datapoint
                 console.log(i);
                 addItem(); //Call to create set of empty area
                 let qNumber = i+1
@@ -41,14 +46,7 @@ fileInput.addEventListener("change", function (event) {
                 document.getElementById("cNum" + qNumber).textContent = "Correct answer:";
                 document.getElementById("Correct" + qNumber).value = q.correctAns;
             })
-
-        } catch (error) {
-            alert("Error reading JSON file: " + error);
-        }
-    };
-    reader.readAsText(file);
-});
-
+}
 
 
 //Creates an empty set of editable textboxes. Uses <template> from html file
@@ -109,3 +107,36 @@ function editItem() {
 document.getElementById("editButton").addEventListener("click", editItem); //Call editItem()
 
 
+let generateBtn = document.getElementById("generateBtn").addEventListener("click", sendTopic);
+let loading = document.getElementById("loading")
+loading.style.visibility = "hidden";
+async function sendTopic() {
+    loading.style.visibility = "visible";
+    const topic = document.getElementById("topic").value;
+
+    try {
+        const res = await fetch("http://localhost:3000/api/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ topic })
+        });
+        const blob = await res.blob();
+        const text = await blob.text();
+        const jsonData = JSON.parse(text);
+        localStorage.setItem("QandAs", JSON.stringify(jsonData));
+        if (jsonData){
+            loadItems(jsonData);
+        }
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = topic + ".json";
+        link.click();
+        
+    } catch (err) {
+        console.error("Fetch error:", err);
+    } finally {
+        loading.style.visibility = "hidden";
+    }
+} 
+        

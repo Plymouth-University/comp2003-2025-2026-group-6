@@ -38,7 +38,7 @@
 
                 <textarea id="topic" rows="4" cols="50" placeholder="Enter topic..."></textarea><br>
 
-                <button id="generateBtn" class="startBig confirm-btn" disabled onclick="sendTopic()">
+                <button id="generateBtn" class="startBig confirm-btn">
                     Generate
                 </button>
 
@@ -87,31 +87,6 @@
                 generateBtn.disabled = true;
             }
         });
-
-        loading.style.visibility = "hidden";
-        async function sendTopic() {
-            loading.style.visibility = "visible";
-            const topic = document.getElementById("topic").value;
-
-            try {
-            const res = await fetch("http://localhost:3000/api/ask", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ topic })
-            });
-            const blob = await res.blob();
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = topic + ".json";
-            link.click();
-
-            } catch (err) {
-                console.error("Fetch error:", err);
-            } finally {
-                // Always hide the loading message
-                loading.style.visibility = "hidden";
-        }
-    } 
     </script>
     <script type="module" src="question-generation.js"></script>
 </body>
