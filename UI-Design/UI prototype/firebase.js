@@ -162,6 +162,53 @@ export function listenRoomMembers(roomId, callback) {
   );
 }
 
+/**
+ * Start a new match for a room.
+ * Automatically creates Team A and Team B with score 0.
+ * Returns matchId.
+ */
+export async function createMatch(roomId) {
+  const matchRef = await addDoc(collection(db, "matches"), {
+    roomId:      roomId,
+    startedAt:   serverTimestamp(),
+    endedAt:     null,
+    winningTeam: null
+  });
+
+  await Promise.all([
+    setDoc(doc(db, "matches", matchRef.id, "teams", "A"), { teamName: "A", finalScore: 0 }),
+    setDoc(doc(db, "matches", matchRef.id, "teams", "B"), { teamName: "B", finalScore: 0 })
+  ]);
+ 
+  console.log("Match started:", matchRef.id);
+  return matchRef.id;
+}
+
+/**
+ * End a match and record the winning team.
+ * winningTeam: "A" | "B"
+ */
+export async function endMatch(matchId, winningTeam) {
+  await updateDoc(doc(db, "matches", matchId), {
+    endedAt:     serverTimestamp(),
+    winningTeam: winningTeam
+  });
+}
+
+/**
+ * Assign a player to a team within a match.
+ * Prevents a player from being on two teams at once.
+ * team: "A" | "B"
+ * teamRole: "scout" | "warrior" | "carrier" | "defender"
+ */
+export async function assignPlayerToTeam(matchId, uid, team, teamRole) {
+  await setDoc(
+    doc(db, "matches", matchId, "team_members", uid),
+    { uid, team, teamRole, assignedAt: serverTimestamp() },
+    { merge: true }
+  );
+}
+
 // ─── Helper ───────────────────────────────────────────────────
 function generatePin() {
   return Math.floor(100000 + Math.random() * 900000).toString();
