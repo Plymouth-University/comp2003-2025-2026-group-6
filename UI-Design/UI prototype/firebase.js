@@ -8,7 +8,7 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore,
+  getFirestore, initializeFirestore,
   doc, getDoc, setDoc, updateDoc,
   collection, addDoc, getDocs,
   query, where, orderBy, limit,
@@ -20,19 +20,24 @@ import {
 
 // Firebase project settings - found in firebase console
 const firebaseConfig = {
-  apiKey:            "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
-  authDomain:        "ctf-game-06.firebaseapp.com",
-  projectId:         "ctf-game-06",
-  storageBucket:     "ctf-game-06.firebasestorage.app",
-  messagingSenderId: "509318018925",
-  appId:             "1:509318018925:web:a91ddc9f7fc130dfe54c64",
-  measurementId:     "G-L4WP0E0V6S"
+  apiKey:            "AIzaSyDoyLX699KLeAifDwTHBRNVQ86ENNvat6w",
+  authDomain:        "capture-the-flag-group-6.firebaseapp.com",
+  projectId:         "capture-the-flag-group-6",
+  storageBucket:     "capture-the-flag-group-6.firebasestorage.app",
+  messagingSenderId: "320174361313",
+  appId:             "1:320174361313:web:792f8cb58ecf1527d445a0",
+  measurementId:     "G-ZFEQKG7L0L"
 };
 
 // Start up firebase and get auth + database ready to use
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db   = getFirestore(app);
+
+// Force long polling to fix Firestore connection issues on localhost
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+  useFetchStreams:               false
+});
 
 export { app, auth, db };
 

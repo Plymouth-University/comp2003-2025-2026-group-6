@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Teacher Dashboard – Capture the Flag</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .dashboard {
+      max-width: 800px;
+      margin: 60px auto 0;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.92);
+      border: 4px solid #000;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .pin-display {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: 12px;
+      color: #6c2bd9;
+      margin: 20px 0;
+      font-family: monospace;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+    .status-open    { background: #c8f7c5; color: #1a7a16; border: 2px solid #1a7a16; }
+    .status-in_game { background: #ffd7a8; color: #a05000; border: 2px solid #a05000; }
+    .status-closed  { background: #f7c5c5; color: #7a1616; border: 2px solid #7a1616; }
+
+    .btn-create {
+      background: #6c2bd9;
+      color: white;
+      font-size: 22px;
+      padding: 18px 50px;
+      border: 4px solid #000;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
+    .btn-start {
+      background: #4caf50;
+      color: white;
+      font-size: 18px;
+      padding: 14px 36px;
+      border: 4px solid #000;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 8px;
+      transition: all 0.2s;
+    }
+    .btn-end {
+      background: #f44336;
+      color: white;
+      font-size: 18px;
+      padding: 14px 36px;
+      border: 4px solid #000;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 8px;
+      transition: all 0.2s;
+    }
+    .btn-start:hover, .btn-end:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .btn-start:disabled, .btn-end:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .player-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+    .player-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      margin: 8px 0;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .team-a-item { background: #c8f7c5; border: 2px solid #19b83d; }
+    .team-b-item { background: #ffc5c5; border: 2px solid #ff4444; }
+
+    .empty-msg {
+      color: #888;
+      font-size: 16px;
+      font-style: italic;
+      margin: 20px 0;
+    }
+
+    .scores {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+    .score-box {
+      min-width: 160px;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      border: 3px solid #000;
+    }
+    .score-box-a { background: #c8f7c5; }
+    .score-box-b { background: #ffc5c5; }
+    .score-label { font-size: 18px; font-weight: 800; }
+    .score-value { font-size: 48px; font-weight: 900; }
+
+    #teacherInfo {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="tabs" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="windowBtns" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+    </header>
+
+    <main class="screen">
+      <div class="dashboard">
+
+        <h1 style="text-align:center; color:#fff; font-size:36px; margin-bottom:30px;">
+          🏫 Teacher Dashboard
+        </h1>
+
+        <!-- Not signed in -->
+        <div id="notSignedIn" class="card" style="display:none;">
+          <h2 style="margin-top:0;">Sign in to continue</h2>
+          <p style="color:#555;">You need to be signed in as a teacher to create sessions.</p>
+          <button class="btn-create" id="teacherSignInBtn" style="font-size:18px; padding:14px 36px;">
+            Sign in with Google
+          </button>
+        </div>
+
+        <!-- Signed in - no active room -->
+        <div id="noRoom" class="card" style="display:none;">
+          <p id="teacherInfo"></p>
+          <h2 style="margin-top:0;">No active session</h2>
+          <p style="color:#555; font-size:18px;">Create a new session to get a PIN for your students.</p>
+          <button class="btn-create" id="createRoomBtn">
+            + Create New Session
+          </button>
+        </div>
+
+        <!-- Active room - show PIN and controls -->
+        <div id="activeRoom" style="display:none;">
+
+          <!-- PIN card -->
+          <div class="card">
+            <h2 style="margin-top:0; font-size:28px;">Share this PIN with your students</h2>
+            <div class="pin-display" id="pinDisplay">------</div>
+            <div id="roomStatusBadge" class="status-badge status-open">● Open</div>
+            <br>
+            <button class="btn-start" id="startMatchBtn">▶ Start Match</button>
+            <button class="btn-end"   id="endMatchBtn" disabled>■ End Match</button>
+          </div>
+
+          <!-- Live scores -->
+          <div class="card" id="scoresCard" style="display:none;">
+            <h2 style="margin-top:0;">Live Scores</h2>
+            <div class="scores">
+              <div class="score-box score-box-a">
+                <div class="score-label">Team A</div>
+                <div class="score-value" id="liveScoreA">0</div>
+              </div>
+              <div class="score-box score-box-b">
+                <div class="score-label">Team B</div>
+                <div class="score-value" id="liveScoreB">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Players in lobby -->
+          <div class="card">
+            <h2 style="margin-top:0;">Players in Lobby (<span id="playerCount">0</span>)</h2>
+            <ul class="player-list" id="playerList">
+              <li class="empty-msg">Waiting for players to join...</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import {
+      signInWithGoogle,
+      listenAuthState,
+      createRoom,
+      updateRoomStatus,
+      createMatch,
+      endMatch,
+      listenRoomMembers,
+      listenTeamScores,
+      getUser
+    } from './firebase.js';
+
+    // Track current session state
+    let currentRoomId  = null;
+    let currentMatchId = null;
+    let unsubMembers   = null;
+    let unsubScores    = null;
+
+    const notSignedIn  = document.getElementById("notSignedIn");
+    const noRoom       = document.getElementById("noRoom");
+    const activeRoom   = document.getElementById("activeRoom");
+    const teacherInfo  = document.getElementById("teacherInfo");
+
+    // Watch auth state - show correct panel
+    listenAuthState(async (user) => {
+      if (!user) {
+        notSignedIn.style.display = "block";
+        noRoom.style.display      = "none";
+        activeRoom.style.display  = "none";
+      } else {
+        notSignedIn.style.display = "none";
+        teacherInfo.textContent   = `Signed in as: ${user.displayName || user.email}`;
+        noRoom.style.display      = "block";
+      }
+    });
+
+    // Sign in button
+    document.getElementById("teacherSignInBtn").addEventListener("click", async () => {
+      await signInWithGoogle();
+    });
+
+    // Create room button
+    document.getElementById("createRoomBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("createRoomBtn");
+      btn.textContent = "Creating...";
+      btn.disabled    = true;
+
+      try {
+        const { auth } = await import('./firebase.js');
+        const uid = auth.currentUser?.uid;
+        if (!uid) { alert("Not signed in!"); return; }
+
+        // Create the room and get the PIN
+        const { roomId, joinCode } = await createRoom(uid);
+        currentRoomId = roomId;
+
+        // Show the active room panel
+        document.getElementById("pinDisplay").textContent = joinCode;
+        noRoom.style.display     = "none";
+        activeRoom.style.display = "block";
+
+        // Start listening to players joining
+        startListeningToMembers(roomId);
+
+      } catch (err) {
+        console.error("Error creating room:", err);
+        alert("Could not create room. Please try again.");
+        btn.textContent = "+ Create New Session";
+        btn.disabled    = false;
+      }
+    });
+
+    // Start match button
+    document.getElementById("startMatchBtn").addEventListener("click", async () => {
+      if (!currentRoomId) return;
+      const btn = document.getElementById("startMatchBtn");
+      btn.textContent = "Starting...";
+      btn.disabled    = true;
+
+      try {
+        // Create the match in Firestore
+        currentMatchId = await createMatch(currentRoomId);
+        await updateRoomStatus(currentRoomId, "in_game");
+
+        // Save matchId to localStorage so teacher can use it too
+        localStorage.setItem("matchId", currentMatchId);
+
+        // Update UI
+        document.getElementById("roomStatusBadge").textContent  = "● In Game";
+        document.getElementById("roomStatusBadge").className    = "status-badge status-in_game";
+        document.getElementById("endMatchBtn").disabled         = false;
+        document.getElementById("scoresCard").style.display     = "block";
+        btn.textContent = "▶ Match Running";
+
+        // Start listening to live scores
+        startListeningToScores(currentMatchId);
+
+      } catch (err) {
+        console.error("Error starting match:", err);
+        alert("Could not start match. Please try again.");
+        btn.textContent = "▶ Start Match";
+        btn.disabled    = false;
+      }
+    });
+
+    // End match button
+    document.getElementById("endMatchBtn").addEventListener("click", async () => {
+      if (!currentMatchId) return;
+
+      const scoreA = parseInt(document.getElementById("liveScoreA").textContent) || 0;
+      const scoreB = parseInt(document.getElementById("liveScoreB").textContent) || 0;
+      const winner = scoreA >= scoreB ? "A" : "B";
+
+      try {
+        await endMatch(currentMatchId, winner);
+        await updateRoomStatus(currentRoomId, "closed");
+
+        // Stop listeners
+        if (unsubScores) unsubScores();
+
+        // Update UI
+        document.getElementById("roomStatusBadge").textContent = "● Closed";
+        document.getElementById("roomStatusBadge").className   = "status-badge status-closed";
+        document.getElementById("startMatchBtn").disabled      = true;
+        document.getElementById("endMatchBtn").disabled        = true;
+
+        alert(`Match ended! Team ${winner} wins!`);
+
+      } catch (err) {
+        console.error("Error ending match:", err);
+        alert("Could not end match. Please try again.");
+      }
+    });
+
+    // Listen to players joining the lobby in real time
+    function startListeningToMembers(roomId) {
+      if (unsubMembers) unsubMembers();
+
+      unsubMembers = listenRoomMembers(roomId, (members) => {
+        const list  = document.getElementById("playerList");
+        const count = document.getElementById("playerCount");
+
+        count.textContent = members.length;
+
+        if (members.length === 0) {
+          list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
+          return;
+        }
+
+        list.innerHTML = members.map(m => `
+          <li class="player-item ${m.roomRole ? (m.team === 'B' ? 'team-b-item' : 'team-a-item') : ''}">
+            <span>${m.uid}</span>
+            <span>${m.roomRole || "No role yet"}</span>
+          </li>
+        `).join("");
+      });
+    }
+
+    // Listen to live scores updating
+    function startListeningToScores(matchId) {
+      if (unsubScores) unsubScores();
+
+      unsubScores = listenTeamScores(matchId, ({ A, B }) => {
+        document.getElementById("liveScoreA").textContent = A;
+        document.getElementById("liveScoreB").textContent = B;
+      });
+    }
+  </script>
+</body>
+</html>
