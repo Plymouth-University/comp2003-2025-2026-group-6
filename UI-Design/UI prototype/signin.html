@@ -30,11 +30,6 @@
       width: 26px;
       height: 26px;
     }
-    .divider {
-      color: #666;
-      font-size: 14px;
-      margin: 10px 0;
-    }
     #statusMsg {
       font-size: 15px;
       color: #c00;
@@ -78,36 +73,23 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    // All Firebase setup is handled in firebase.js - just import what we need
+    import { signInWithGoogle } from './firebase.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAYQeZzdYUqKYiiwcpFp8BNZQsJNHtoMXo",
-      authDomain: "ctf-game-06.firebaseapp.com",
-      projectId: "ctf-game-06",
-      storageBucket: "ctf-game-06.firebasestorage.app",
-      messagingSenderId: "509318018925",
-      appId: "1:509318018925:web:a91ddc9f7fc130dfe54c64",
-      measurementId: "G-L4WP0E0V6S"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
     const statusMsg = document.getElementById("statusMsg");
 
     document.getElementById("googleBtn").addEventListener("click", async () => {
       statusMsg.textContent = "";
       try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+        // signInWithGoogle handles the popup, saves user to Firestore and returns the user
+        const user = await signInWithGoogle();
 
-        const playerName = user.displayName || user.email.split("@")[0];
-
-        localStorage.setItem("playerName", playerName);
+        // Save player name to localStorage for use in the game
+        localStorage.setItem("playerName", user.displayName || user.email.split("@")[0]);
         localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("uid", user.uid);
 
-        console.log("Signed in as:", playerName, user.uid);
+        console.log("Signed in as:", user.displayName, user.uid);
         window.location.href = "join.html";
 
       } catch (error) {
