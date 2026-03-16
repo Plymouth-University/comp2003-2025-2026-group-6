@@ -14,3 +14,6 @@ was translated into a working web-based game prototype.
 ## Purpose
 This prototype focuses on validating UI layout, gameplay flow,
 and interaction between game logic and interface components.
+
+## THIS IS MISSING 'node_modules' FOLDER - SEE THE AI PROTOTYPE README FOR MORE DETAILS
+Link - https://github.com/Plymouth-University/comp2003-2025-2026-group-6/blob/main/AI%20demo/README

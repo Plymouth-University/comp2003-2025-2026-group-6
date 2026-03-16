@@ -1,0 +1,92 @@
+{
+  "0": {
+    "question": "Which of the following is the primary goal of cybersecurity?",
+    "answers": [
+      "Protecting data from unauthorized access.",
+      "Generating revenue through data collection.",
+      "Providing entertainment through interactive content.",
+      "Creating complex algorithms for financial gain."
+    ],
+    "correctAns": "Protecting data from unauthorized access."
+  },
+  "1": {
+    "question": "What is a firewall primarily designed to do?",
+    "answers": [
+      "Allow all network traffic without inspection.",
+      "Encrypt data in transit to prevent interception.",
+      "Provide a secure network environment for employees.",
+      "Automatically update software across the entire network."
+    ],
+    "correctAns": "Protecting data from unauthorized access."
+  },
+  "2": {
+    "question": "What is a common method used to identify and mitigate phishing attacks?",
+    "answers": [
+      "Sending email with a link to a malicious website.",
+      "Analyzing email content for suspicious patterns.",
+      "Implementing a strict policy of employee training.",
+      "Ignoring potential threats due to lack of awareness."
+    ],
+    "correctAns": "Analyzing email content for suspicious patterns."
+  },
+  "3": {
+    "question": "What does 'authentication' refer to in the context of cybersecurity?",
+    "answers": [
+      "Providing user accounts for accessing systems.",
+      "Verifying a user's identity before granting access.",
+      "Creating a secure and private data storage system.",
+      "Designing visually appealing user interfaces."
+    ],
+    "correctAns": "Verifying a user's identity before granting access."
+  },
+  "4": {
+    "question": "Which of the following is a critical component of an intrusion detection system?",
+    "answers": [
+      "Printing documents for casual use.",
+      "Monitoring network traffic for suspicious activity.",
+      "Automatically adjusting computer settings.",
+      "Creating memes for social media."
+    ],
+    "correctAns": "Monitoring network traffic for suspicious activity."
+  },
+  "5": {
+    "question": "What is the purpose of an Access Control List (ACL)?",
+    "answers": [
+      "To define the data each user is allowed to access.",
+      "To display a user's profile on the website.",
+      "To manage network permissions.",
+      "To create a daily report of system activity."
+    ],
+    "correctAns": "To manage network permissions."
+  },
+  "6": {
+    "question": "What does 'threat intelligence' involve?",
+    "answers": [
+      "Generating new security vulnerabilities.",
+      "Analyzing data to identify potential threats.",
+      "Creating security training materials.",
+      "Automatically patching all software updates."
+    ],
+    "correctAns": "Analyzing data to identify potential threats."
+  },
+  "7": {
+    "question": "Which type of security measure focuses on preventing unauthorized access to a system?",
+    "answers": [
+      "Lateral movement – moving to a different system.",
+      "Data loss – losing data accidentally or intentionally.",
+      "Malware – harmful software.",
+      "Physical security – protecting the building."
+    ],
+    "correctAns": "Preventing unauthorized access to a system."
+  },
+  "8": {
+    "question": "What is a 'zero-day vulnerability'?",
+    "answers": [
+      "A vulnerability that is known to the vendor.",
+      "A vulnerability that has been discovered and patched by the vendor.",
+      "A vulnerability that exists in a user's software.",
+      "A vulnerability that is widely publicized."
+    ],
+    "correctAns": "A vulnerability that exists in a user's software."
+  }
+}

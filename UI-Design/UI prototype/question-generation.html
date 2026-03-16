@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Generate Questions � Capture the Flag</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .confirm-btn {
+            display: block;
+            margin: 30px auto 0;
+            font-size: 22px;
+            padding: 18px 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="topbar">
+            <div class="tabs" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="windowBtns" aria-hidden="true">
+                <i></i><i></i><i></i>
+            </div>
+        </header>
+
+        <main class="screen">
+            <section class="welcomeCard" style="max-width: 900px; margin: 100px auto 0;">
+                <h2 style="margin-top:0; font-size:36px; font-weight:900; text-align:center;">
+                    Generate Questions
+                </h2>
+
+                <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
+                    Input your topic of choice and press generate:
+                </p>
+
+                <textarea id="topic" rows="4" cols="50" placeholder="Enter topic..."></textarea><br>
+
+                <button id="generateBtn" class="startBig confirm-btn">
+                    Generate
+                </button>
+
+                <h2 id="loading" style="visibility: hidden;">Questions are generating - this could take a minute...</h2>
+
+                <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
+                    Or upload question pack:
+                </p>
+
+                <input type="file" id="file-input" accept=".json">
+
+            </section>
+
+
+            <template id="itemTemplate">
+                <div id="qNum">Q</div>
+                <div class="item">
+                    <textarea id="Q" rows="1" cols="100"></textarea>
+                </div>
+                <div id="aNum">A</div>
+                <textarea id="A" rows="2" cols="40"></textarea>
+                <textarea id="B" rows="2" cols="40"></textarea>
+                <textarea id="C" rows="2" cols="40"></textarea>
+                <textarea id="D" rows="2" cols="40"></textarea>
+                <div id="cNum">C</div>
+                <div class="item">
+                    <textarea id="Correct" rows="1" cols="100"></textarea>
+                </div>
+                <br><br>
+            </template>
+            <div id="container"></div>
+            <button id="addButton">Add</button>
+            <button id="editButton">Edit</button>
+        </main>
+    </div>
+
+    <script>
+        //Button activation
+        const getTopic = document.getElementById("topic")
+        getTopic.addEventListener('input', () => {
+            generateBtn.disabled = false
+            if (getTopic.value.trim() === "") {
+                generateBtn.disabled = true;
+            }
+        });
+    </script>
+    <script type="module" src="question-generation.js"></script>
+</body>
+</html>

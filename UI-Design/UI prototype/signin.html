@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign In – Capture the Flag</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 8px;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 20px auto;
+      transition: all 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    .google-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+    .google-btn img {
+      width: 26px;
+      height: 26px;
+    }
+    #statusMsg {
+      font-size: 15px;
+      color: #c00;
+      min-height: 22px;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="tabs" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="windowBtns" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+    </header>
+
+    <main class="screen">
+      <section class="welcomeCard">
+        <h2 style="margin-top:0; font-size:32px; font-weight:900;">
+          Sign In
+        </h2>
+
+        <p class="welcomeText">Sign in to play Capture the Flag!</p>
+
+        <button class="google-btn" id="googleBtn">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" />
+          Continue with Google
+        </button>
+
+        <p id="statusMsg"></p>
+
+        <p style="margin-top: 24px; font-size: 14px; color: #555;">
+          Your Google display name will be used as your player name.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    // All Firebase setup is handled in firebase.js - just import what we need
+    import { signInWithGoogle } from './firebase.js';
+
+    const statusMsg = document.getElementById("statusMsg");
+
+    document.getElementById("googleBtn").addEventListener("click", async () => {
+      statusMsg.textContent = "";
+      try {
+        // signInWithGoogle handles the popup, saves user to Firestore and returns the user
+        const user = await signInWithGoogle();
+
+        // Save player name to localStorage for use in the game
+        localStorage.setItem("playerName", user.displayName || user.email.split("@")[0]);
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("uid", user.uid);
+
+        console.log("Signed in as:", user.displayName, user.uid);
+        window.location.href = "join.html";
+
+      } catch (error) {
+        if (error.code === "auth/popup-closed-by-user") {
+          statusMsg.textContent = "Sign-in cancelled. Please try again.";
+        } else if (error.code === "auth/popup-blocked") {
+          statusMsg.textContent = "Popup was blocked. Please allow popups for this site.";
+        } else {
+          statusMsg.textContent = "Sign-in failed. Please try again.";
+          console.error("Google sign-in error:", error.code, error.message);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
