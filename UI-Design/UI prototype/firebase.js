@@ -340,7 +340,8 @@ function generatePin() {
 
 // Upload questions
 export async function uploadQuestions(data) {
+  const roomId = localStorage.getItem("roomId");
   for (const qa of data) {
-    await addDoc(collection(db, "questions"), qa);
+    await addDoc(collection(db, "rooms", roomId, "questions"), qa);
   }
 }
