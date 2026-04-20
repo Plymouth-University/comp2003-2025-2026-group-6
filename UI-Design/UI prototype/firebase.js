@@ -334,3 +334,13 @@ export function listenLeaderboard(topN = 10, callback) {
 function generatePin() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
+
+
+// SECTION 7 – QUESTION UPLOAD/RETRIEVAL
+
+// Upload questions
+export async function uploadQuestions(data) {
+  for (const qa of data) {
+    await addDoc(collection(db, "questions"), qa);
+  }
+}

@@ -112,18 +112,14 @@
                 <a href="join.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Back to PIN</a>
             </p>
         </section>
-        <!-- Temporery Question Generation -->
-        <h1>Generate Questions</h1>
+        <!-- Temporery Question Upload -->
+        <h1>Upload Questions</h1>
 
-        <textarea id="topic" rows="4" cols="50" placeholder="Enter topic..."></textarea><br>
-                <button onclick="sendTopic()">Generate</button>
-
-                <h2>Response:</h2>
-        <pre id="response"></pre>
+        <input type="file" id="fileUpload" accept=".json">
     </main>
   </div>
 
-  <script>
+  <script type="module">
     let selectedTeam = null;
     let selectedRole = null;
 
@@ -149,27 +145,24 @@
       window.location.href = 'confirm-team.html';
     });
 
-      async function sendTopic() {
-          const topic = document.getElementById("topic").value;
-          const responseBox = document.getElementById("response");
-          responseBox.textContent = ""; // Clear previous output
-
-          const res = await fetch("http://localhost:3000/api/ask", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ topic })
-          });
-
-          // STREAM the AI output
-          const reader = res.body.getReader();
-          const decoder = new TextDecoder();
-
-          while (true) {
-              const { value, done } = await reader.read();
-              if (done) break;
-              responseBox.textContent += decoder.decode(value);
-          }
-      }
+    //Read JSON file for upload button
+    import { uploadQuestions } from './firebase.js';
+    fileUpload.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async function (e) {
+            try {
+                const jsonData = JSON.parse(e.target.result);
+                const qaArray = Object.values(jsonData);
+                await uploadQuestions(qaArray);
+                alert("Questions uploaded successfully!");
+            } catch (error) {
+                alert("Error reading JSON file: " + error);
+            }
+        };
+        reader.readAsText(file);
+    });
   </script>
 </body>
 </html>

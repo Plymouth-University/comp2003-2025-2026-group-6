@@ -14,7 +14,7 @@ fileInput.addEventListener("change", function (event) {
     reader.onload = function (e) {
         try {
             const jsonData = JSON.parse(e.target.result);
-            localStorage.setItem('QandAs', JSON.stringify(jsonData)); //save array to local storage to be accessed in game
+            localStorage.setItem('QandAs', JSON.stringify(jsonData));
             loadItems(jsonData);
         } catch (error) {
             alert("Error reading JSON file: " + error);
