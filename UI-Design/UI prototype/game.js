@@ -1,4 +1,6 @@
-import { db, doc, setDoc, increment, onSnapshot } from './firebase.js';
+import { db } from './firebase.js';
+import { doc, setDoc, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
 
 // --- GAME CONFIG ---
 let quizBonusTime = 0;
@@ -73,7 +75,7 @@ function launchUnityGame() {
 }
 
 // --- 4. MULTIPLAYER SYNC (FIREBASE) ---
-document.addEventListener("DOMContentLoaded", () => {
+function startApp() {
     const sessionPin = localStorage.getItem("sessionPin") || "DEFAULT_SESSION";
     const sessionRef = doc(db, "sessions", sessionPin);
 
@@ -87,9 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (scoreB) scoreB.textContent = data.teamBScore || 0;
         }
     });
-
+    console.log("App started");
     initGameFlow();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startApp);
+} else {
+    startApp();
+}
 
 // --- 5. UNITY SCORE CATCHER ---
 // Restores the logic that takes Unity points and updates the Cloud DB
