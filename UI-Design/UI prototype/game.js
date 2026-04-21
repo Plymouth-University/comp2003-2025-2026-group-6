@@ -30,6 +30,7 @@ function startQuiz(questions) {
 
     modal.style.display = 'flex';
     let currentQ = 0;
+    let multiplier = 1;
 
     function renderQuestion() {
         if (currentQ >= questions.length) {
@@ -52,12 +53,23 @@ function startQuiz(questions) {
                 btn.onclick = () => {
                     if (opt === qData.correctAns) {
                         quizBonusTime += 5; // Reward logic restored
+                        multiplier += 0.25;
+                        btn.textContent = "Correct!";
+                        multiplierText.textContent = `Current multiplier: ${multiplier}x`;
+                    } else {
+                        btn.textContent = "Incorrect...";
                     }
-                    currentQ++;
-                    renderQuestion();
+                    setTimeout(() => {
+                        currentQ++;
+                        renderQuestion();
+                    }, 1500);       
                 };
                 container.appendChild(btn);
             });
+            const multiplierText = document.createElement('multiplier');
+            multiplierText.textContent = `Current multiplier: ${multiplier}x`;
+            multiplierText.className = "info-text";
+            container.appendChild(multiplierText);
         }
     }
     renderQuestion();
