@@ -1,5 +1,5 @@
 import { db } from './firebase.js';
-import { doc, setDoc, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { doc, setDoc, collection, getDocs, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 
 // --- GAME CONFIG ---
@@ -10,13 +10,12 @@ let baseTime = 60;
 // Restores the full sequence: Load AI Questions -> Run Quiz -> Start Unity
 async function initGameFlow() {
     try {
-        const response = await fetch('questions.json');
-        if (!response.ok) throw new Error("questions.json not found");
+        const roomId = localStorage.getItem("roomId");
+        const response = await getDocs(collection(db, "rooms", roomId, "questions"));
+        if (response.empty) throw new Error("questions not found");
         
-        const rawData = await response.json();
-        // Handles the numbered object format from your AI generator
-        const questions = Object.values(rawData);
-        
+        const questions = response.docs.map(doc => doc.data());
+
         startQuiz(questions);
     } catch (err) {
         console.warn("Quiz phase skipped due to missing questions.json");
