@@ -111,11 +111,7 @@
             <p style="margin-top: 24px; font-size: 16px; color: #333; text-align:center;">
                 <a href="join.html" style="color: #6c2bd9; font-weight: bold; text-decoration: underline;">Back to PIN</a>
             </p>
-        </section>
-        <!-- Temporery Question Upload -->
-        <h1>Upload Questions</h1>
-
-        <input type="file" id="fileUpload" accept=".json">
+          </section>
     </main>
   </div>
 
@@ -143,25 +139,6 @@
       localStorage.setItem('role', selectedRole);
 
       window.location.href = 'confirm-team.html';
-    });
-
-    //Read JSON file for upload button
-    import { uploadQuestions } from './firebase.js';
-    fileUpload.addEventListener("change", function (event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async function (e) {
-            try {
-                const jsonData = JSON.parse(e.target.result);
-                const qaArray = Object.values(jsonData);
-                await uploadQuestions(qaArray);
-                alert("Questions uploaded successfully!");
-            } catch (error) {
-                alert("Error reading JSON file: " + error);
-            }
-        };
-        reader.readAsText(file);
     });
   </script>
 </body>
