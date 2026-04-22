@@ -55,14 +55,19 @@ function startQuiz(questions) {
                 btn.textContent = opt;
                 btn.className = 'option-btn'; // Restores your CSS styling
                 btn.onclick = () => {
+                    const allBtns = container.querySelectorAll("button");
+                    allBtns.forEach(b => b.disabled = true);
                     if (opt === qData.correctAns) {
                         quizBonusTime += 5; // Reward logic restored
                         multiplier += 0.25;
                         btn.textContent = "Correct!";
+                        btn.classList.add("disabled-correct")
                         multiplierText.textContent = `Current multiplier: ${multiplier}x`;
                     } else {
                         btn.textContent = "Incorrect...";
+                        btn.classList.add("disabled-incorrect")
                     }
+                    btn.disabled = true;
                     setTimeout(() => {
                         currentQ++;
                         questionsThisRound ++;
@@ -156,11 +161,17 @@ document.addEventListener('unityGameOver', async function(e) {
         
         console.log("Scores successfully pushed to Firebase.");
 
-        // Start questions back up
-        if (currentQ < questions.length) { //Start quiz back up if there are questions left
-            startQuiz(questions);
-            launchUnityGame();
-        }
+        setTimeout(() => {
+            if (questions.length - currentQ >= 4) { //Start quiz back up if there are 4 or more questions left
+                startQuiz(questions);
+                launchUnityGame(); 
+            } else { //Finish game loop
+                statusEl.textContent = "FINISHED";
+                setTimeout(() => {
+                    window.location.href = 'join.html';
+                }, 3000); 
+            }
+        }, 3000); 
     } catch (error) {
         console.error("Firebase update failed:", error);
     }
