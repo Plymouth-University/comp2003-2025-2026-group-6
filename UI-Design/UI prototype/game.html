@@ -144,7 +144,6 @@
       if (event.data && event.data.type === "STACKER_GAME_OVER") {
         clearInterval(hackTimer);
         const finalScore = event.data.score;
-        statusEl.textContent = "HACK COMPLETE: " + finalScore + " POINTS!";
         // Dispatch event for game.js to catch and send to Firebase
         document.dispatchEvent(new CustomEvent('unityGameOver', { detail: { score: finalScore } }));
       }

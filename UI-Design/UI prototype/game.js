@@ -6,6 +6,8 @@ import { doc, setDoc, collection, getDocs, increment, onSnapshot } from "https:/
 let quizBonusTime = 0;
 let baseTime = 60; 
 
+let multiplier;
+
 // --- 1. INITIALIZE GAME FLOW ---
 // Restores the full sequence: Load AI Questions -> Run Quiz -> Start Unity
 async function initGameFlow() {
@@ -30,7 +32,7 @@ function startQuiz(questions) {
 
     modal.style.display = 'flex';
     let currentQ = 0;
-    let multiplier = 1;
+    multiplier = 1;
 
     function renderQuestion() {
         if (currentQ >= questions.length) {
@@ -113,14 +115,18 @@ if (document.readyState === "loading") {
 // --- 5. UNITY SCORE CATCHER ---
 // Restores the logic that takes Unity points and updates the Cloud DB
 document.addEventListener('unityGameOver', async function(e) {
-    const finalScore = e.detail.score;
+    const statusEl = document.getElementById('status');
+    const finalScore = e.detail.score * multiplier;
     const team = localStorage.getItem("team") || "A";
     const playerName = localStorage.getItem("playerName") || "Player";
     const sessionPin = localStorage.getItem("sessionPin") || "DEFAULT_SESSION";
 
     try {
         const sessionRef = doc(db, "sessions", sessionPin);
-        
+
+        // Update Score Text
+        statusEl.textContent = "HACK COMPLETE: " + finalScore + " POINTS!" + " (" + e.detail.score + "x" + multiplier + ")";
+
         // Update Team Total
         const updateObj = {};
         updateObj[team === "A" ? "teamAScore" : "teamBScore"] = increment(finalScore);
