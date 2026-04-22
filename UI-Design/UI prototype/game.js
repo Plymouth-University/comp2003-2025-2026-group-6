@@ -6,7 +6,10 @@ import { doc, setDoc, collection, getDocs, increment, onSnapshot } from "https:/
 let quizBonusTime = 0;
 let baseTime = 60; 
 
-let multiplier;
+let multiplier = 1;
+let currentQ = 0;
+let questions = [];
+let questionsThisRound = 0;
 
 // --- 1. INITIALIZE GAME FLOW ---
 // Restores the full sequence: Load AI Questions -> Run Quiz -> Start Unity
@@ -16,7 +19,7 @@ async function initGameFlow() {
         const response = await getDocs(collection(db, "rooms", roomId, "questions"));
         if (response.empty) throw new Error("questions not found");
         
-        const questions = response.docs.map(doc => doc.data());
+        questions = response.docs.map(doc => doc.data());
 
         startQuiz(questions);
     } catch (err) {
@@ -31,13 +34,12 @@ function startQuiz(questions) {
     if (!modal) return launchUnityGame();
 
     modal.style.display = 'flex';
-    let currentQ = 0;
     multiplier = 1;
+    questionsThisRound = 0;
 
     function renderQuestion() {
-        if (currentQ >= questions.length) {
+        if (currentQ >= questions.length || questionsThisRound >= 4) {
             modal.style.display = 'none';
-            launchUnityGame();
             return;
         }
 
@@ -63,12 +65,13 @@ function startQuiz(questions) {
                     }
                     setTimeout(() => {
                         currentQ++;
+                        questionsThisRound ++;
                         renderQuestion();
                     }, 1500);       
                 };
                 container.appendChild(btn);
             });
-            const multiplierText = document.createElement('multiplier');
+            const multiplierText = document.createElement('div');
             multiplierText.textContent = `Current multiplier: ${multiplier}x`;
             multiplierText.className = "info-text";
             container.appendChild(multiplierText);
@@ -85,6 +88,18 @@ function launchUnityGame() {
 
     const statusEl = document.getElementById("status");
     if (statusEl) statusEl.textContent = `Bonus time applied: +${quizBonusTime}s. Ready to start!`;
+
+    const iframe = document.getElementById("unityIframe");
+
+    iframe.src = iframe.src;
+
+    iframe.contentWindow.postMessage(
+        {
+            type: "START_GAME",
+            time: finalStartTime
+        },
+        "*"
+    );
 }
 
 // --- 4. MULTIPLAYER SYNC (FIREBASE) ---
@@ -140,6 +155,12 @@ document.addEventListener('unityGameOver', async function(e) {
         }, { merge: true });
         
         console.log("Scores successfully pushed to Firebase.");
+
+        // Start questions back up
+        if (currentQ < questions.length) { //Start quiz back up if there are questions left
+            startQuiz(questions);
+            launchUnityGame();
+        }
     } catch (error) {
         console.error("Firebase update failed:", error);
     }

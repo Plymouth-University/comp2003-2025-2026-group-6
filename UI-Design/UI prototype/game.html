@@ -148,6 +148,18 @@
         document.dispatchEvent(new CustomEvent('unityGameOver', { detail: { score: finalScore } }));
       }
     });
+
+    window.addEventListener("message", function(event) {
+    if (event.data?.type === "START_GAME") {
+        const time = event.data.time;
+
+        unityInstance.SendMessage(
+            'GameManager',
+            'StartGame',
+            String(time)
+        );
+    }
+});
   </script>
 </body>
 </html>
