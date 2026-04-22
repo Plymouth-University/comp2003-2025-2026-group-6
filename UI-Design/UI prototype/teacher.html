@@ -285,6 +285,7 @@
 
         // Show the active room panel
         document.getElementById("pinDisplay").textContent = joinCode;
+        localStorage.setItem("roomId", roomId);
         noRoom.style.display     = "none";
         activeRoom.style.display = "block";
 
