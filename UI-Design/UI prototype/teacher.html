@@ -242,7 +242,7 @@
 
     // Need getDoc and doc so we can look up usernames from the users collection
     import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-    
+
     // Track current session state
     let currentRoomId  = null;
     let currentMatchId = null;
@@ -254,13 +254,22 @@
     const activeRoom   = document.getElementById("activeRoom");
     const teacherInfo  = document.getElementById("teacherInfo");
 
-    // Watch auth state - show correct panel
+    // Watch auth state - check the users role in Firestore before showing anything
+    // If they are not a teacher redirect them back to the home page
     listenAuthState(async (user) => {
       if (!user) {
         notSignedIn.style.display = "block";
         noRoom.style.display      = "none";
         activeRoom.style.display  = "none";
       } else {
+        // Look up their role in Firestore to make sure they are a teacher
+        const userData = await getUser(user.uid);
+        if (!userData || userData.role !== "teacher") {
+          alert("You do not have permission to access this page.");
+          window.location.href = "index.html";
+          return;
+        }
+
         notSignedIn.style.display = "none";
         teacherInfo.textContent   = `Signed in as: ${user.displayName || user.email}`;
         noRoom.style.display      = "block";
@@ -392,6 +401,7 @@
           })
         );
  
+        // Show green for team A and red for team B, also show their role
         list.innerHTML = memberDetails.map(m => `
           <li class="player-item ${m.roomRole ? (m.team === 'B' ? 'team-b-item' : 'team-a-item') : ''}">
             <span>${m.username}</span>
