@@ -236,9 +236,13 @@
       endMatch,
       listenRoomMembers,
       listenTeamScores,
-      getUser
+      getUser,
+      db
     } from './firebase.js';
 
+    // Need getDoc and doc so we can look up usernames from the users collection
+    import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    
     // Track current session state
     let currentRoomId  = null;
     let currentMatchId = null;
@@ -363,23 +367,34 @@
     });
 
     // Listen to players joining the lobby in real time
+    // Made async so we can look up each players username from the users collection
     function startListeningToMembers(roomId) {
       if (unsubMembers) unsubMembers();
-
-      unsubMembers = listenRoomMembers(roomId, (members) => {
+ 
+      unsubMembers = listenRoomMembers(roomId, async (members) => {
         const list  = document.getElementById("playerList");
         const count = document.getElementById("playerCount");
-
+ 
         count.textContent = members.length;
-
+ 
         if (members.length === 0) {
           list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
           return;
         }
-
-        list.innerHTML = members.map(m => `
+ 
+        // Look up the username for each member from the users collection
+        // This way we show their name instead of their uid
+        const memberDetails = await Promise.all(
+          members.map(async (m) => {
+            const userSnap = await getDoc(doc(db, "users", m.uid));
+            const username = userSnap.exists() ? userSnap.data().username : m.uid;
+            return { ...m, username };
+          })
+        );
+ 
+        list.innerHTML = memberDetails.map(m => `
           <li class="player-item ${m.roomRole ? (m.team === 'B' ? 'team-b-item' : 'team-a-item') : ''}">
-            <span>${m.uid}</span>
+            <span>${m.username}</span>
             <span>${m.roomRole || "No role yet"}</span>
           </li>
         `).join("");
