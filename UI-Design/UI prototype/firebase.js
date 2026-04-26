@@ -142,10 +142,11 @@ export async function updateRoomStatus(roomId, status) {
 
 // Adds a player to the room when they join with a PIN
 // Also saves their chosen role like scout or warrior
-export async function joinRoom(roomId, uid, roomRole = null) {
+export async function joinRoom(roomId, uid, roomRole = null, team = null) {
   await setDoc(doc(db, "rooms", roomId, "memberships", uid), {
     uid:      uid,
     roomRole: roomRole,
+    team: team,
     joinedAt: serverTimestamp(),
     leftAt:   null
   });
