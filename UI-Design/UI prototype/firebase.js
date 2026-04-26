@@ -46,16 +46,20 @@ export { app, auth, db };
 
 // Opens google popup so the player can sign in
 // Also saves their info to the database if its their first time
+// We wait for the save to finish before returning so the username is always there
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   const result   = await signInWithPopup(auth, provider);
   const user     = result.user;
 
-  // Save to Firestore in the background - dont block the redirect if it fails
-  createOrUpdateUser(user).catch(err => {
-    console.warn("Could not save user to Firestore (will retry next time):", err.message);
-  });
-
+  // Wait for the user to be saved to Firestore before moving on
+  // This fixes the bug where new players showed their uid instead of username
+  try {
+    await createOrUpdateUser(user);
+  } catch (err) {
+    console.warn("Could not save user to Firestore:", err.message);
+  }
+ 
   return user;
 }
 
