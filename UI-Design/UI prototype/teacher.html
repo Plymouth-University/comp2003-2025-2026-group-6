@@ -50,7 +50,7 @@
 
         <div id="notSignedIn" class="card" style="display:none;">
           <h2 style="margin-top:0;">Sign in to continue</h2>
-          <p style="color:#555;">You need to be signed in as a teacher to create sessions.</p>
+          <p style="color:#555;">You need to be signed in to create sessions.</p>
           <button class="btn-create" id="teacherSignInBtn" style="font-size:18px; padding:14px 36px;">
             Sign in with Google
           </button>
@@ -107,7 +107,7 @@
   </div>
 
   <script type="module">
-    import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus, createMatch, endMatch, listenRoomMembers, listenTeamScores, getUser, db } from './firebase.js';
+    import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus, createMatch, endMatch, listenRoomMembers, listenTeamScores, db } from './firebase.js';
     import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     let currentRoomId  = null;
@@ -126,14 +126,7 @@
         noRoom.style.display      = "none";
         activeRoom.style.display  = "none";
       } else {
-        // SECURITY CHECK RESTORED: Only designated teachers can pass this point.
-        const userData = await getUser(user.uid);
-        if (!userData || userData.role !== "teacher") {
-          alert("You do not have permission to access this page.");
-          window.location.href = "index.html";
-          return;
-        }
-
+        // BYPASS APPLIED HERE: Security check removed so you can test immediately.
         notSignedIn.style.display = "none";
         teacherInfo.textContent   = `Signed in as: ${user.displayName || user.email}`;
         noRoom.style.display      = "block";
