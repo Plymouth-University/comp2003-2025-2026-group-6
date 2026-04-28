@@ -223,8 +223,18 @@
     let selectedTeam = null;
     let selectedRole = null;
 
+    const roleClickSound = new Audio("assets/click.wav");
+    const joinSound = new Audio("assets/confirm.wav");
+
+    function playSound(sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
     document.querySelectorAll('.role-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        playSound(roleClickSound);
+
         const teamCard = btn.closest('.team-card');
 
         selectedTeam = teamCard.dataset.team;
@@ -240,10 +250,14 @@
     document.getElementById('confirmTeam').addEventListener('click', () => {
       if (!selectedTeam || !selectedRole) return;
 
+      playSound(joinSound);
+
       localStorage.setItem('team', selectedTeam);
       localStorage.setItem('role', selectedRole);
 
-      window.location.href = 'confirm-team.html';
+      setTimeout(() => {
+        window.location.href = 'confirm-team.html';
+      }, 250);
     });
   </script>
 </body>

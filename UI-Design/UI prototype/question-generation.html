@@ -236,6 +236,29 @@
     });
   </script>
 
+  <script>
+    const clickSound = new Audio("assets/click.wav");
+    const confirmSound = new Audio("assets/confirm.wav");
+
+    function playSound(sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const addBtn = document.getElementById("addButton");
+      const saveBtn = document.getElementById("editButton");
+
+      addBtn.addEventListener("click", () => {
+        playSound(clickSound);
+      });
+
+      saveBtn.addEventListener("click", () => {
+        playSound(confirmSound);
+      });
+    });
+  </script>
+
   <script type="module" src="question-generation.js"></script>
 </body>
 </html>

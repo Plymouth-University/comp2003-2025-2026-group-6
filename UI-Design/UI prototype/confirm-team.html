@@ -155,6 +155,7 @@
       <div class="tabs" aria-hidden="true">
         <span></span><span></span><span></span><span></span>
       </div>
+
       <div class="windowBtns" aria-hidden="true">
         <i></i><i></i><i></i>
       </div>
@@ -193,6 +194,14 @@
   <script type="module">
     import { joinRoom, assignPlayerToTeam } from './firebase.js';
 
+    const confirmSound = new Audio("assets/confirm.wav");
+    const clickSound = new Audio("assets/click.wav");
+
+    function playSound(sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
     const team = localStorage.getItem("team") || "A";
     const role = localStorage.getItem("role") || "scout";
 
@@ -207,6 +216,7 @@
     document.getElementById("roleDisplay").textContent = roleNames[role] || role;
 
     const card = document.getElementById("confirmCard");
+
     if (team === "A") {
       card.classList.add("team-a");
     } else {
@@ -214,6 +224,8 @@
     }
 
     document.getElementById("confirmBtn").addEventListener("click", async () => {
+      playSound(confirmSound);
+
       const uid = localStorage.getItem("uid");
       const roomId = localStorage.getItem("roomId");
       const matchId = localStorage.getItem("matchId") || null;
@@ -231,7 +243,9 @@
           await assignPlayerToTeam(matchId, uid, team, role);
         }
 
-        window.location.href = "waiting.html";
+        setTimeout(() => {
+          window.location.href = "waiting.html";
+        }, 250);
 
       } catch (error) {
         console.error("Error joining game:", error);
@@ -240,7 +254,11 @@
     });
 
     document.getElementById("changeBtn").addEventListener("click", () => {
-      window.location.href = "team-select.html";
+      playSound(clickSound);
+
+      setTimeout(() => {
+        window.location.href = "team-select.html";
+      }, 200);
     });
   </script>
 </body>
