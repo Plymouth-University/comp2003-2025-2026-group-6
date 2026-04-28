@@ -5,8 +5,55 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Teacher Dashboard – Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
+
   <style>
-    .dashboard { max-width: 800px; margin: 60px auto 0; padding: 20px; }
+    .screen {
+      position: relative;
+      overflow: hidden;
+      min-height: calc(100vh - 72px);
+    }
+
+    .bg-circuit,
+    .bg-sprites,
+    .fox-mascot {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .bg-circuit {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.16;
+      z-index: 0;
+    }
+
+    .bg-sprites {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.28;
+      z-index: 1;
+    }
+
+    .fox-mascot {
+      width: 185px;
+      right: 60px;
+      top: 100px;
+      z-index: 2;
+    }
+
+    .dashboard {
+      position: relative;
+      z-index: 5;
+      max-width: 800px;
+      margin: 60px auto 0;
+      padding: 20px;
+    }
+
     .card { background: rgba(255,255,255,0.92); border: 4px solid #000; border-radius: 16px; padding: 30px; margin-bottom: 24px; text-align: center; }
     .pin-display { font-size: 72px; font-weight: 900; letter-spacing: 12px; color: #6c2bd9; margin: 20px 0; font-family: monospace; }
     .status-badge { display: inline-block; padding: 6px 18px; border-radius: 50px; font-weight: 800; font-size: 16px; margin-bottom: 16px; }
@@ -31,6 +78,26 @@
     .score-label { font-size: 18px; font-weight: 800; }
     .score-value { font-size: 48px; font-weight: 900; }
     #teacherInfo { font-size: 16px; color: #555; margin-bottom: 16px; }
+
+    @media (max-width: 1000px) {
+      .fox-mascot {
+        width: 145px;
+        right: 10px;
+        top: 90px;
+        opacity: 0.9;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .fox-mascot {
+        display: none;
+      }
+
+      .pin-display {
+        font-size: 48px;
+        letter-spacing: 6px;
+      }
+    }
   </style>
 </head>
 
@@ -42,6 +109,10 @@
     </header>
 
     <main class="screen">
+      <img src="assets/background_circuit_blobs.svg" class="bg-circuit" alt="">
+      <img src="assets/login_decor_sprites.svg" class="bg-sprites" alt="">
+      <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
+
       <div class="dashboard">
 
         <h1 style="text-align:center; color:#fff; font-size:36px; margin-bottom:30px;">
@@ -73,12 +144,13 @@
             <div id="roomStatusBadge" class="status-badge status-open">● Open</div>
             <br>
             <button class="btn-start" id="startMatchBtn">▶ Start Match</button>
-            <button class="btn-end"   id="endMatchBtn" disabled>■ End Match</button>
+            <button class="btn-end" id="endMatchBtn" disabled>■ End Match</button>
           </div>
 
-          <h1>Upload Questions</h1>
-          <input type="file" id="fileUpload" accept=".json">
-          <br><br>
+          <div class="card">
+            <h2 style="margin-top:0;">Upload Questions</h2>
+            <input type="file" id="fileUpload" accept=".json">
+          </div>
 
           <div class="card" id="scoresCard" style="display:none;">
             <h2 style="margin-top:0;">Live Scores</h2>
@@ -110,26 +182,25 @@
     import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus, createMatch, endMatch, listenRoomMembers, listenTeamScores, db } from './firebase.js';
     import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    let currentRoomId  = null;
+    let currentRoomId = null;
     let currentMatchId = null;
-    let unsubMembers   = null;
-    let unsubScores    = null;
+    let unsubMembers = null;
+    let unsubScores = null;
 
-    const notSignedIn  = document.getElementById("notSignedIn");
-    const noRoom       = document.getElementById("noRoom");
-    const activeRoom   = document.getElementById("activeRoom");
-    const teacherInfo  = document.getElementById("teacherInfo");
+    const notSignedIn = document.getElementById("notSignedIn");
+    const noRoom = document.getElementById("noRoom");
+    const activeRoom = document.getElementById("activeRoom");
+    const teacherInfo = document.getElementById("teacherInfo");
 
     listenAuthState(async (user) => {
       if (!user) {
         notSignedIn.style.display = "block";
-        noRoom.style.display      = "none";
-        activeRoom.style.display  = "none";
+        noRoom.style.display = "none";
+        activeRoom.style.display = "none";
       } else {
-        // BYPASS APPLIED HERE: Security check removed so you can test immediately.
         notSignedIn.style.display = "none";
-        teacherInfo.textContent   = `Signed in as: ${user.displayName || user.email}`;
-        noRoom.style.display      = "block";
+        teacherInfo.textContent = `Signed in as: ${user.displayName || user.email}`;
+        noRoom.style.display = "block";
       }
     });
 
@@ -140,19 +211,24 @@
     document.getElementById("createRoomBtn").addEventListener("click", async () => {
       const btn = document.getElementById("createRoomBtn");
       btn.textContent = "Creating...";
-      btn.disabled    = true;
+      btn.disabled = true;
 
       try {
         const { auth } = await import('./firebase.js');
         const uid = auth.currentUser?.uid;
-        if (!uid) { alert("Not signed in!"); return; }
+
+        if (!uid) {
+          alert("Not signed in!");
+          return;
+        }
 
         const { roomId, joinCode } = await createRoom(uid);
         currentRoomId = roomId;
 
         document.getElementById("pinDisplay").textContent = joinCode;
         localStorage.setItem("roomId", roomId);
-        noRoom.style.display     = "none";
+
+        noRoom.style.display = "none";
         activeRoom.style.display = "block";
 
         startListeningToMembers(roomId);
@@ -160,15 +236,16 @@
         console.error("Error creating room:", err);
         alert("Could not create room. Please try again.");
         btn.textContent = "+ Create New Session";
-        btn.disabled    = false;
+        btn.disabled = false;
       }
     });
 
     document.getElementById("startMatchBtn").addEventListener("click", async () => {
       if (!currentRoomId) return;
+
       const btn = document.getElementById("startMatchBtn");
       btn.textContent = "Starting...";
-      btn.disabled    = true;
+      btn.disabled = true;
 
       try {
         currentMatchId = await createMatch(currentRoomId);
@@ -176,10 +253,10 @@
 
         localStorage.setItem("matchId", currentMatchId);
 
-        document.getElementById("roomStatusBadge").textContent  = "● In Game";
-        document.getElementById("roomStatusBadge").className    = "status-badge status-in_game";
-        document.getElementById("endMatchBtn").disabled         = false;
-        document.getElementById("scoresCard").style.display     = "block";
+        document.getElementById("roomStatusBadge").textContent = "● In Game";
+        document.getElementById("roomStatusBadge").className = "status-badge status-in_game";
+        document.getElementById("endMatchBtn").disabled = false;
+        document.getElementById("scoresCard").style.display = "block";
         btn.textContent = "▶ Match Running";
 
         startListeningToScores(currentMatchId);
@@ -187,12 +264,13 @@
         console.error("Error starting match:", err);
         alert("Could not start match. Please try again.");
         btn.textContent = "▶ Start Match";
-        btn.disabled    = false;
+        btn.disabled = false;
       }
     });
 
     document.getElementById("endMatchBtn").addEventListener("click", async () => {
       if (!currentMatchId) return;
+
       const scoreA = parseInt(document.getElementById("liveScoreA").textContent) || 0;
       const scoreB = parseInt(document.getElementById("liveScoreB").textContent) || 0;
       const winner = scoreA >= scoreB ? "A" : "B";
@@ -204,9 +282,9 @@
         if (unsubScores) unsubScores();
 
         document.getElementById("roomStatusBadge").textContent = "● Closed";
-        document.getElementById("roomStatusBadge").className   = "status-badge status-closed";
-        document.getElementById("startMatchBtn").disabled      = true;
-        document.getElementById("endMatchBtn").disabled        = true;
+        document.getElementById("roomStatusBadge").className = "status-badge status-closed";
+        document.getElementById("startMatchBtn").disabled = true;
+        document.getElementById("endMatchBtn").disabled = true;
 
         alert(`Match ended! Team ${winner} wins!`);
       } catch (err) {
@@ -217,14 +295,18 @@
 
     function startListeningToMembers(roomId) {
       if (unsubMembers) unsubMembers();
+
       unsubMembers = listenRoomMembers(roomId, async (members) => {
-        const list  = document.getElementById("playerList");
+        const list = document.getElementById("playerList");
         const count = document.getElementById("playerCount");
+
         count.textContent = members.length;
+
         if (members.length === 0) {
           list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
           return;
         }
+
         const memberDetails = await Promise.all(
           members.map(async (m) => {
             const userSnap = await getDoc(doc(db, "users", m.uid));
@@ -232,6 +314,7 @@
             return { ...m, username };
           })
         );
+
         list.innerHTML = memberDetails.map(m => `
           <li class="player-item ${m.roomRole ? (m.team === 'B' ? 'team-b-item' : 'team-a-item') : ''}">
             <span>${m.username}</span>
@@ -243,6 +326,7 @@
 
     function startListeningToScores(matchId) {
       if (unsubScores) unsubScores();
+
       unsubScores = listenTeamScores(matchId, ({ A, B }) => {
         document.getElementById("liveScoreA").textContent = A;
         document.getElementById("liveScoreB").textContent = B;
@@ -250,21 +334,27 @@
     }
 
     import { uploadQuestions } from './firebase.js';
+
     fileUpload.addEventListener("change", function (event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async function (e) {
-            try {
-                const jsonData = JSON.parse(e.target.result);
-                const qaArray = Object.values(jsonData);
-                await uploadQuestions(qaArray);
-                alert("Questions uploaded successfully!");
-            } catch (error) {
-                alert("Error reading JSON file: " + error);
-            }
-        };
-        reader.readAsText(file);
+      const file = event.target.files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = async function (e) {
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          const qaArray = Object.values(jsonData);
+
+          await uploadQuestions(qaArray);
+          alert("Questions uploaded successfully!");
+        } catch (error) {
+          alert("Error reading JSON file: " + error);
+        }
+      };
+
+      reader.readAsText(file);
     });
   </script>
 </body>

@@ -5,10 +5,61 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Confirm Your Team & Role – Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
+
   <style>
+    .screen {
+      position: relative;
+      overflow: hidden;
+      min-height: calc(100vh - 72px);
+    }
+
+    .bg-circuit,
+    .bg-sprites,
+    .top-flags,
+    .fox-mascot {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .bg-circuit {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.16;
+      z-index: 0;
+    }
+
+    .bg-sprites {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.28;
+      z-index: 1;
+    }
+
+    .top-flags {
+      width: 360px;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .fox-mascot {
+      width: 185px;
+      right: 60px;
+      top: 100px;
+      z-index: 2;
+    }
+
     .confirmation-card {
+      position: relative;
+      z-index: 5;
       max-width: 500px;
-      margin: 120px auto 0;
+      margin: 140px auto 0;
       padding: 40px 30px;
       background: rgba(255,255,255,0.92);
       border: 5px solid #000;
@@ -16,6 +67,7 @@
       text-align: center;
       box-shadow: 0 8px 30px rgba(0,0,0,0.4);
     }
+
     .team-badge {
       font-size: 48px;
       font-weight: 900;
@@ -24,20 +76,24 @@
       border-radius: 50px;
       display: inline-block;
     }
+
     .team-a .team-badge { background: #19b83d; color: white; }
     .team-b .team-badge { background: #ff4444; color: white; }
+
     .role-name {
       font-size: 28px;
       font-weight: bold;
       margin: 20px 0 30px;
       color: #333;
     }
+
     .buttons {
       display: flex;
       justify-content: center;
       gap: 30px;
       flex-wrap: wrap;
     }
+
     .btn {
       padding: 16px 40px;
       font-size: 20px;
@@ -47,17 +103,48 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
     .btn-confirm {
       background: #4caf50;
       color: white;
     }
+
     .btn-change {
       background: #ff9800;
       color: white;
     }
+
     .btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 1000px) {
+      .fox-mascot {
+        width: 145px;
+        right: 10px;
+        top: 90px;
+        opacity: 0.9;
+      }
+
+      .top-flags {
+        width: 250px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .fox-mascot {
+        display: none;
+      }
+
+      .top-flags {
+        width: 210px;
+      }
+
+      .buttons {
+        flex-direction: column;
+        gap: 15px;
+      }
     }
   </style>
 </head>
@@ -74,8 +161,14 @@
     </header>
 
     <main class="screen">
+
+      <img src="assets/background_circuit_blobs.svg" class="bg-circuit" alt="">
+      <img src="assets/login_decor_sprites.svg" class="bg-sprites" alt="">
+      <img src="assets/floating_flags.svg" class="top-flags" alt="">
+      <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
+
       <div class="confirmation-card" id="confirmCard">
-        <h2 style="font-size: 34px; margin: 0 0 30px;">Confirm Your Choice</h2>
+        <h2 style="font-size:34px; margin:0 0 30px;">Confirm Your Choice</h2>
 
         <div id="teamDisplayWrapper">
           <div class="team-badge" id="teamBadge">TEAM ?</div>
@@ -90,8 +183,8 @@
           <button class="btn btn-change" id="changeBtn">Change Team/Role</button>
         </div>
 
-        <p style="margin-top: 40px; font-size: 16px; color: #555;">
-          <a href="join.html" style="color: #6c2bd9; text-decoration: underline;">Back to PIN</a>
+        <p style="margin-top:40px; font-size:16px; color:#555;">
+          <a href="join.html" style="color:#6c2bd9; text-decoration:underline;">Back to PIN</a>
         </p>
       </div>
     </main>
@@ -121,8 +214,8 @@
     }
 
     document.getElementById("confirmBtn").addEventListener("click", async () => {
-      const uid     = localStorage.getItem("uid");
-      const roomId  = localStorage.getItem("roomId");
+      const uid = localStorage.getItem("uid");
+      const roomId = localStorage.getItem("roomId");
       const matchId = localStorage.getItem("matchId") || null;
 
       if (!uid || !roomId) {
@@ -132,10 +225,8 @@
       }
 
       try {
-        // Save player into the room membership
         await joinRoom(roomId, uid, role, team);
 
-        // If a match is already running save player to the team
         if (matchId) {
           await assignPlayerToTeam(matchId, uid, team, role);
         }

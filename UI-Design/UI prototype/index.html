@@ -5,6 +5,84 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .screen {
+      position: relative;
+      overflow: hidden;
+      min-height: calc(100vh - 72px);
+    }
+
+    .bg-circuit,
+    .bg-sprites,
+    .top-flags,
+    .fox-mascot {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .bg-circuit {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.16;
+      z-index: 0;
+    }
+
+    .bg-sprites {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.28;
+      z-index: 1;
+    }
+
+    .top-flags {
+      width: 360px;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .fox-mascot {
+      width: 185px;
+      right: 60px;
+      top: 100px;
+      z-index: 2;
+    }
+
+    #welcomeScreen {
+      position: relative;
+      z-index: 5;
+    }
+
+    @media (max-width: 1000px) {
+      .fox-mascot {
+        width: 145px;
+        right: 10px;
+        top: 90px;
+        opacity: 0.9;
+      }
+
+      .top-flags {
+        width: 250px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .fox-mascot {
+        display: none;
+      }
+
+      .top-flags {
+        width: 210px;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -13,6 +91,7 @@
       <div class="tabs" aria-hidden="true">
         <span></span><span></span><span></span><span></span>
       </div>
+
       <div class="windowBtns" aria-hidden="true">
         <i></i><i></i><i></i>
       </div>
@@ -20,16 +99,21 @@
 
     <main class="screen">
 
+      <img src="assets/background_circuit_blobs.svg" class="bg-circuit" alt="">
+      <img src="assets/login_decor_sprites.svg" class="bg-sprites" alt="">
+      <img src="assets/floating_flags.svg" class="top-flags" alt="">
+      <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
+
       <section id="welcomeScreen">
         <section class="hero">
-          <img src="flag.png" class="flagIcon" alt="Flag icon">
           
+
           <div class="title">
             <div class="title-outline">CAPTURE THE<br>FLAG!</div>
             <div class="title-main">CAPTURE THE<br>FLAG!</div>
           </div>
         </section>
-        
+
         <section class="welcomeCard">
           <p class="hint welcomeText">
             Steal the flag and return to base.<br>
@@ -40,9 +124,8 @@
             <button id="startBtn" class="startBig">Start</button>
           </div>
 
-          <!-- Small teacher link at the bottom - not obvious to students -->
-          <p style="margin-top: 40px; font-size: 12px; color: #888;">
-            <a href="teacher.html" style="color: #888; text-decoration: none;">Teacher Login</a>
+          <p style="margin-top:40px; font-size:12px; color:#888;">
+            <a href="teacher.html" style="color:#888; text-decoration:none;">Teacher Login</a>
           </p>
         </section>
 
@@ -57,7 +140,9 @@
             <div id="gameStatus"></div>
           </div>
         </section>
-      </main>
+      </section>
+
+    </main>
   </div>
 
   <script>

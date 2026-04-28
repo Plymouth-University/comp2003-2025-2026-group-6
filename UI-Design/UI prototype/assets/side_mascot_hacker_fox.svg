@@ -1,0 +1,20 @@
+<svg width="700" height="520" viewBox="0 0 700 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fur" x1="0" x2="1">
+      <stop stop-color="#FFB347"/><stop offset="1" stop-color="#FF5E7E"/>
+    </linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="16" flood-opacity=".16"/></filter>
+  </defs>
+  <g filter="url(#shadow)" transform="translate(80 20)">
+    <path d="M145 145 L70 15 L230 105 Z" fill="url(#fur)"/>
+    <path d="M395 145 L470 15 L310 105 Z" fill="url(#fur)"/>
+    <ellipse cx="270" cy="245" rx="215" ry="185" fill="url(#fur)"/>
+    <path d="M125 225 Q270 430 415 225 Q390 420 270 440 Q150 420 125 225" fill="#fff" opacity=".94"/>
+    <rect x="135" y="195" width="270" height="72" rx="18" fill="#101828"/>
+    <circle cx="205" cy="232" r="20" fill="#00E5FF"/>
+    <circle cx="335" cy="232" r="20" fill="#00E5FF"/>
+    <path d="M228 320 Q270 350 312 320" fill="none" stroke="#101828" stroke-width="14" stroke-linecap="round"/>
+    <rect x="190" y="370" width="160" height="85" rx="16" fill="#101828"/>
+    <text x="270" y="422" font-family="Arial, sans-serif" font-weight="700" font-size="32" text-anchor="middle" fill="#fff">&lt;/&gt;</text>
+  </g>
+</svg>
