@@ -79,6 +79,34 @@
     .score-value { font-size: 48px; font-weight: 900; }
     #teacherInfo { font-size: 16px; color: #555; margin-bottom: 16px; }
 
+    #musicControls {
+      position: fixed;
+      top: 90px;
+      right: 28px;
+      z-index: 999999;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #musicToggleBtn,
+    .musicVolBtn {
+      background: #6c2bd9;
+      color: white;
+      border: 3px solid #000;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    #musicToggleBtn:hover,
+    .musicVolBtn:hover {
+      transform: translateY(-2px);
+    }
+
     @media (max-width: 1000px) {
       .fox-mascot {
         width: 145px;
@@ -107,6 +135,16 @@
       <div class="tabs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
       <div class="windowBtns" aria-hidden="true"><i></i><i></i><i></i></div>
     </header>
+
+    <audio id="bgMusic" loop style="display:none;">
+      <source src="assets/Mini-Game%20Shuffle.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="musicControls">
+      <button id="musicToggleBtn" type="button">🔇 Music Off</button>
+      <button id="volumeDownBtn" class="musicVolBtn" type="button">−</button>
+      <button id="volumeUpBtn" class="musicVolBtn" type="button">+</button>
+    </div>
 
     <main class="screen">
       <img src="assets/background_circuit_blobs.svg" class="bg-circuit" alt="">
@@ -335,7 +373,7 @@
 
     import { uploadQuestions } from './firebase.js';
 
-    fileUpload.addEventListener("change", function (event) {
+    document.getElementById("fileUpload").addEventListener("change", function (event) {
       const file = event.target.files[0];
 
       if (!file) return;
@@ -355,6 +393,33 @@
       };
 
       reader.readAsText(file);
+    });
+  </script>
+
+  <script>
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggleBtn = document.getElementById("musicToggleBtn");
+    const volumeDownBtn = document.getElementById("volumeDownBtn");
+    const volumeUpBtn = document.getElementById("volumeUpBtn");
+
+    bgMusic.volume = 0.3;
+
+    musicToggleBtn.addEventListener("click", function () {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        musicToggleBtn.textContent = "🔊 Music On";
+      } else {
+        bgMusic.pause();
+        musicToggleBtn.textContent = "🔇 Music Off";
+      }
+    });
+
+    volumeDownBtn.addEventListener("click", function () {
+      bgMusic.volume = Math.max(0, bgMusic.volume - 0.1);
+    });
+
+    volumeUpBtn.addEventListener("click", function () {
+      bgMusic.volume = Math.min(1, bgMusic.volume + 0.1);
     });
   </script>
 </body>
