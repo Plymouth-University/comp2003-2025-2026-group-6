@@ -1,177 +1,205 @@
-import { db } from './firebase.js';
-import { doc, setDoc, collection, getDocs, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { db, addTeamScore } from './firebase.js';
+import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-
-// --- GAME CONFIG ---
+// Game variables
 let quizBonusTime = 0;
-let baseTime = 60; 
-
+let quizScore = 0;
+let baseTime = 60;
 let multiplier = 1;
 let currentQ = 0;
 let questions = [];
 let questionsThisRound = 0;
+let questionTimer;
 
-// --- 1. INITIALIZE GAME FLOW ---
-// Restores the full sequence: Load AI Questions -> Run Quiz -> Start Unity
+// Initializes game and fetches questions
 async function initGameFlow() {
-    try {
-        const roomId = localStorage.getItem("roomId");
-        const response = await getDocs(collection(db, "rooms", roomId, "questions"));
-        if (response.empty) throw new Error("questions not found");
-        
-        questions = response.docs.map(doc => doc.data());
+    const roomId = localStorage.getItem("roomId");
+    if (!roomId) return;
 
-        startQuiz(questions);
+    try {
+        const response = await getDocs(collection(db, "rooms", roomId, "questions"));
+        questions = response.docs.map(doc => doc.data());
+        if (questions.length > 0) {
+            startQuiz();
+        }
     } catch (err) {
-        console.warn("Quiz phase skipped due to missing questions.json");
-        launchUnityGame();
+        console.error("Error loading questions", err);
     }
 }
 
-// --- 2. QUIZ PHASE LOGIC ---
-function startQuiz(questions) {
+// Controls the question popup and scoring
+function startQuiz() {
     const modal = document.getElementById('questionModal');
-    if (!modal) return launchUnityGame();
-
     modal.style.display = 'flex';
+    
     multiplier = 1;
+    quizScore = 0;
     questionsThisRound = 0;
 
+    // Renders a single question
     function renderQuestion() {
-        if (currentQ >= questions.length || questionsThisRound >= 4) {
+        if (currentQ >= questions.length) {
+            currentQ = 0;
+        }
+
+        if (questionsThisRound >= 3) {
             modal.style.display = 'none';
-            return;
+            return showGameBrief();
         }
 
         const qData = questions[currentQ];
-        const questionTextEl = document.getElementById('questionText');
-        if (questionTextEl) questionTextEl.textContent = qData.question;
+        document.getElementById('questionText').textContent = qData.question;
         
         const container = document.getElementById('optionsContainer');
-        if (container) {
-            container.innerHTML = '';
-            qData.answers.forEach((opt) => {
-                const btn = document.createElement('button');
-                btn.textContent = opt;
-                btn.className = 'option-btn'; // Restores your CSS styling
-                btn.onclick = () => {
-                    const allBtns = container.querySelectorAll("button");
-                    allBtns.forEach(b => b.disabled = true);
-                    if (opt === qData.correctAns) {
-                        quizBonusTime += 5; // Reward logic restored
-                        multiplier += 0.25;
-                        btn.textContent = "Correct!";
-                        btn.classList.add("disabled-correct")
-                        multiplierText.textContent = `Current multiplier: ${multiplier}x`;
-                    } else {
-                        btn.textContent = "Incorrect...";
-                        btn.classList.add("disabled-incorrect")
-                    }
-                    btn.disabled = true;
-                    setTimeout(() => {
-                        currentQ++;
-                        questionsThisRound ++;
-                        renderQuestion();
-                    }, 1500);       
-                };
-                container.appendChild(btn);
-            });
-            const multiplierText = document.createElement('div');
-            multiplierText.textContent = `Current multiplier: ${multiplier}x`;
-            multiplierText.className = "info-text";
-            container.appendChild(multiplierText);
+        const timerBar = document.getElementById('quizTimerBar');
+        container.innerHTML = '';
+        
+        let timeLeft = 10;
+        
+        // Resets and animates the timer bar
+        if (timerBar) {
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+            timerBar.style.backgroundColor = '#00e5ff';
+            void timerBar.offsetWidth;
+            timerBar.style.transition = 'width 1s linear, background-color 0.5s';
         }
+
+        // Handles the 10 second countdown
+        clearInterval(questionTimer);
+        questionTimer = setInterval(() => {
+            timeLeft--;
+            if (timerBar) {
+                timerBar.style.width = (timeLeft / 10) * 100 + '%';
+                if (timeLeft <= 3) timerBar.style.backgroundColor = '#ff5e5e';
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(questionTimer);
+                handleAnswerLogic(null, null);
+            }
+        }, 1000);
+
+        // Creates answer buttons
+        qData.answers.forEach((opt) => {
+            const btn = document.createElement('button');
+            btn.textContent = opt;
+            btn.className = 'option-btn';
+            btn.onclick = () => {
+                clearInterval(questionTimer);
+                handleAnswerLogic(opt, btn);
+            };
+            container.appendChild(btn);
+        });
     }
+
+    // Checks answer and applies points
+    function handleAnswerLogic(selectedOpt, btnClicked) {
+        const container = document.getElementById('optionsContainer');
+        const allBtns = container.querySelectorAll("button");
+        allBtns.forEach(b => b.disabled = true);
+
+        // The Fix: .trim() removes invisible spaces that were breaking the score check
+        const isCorrect = String(selectedOpt).trim() === String(questions[currentQ].correctAns).trim();
+
+        if (isCorrect) {
+            quizBonusTime += 5;
+            multiplier += 0.25;
+            quizScore += 100;
+            
+            if (btnClicked) {
+                btnClicked.textContent = "CORRECT! +100 PTS";
+                btnClicked.classList.add("disabled-correct");
+            }
+        } else {
+            if (btnClicked) {
+                btnClicked.textContent = "INCORRECT";
+                btnClicked.classList.add("disabled-incorrect");
+            }
+        }
+
+        // Displays current points and multiplier
+        const statsText = document.createElement('div');
+        statsText.textContent = `Points: ${quizScore} | Multiplier: ${multiplier}x`;
+        statsText.style.color = "#00e5ff";
+        statsText.style.marginTop = "15px";
+        statsText.style.fontWeight = "bold";
+        container.appendChild(statsText);
+
+        // Moves to next question after delay
+        setTimeout(() => {
+            currentQ++;
+            questionsThisRound++;
+            renderQuestion();
+        }, 1500);       
+    }
+    
     renderQuestion();
 }
 
-// --- 3. UNITY PREP ---
-function launchUnityGame() {
-    const finalStartTime = baseTime + quizBonusTime;
-    const timerEl = document.getElementById("timeLeft");
-    if (timerEl) timerEl.textContent = finalStartTime;
+// Shows briefing screen before Unity game
+function showGameBrief() {
+    const briefModal = document.getElementById('briefModal');
+    document.getElementById('briefStatsDisplay').textContent = `Trivia Points: ${quizScore} | Multiplier: ${multiplier}x`;
+    briefModal.style.display = 'flex';
 
-    const statusEl = document.getElementById("status");
-    if (statusEl) statusEl.textContent = `Bonus time applied: +${quizBonusTime}s. Ready to start!`;
-
-    const iframe = document.getElementById("unityIframe");
-
-    iframe.src = iframe.src;
-
-    iframe.contentWindow.postMessage(
-        {
-            type: "START_GAME",
-            time: finalStartTime
-        },
-        "*"
-    );
+    document.getElementById('startMiniGameBtn').onclick = () => {
+        briefModal.style.display = 'none';
+        launchUnityGame();
+    };
 }
 
-// --- 4. MULTIPLAYER SYNC (FIREBASE) ---
-function startApp() {
-    const sessionPin = localStorage.getItem("sessionPin") || "DEFAULT_SESSION";
-    const sessionRef = doc(db, "sessions", sessionPin);
+// Starts the Unity WebGL game
+function launchUnityGame() {
+    const finalStartTime = baseTime + quizBonusTime;
+    document.getElementById("timeLeft").textContent = finalStartTime;
+    document.getElementById("status").textContent = `Bonus time: +${quizBonusTime}s`;
 
-    // Restores live score updates for both teams
-    onSnapshot(sessionRef, (docSnap) => {
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const scoreA = document.getElementById("scoreA");
-            const scoreB = document.getElementById("scoreB");
-            if (scoreA) scoreA.textContent = data.teamAScore || 0;
-            if (scoreB) scoreB.textContent = data.teamBScore || 0;
-        }
-    });
-    console.log("App started");
+    const iframe = document.getElementById("unityIframe");
+    iframe.src = iframe.src;
+
+    setTimeout(() => {
+        iframe.contentWindow.postMessage({ type: "START_GAME", time: finalStartTime }, "*");
+    }, 1000);
+}
+
+// Starts the app on load
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initGameFlow);
+} else {
     initGameFlow();
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startApp);
-} else {
-    startApp();
-}
-
-// --- 5. UNITY SCORE CATCHER ---
-// Restores the logic that takes Unity points and updates the Cloud DB
+// Listens for game over from Unity and saves scores
 document.addEventListener('unityGameOver', async function(e) {
+    const unityBaseScore = e.detail.score;
+    const unityTotal = Math.floor(unityBaseScore * multiplier);
+    const finalScore = quizScore + unityTotal; 
+    
     const statusEl = document.getElementById('status');
-    const finalScore = e.detail.score * multiplier;
+    statusEl.textContent = `ROUND COMPLETE: ${finalScore} PTS!`;
+    statusEl.style.color = "#00e5ff";
+
+    const roomId = localStorage.getItem("roomId");
     const team = localStorage.getItem("team") || "A";
-    const playerName = localStorage.getItem("playerName") || "Player";
-    const sessionPin = localStorage.getItem("sessionPin") || "DEFAULT_SESSION";
 
     try {
-        const sessionRef = doc(db, "sessions", sessionPin);
-
-        // Update Score Text
-        statusEl.textContent = "HACK COMPLETE: " + finalScore + " POINTS!" + " (" + e.detail.score + "x" + multiplier + ")";
-
-        // Update Team Total
-        const updateObj = {};
-        updateObj[team === "A" ? "teamAScore" : "teamBScore"] = increment(finalScore);
-        await setDoc(sessionRef, updateObj, { merge: true });
-
-        // Update Individual Player Record
-        const playerRef = doc(db, "sessions", sessionPin, "players", playerName);
-        await setDoc(playerRef, { 
-            score: increment(finalScore), 
-            team: team 
-        }, { merge: true });
+        // Finds the active match
+        const q = query(collection(db, "matches"), where("roomId", "==", roomId));
+        const snap = await getDocs(q);
         
-        console.log("Scores successfully pushed to Firebase.");
+        if (!snap.empty) {
+            const matchId = snap.docs[0].id;
+            await addTeamScore(matchId, team, finalScore);
+        }
 
+        // Restarts the quiz loop after 3 seconds
         setTimeout(() => {
-            if (questions.length - currentQ >= 4) { //Start quiz back up if there are 4 or more questions left
-                startQuiz(questions);
-                launchUnityGame(); 
-            } else { //Finish game loop
-                statusEl.textContent = "FINISHED";
-                setTimeout(() => {
-                    window.location.href = 'join.html';
-                }, 3000); 
-            }
+            quizBonusTime = 0; 
+            quizScore = 0; 
+            startQuiz();
         }, 3000); 
+
     } catch (error) {
         console.error("Firebase update failed:", error);
     }

@@ -133,7 +133,7 @@
 
       try {
         // Save player into the room membership
-        await joinRoom(roomId, uid, role);
+        await joinRoom(roomId, uid, role, team);
 
         // If a match is already running save player to the team
         if (matchId) {

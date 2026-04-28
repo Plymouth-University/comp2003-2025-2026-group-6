@@ -83,38 +83,57 @@
 
 <body>
   <div class="waiting-screen">
-    <!-- Phase 1: Waiting -->
     <div id="waitingPhase">
       <div class="loading-spinner"></div>
       <div class="waiting-message">Waiting for the game to start...</div>
       <div class="small-hint">Your teacher will begin the session soon. Stay ready!</div>
     </div>
 
-    <!-- Phase 2: Countdown -->
     <div id="countdownPhase" class="countdown-container">
       <div class="starting-text">Starting in...</div>
       <div class="countdown-number" id="countdownNumber">3</div>
     </div>
 
-    <!-- Phase 3: GO! -->
     <div id="goPhase" style="display: none;">
       <div class="go-text">GO!</div>
       <div class="starting-text">Game starting now!</div>
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // THE FIX: Import db from your team's file, but get the missing tools directly from Google
+    import { db } from './firebase.js';
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
     const waitingPhase = document.getElementById('waitingPhase');
     const countdownPhase = document.getElementById('countdownPhase');
     const goPhase = document.getElementById('goPhase');
     const countdownNumber = document.getElementById('countdownNumber');
 
-    // Step 1: Show waiting for 3–4 seconds (adjust as needed)
-    setTimeout(() => {
+    // Get the room ID saved from the join screen
+    const roomId = localStorage.getItem('roomId');
+
+    if (!roomId) {
+      window.location.href = 'join.html';
+    } else {
+      // Connect to the specific room in Firebase (using the "rooms" collection)
+      const roomRef = doc(db, "rooms", roomId); 
+      
+      // Listen for the teacher to change the status to "in_game"
+      onSnapshot(roomRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.status === "in_game") {
+            triggerCountdown();
+          }
+        }
+      });
+    }
+
+    function triggerCountdown() {
       waitingPhase.style.display = 'none';
       countdownPhase.style.display = 'flex';
 
-      // Start countdown: 3 → 2 → 1
       let count = 3;
       countdownNumber.textContent = count;
       countdownNumber.classList.add('visible');
@@ -126,20 +145,19 @@
           setTimeout(() => {
             countdownNumber.textContent = count;
             countdownNumber.classList.add('visible');
-          }, 400); // quick fade out / in
+          }, 400); 
         } else {
           clearInterval(countdownInterval);
           countdownPhase.style.display = 'none';
           goPhase.style.display = 'flex';
 
-          // Show GO for 1.8 seconds then redirect
+          // Launch into the game!
           setTimeout(() => {
             window.location.href = 'game.html';
           }, 1800);
         }
-      }, 1200); // each number visible for ~1.2 seconds
-
-    }, 3500); // waiting time before countdown starts
+      }, 1200); 
+    }
   </script>
 </body>
 </html>

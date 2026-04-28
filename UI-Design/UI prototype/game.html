@@ -6,18 +6,27 @@
   <title>Game – Capture the Flag</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    html, body { overflow-x: hidden; scroll-behavior: smooth; background: #0a0a1a; }
-    /* Simple styling for the quiz buttons since we are restoring everything */
+    /* Retro Purple and Blue Theme */
+    html, body { overflow-x: hidden; scroll-behavior: smooth; background: #130f24; color: #e0f7ff; font-family: system-ui, sans-serif; }
+    
     .option-btn {
       padding: 14px;
       font-size: 18px;
-      background: #f0f0f0;
-      border: 3px solid #000;
+      background: #2a1b54; 
+      color: #e0f7ff;
+      border: 2px solid #6c2bd9;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      font-weight: bold;
     }
-    .option-btn:hover { background: #e0e0e0; }
+    .option-btn:hover { 
+      background: #6c2bd9; 
+      color: #fff;
+      box-shadow: 0 0 15px rgba(108, 43, 217, 0.6); 
+    }
+    .disabled-correct { background: #00e5ff !important; color: #000 !important; border-color: #00e5ff !important; }
+    .disabled-incorrect { background: #332b4d !important; color: #7a7099 !important; border-color: #4a3e6b !important; }
   </style>
 </head>
 <body>
@@ -41,9 +50,9 @@
       <div style="max-width:1140px; margin:0 auto; padding:20px;">
         
         <div style="margin-bottom:15px; text-align:center;">
-          <button id="startBtnGame" class="startBig">Start</button>
-          <button id="pauseBtn">Pause</button>
-          <button id="resetBtn">Reset</button>
+          <button id="startBtnGame" class="startBig" style="background:#6c2bd9; color:white; border:none; padding:10px 30px; border-radius:5px; font-size:1.2em; cursor:pointer;">Start</button>
+          <button id="pauseBtn" style="padding:10px 20px; background:#2a1b54; color:white; border:2px solid #6c2bd9; border-radius:5px;">Pause</button>
+          <button id="resetBtn" style="padding:10px 20px; background:#2a1b54; color:white; border:2px solid #6c2bd9; border-radius:5px;">Reset</button>
         </div>
 
         <div style="text-align:center; color:#e0f7ff; margin:10px; font-size:1.2em;">
@@ -52,20 +61,20 @@
         </div>
 
         <div style="text-align:center;">
-          <iframe id="unityIframe" src="stacker_game/index.html" scrolling="no" style="width:100%; max-width:1100px; height:700px; border:4px solid #000; background:#222; border-radius:8px; display:block; margin:0 auto;"></iframe>
+          <iframe id="unityIframe" src="stacker_game/index.html" scrolling="no" style="width:100%; max-width:1100px; height:700px; border:4px solid #6c2bd9; background:#1a1130; border-radius:8px; display:block; margin:0 auto;"></iframe>
         </div>
 
-        <div style="margin-top: 20px; padding: 20px; background: rgba(20, 20, 40, 0.8); border: 2px solid #333; border-radius: 10px; color: #e0f7ff; max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div style="margin-top: 20px; padding: 20px; background: rgba(42, 27, 84, 0.5); border: 2px solid #6c2bd9; border-radius: 10px; color: #e0f7ff; max-width: 800px; margin-left: auto; margin-right: auto;">
           <p style="margin: 8px 0; font-size: 1.4em;">
-            Time left: <span id="timeLeft" style="color: #fffb99; font-weight: bold;">60</span>s
+            Time left: <span id="timeLeft" style="color: #00e5ff; font-weight: bold;">60</span>s
           </p>
           
-          <p id="status" style="color: #ffd700; font-weight: bold; font-size: 1.3em; margin: 12px 0;">
+          <p id="status" style="color: #d0bfff; font-weight: bold; font-size: 1.3em; margin: 12px 0;">
             Initializing Systems...
           </p>
           
           <p style="margin: 8px 0;">
-            Team A Score: <span id="scoreA" style="color: #00ff9d; font-weight: bold;">0</span> 
+            Team A Score: <span id="scoreA" style="color: #00e5ff; font-weight: bold;">0</span> 
             | Team B Score: <span id="scoreB" style="color: #ff5e5e; font-weight: bold;">0</span>
           </p>
           
@@ -76,22 +85,44 @@
         </div>
       </div>
 
-      <div id="questionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center;">
-        <div style="background:white; padding:40px; border:6px solid #000; border-radius:20px; max-width:550px; width:90%; text-align:center; box-shadow:0 0 50px rgba(0,255,157,0.3);">
-            <h3 id="questionText" style="margin:0 0 25px; font-size:28px; color:#1a1a1a; font-family: sans-serif;">Security Challenge</h3>
+      <div id="questionModal" style="display:none; position:fixed; inset:0; background:rgba(19, 15, 36, 0.95); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#1a1130; padding:40px; border:4px solid #6c2bd9; border-radius:12px; max-width:550px; width:90%; text-align:center; box-shadow:0 0 40px rgba(108, 43, 217, 0.5);">
+            <h3 id="questionText" style="margin:0 0 15px; font-size:26px; color:#e0f7ff;">Trivia Round</h3>
+            
+            <div style="width: 100%; height: 12px; background: #2a1b54; border-radius: 6px; margin-bottom: 25px; overflow: hidden; border: 2px solid #4a148c;">
+              <div id="quizTimerBar" style="width: 100%; height: 100%; background: #00e5ff; transition: width 1s linear, background-color 0.5s;"></div>
+            </div>
+
             <div id="optionsContainer" style="display:flex; flex-direction:column; gap:15px; margin-bottom:20px;">
-              </div>
+            </div>
         </div>
       </div>
 
-      <div id="resultsScreen" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; color: white; text-align: center; padding: 40px;">
-        <div style="max-width: 700px; margin: 0 auto; border: 6px solid #ffd700; border-radius: 20px; padding: 40px; background: #111;">
-          <h1 style="font-size: 3em; color: #ffd700;">GAME OVER</h1>
-          <div style="display:flex; justify-content: space-around; margin: 40px 0;">
-            <div><h2>Team A</h2><p id="finalScoreA" style="font-size: 3em;">0</p></div>
-            <div><h2>Team B</h2><p id="finalScoreB" style="font-size: 3em;">0</p></div>
+      <div id="briefModal" style="display:none; position:fixed; inset:0; background:rgba(19, 15, 36, 0.95); z-index:2500; align-items:center; justify-content:center;">
+        <div style="background:#1a1130; padding:40px; border:4px solid #00e5ff; border-radius:12px; max-width:600px; width:90%; text-align:center; box-shadow:0 0 40px rgba(0, 229, 255, 0.3);">
+          <h2 style="color:#00e5ff; font-size: 32px; margin-top:0;">MINI-GAME UNLOCKED</h2>
+          
+          <div style="background:#2a1b54; border: 2px solid #6c2bd9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 id="gameTitleDisplay" style="color:#fff; font-size: 24px; margin-top: 0;">Data Stacker</h3>
+            <p id="gameRulesDisplay" style="color:#d0bfff; font-size:18px; line-height: 1.5;">Hit SPACE to drop the blocks. Build the highest tower before the time runs out!</p>
           </div>
-          <button onclick="location.reload()" style="padding: 15px 40px; font-size: 20px; cursor: pointer;">Play Again</button>
+
+          <div style="color:#e0f7ff; font-size: 18px; margin-bottom: 25px; font-weight: bold;" id="briefStatsDisplay">
+            Trivia Points Secured: 0 | Multiplier: 1.0x
+          </div>
+
+          <button id="startMiniGameBtn" class="option-btn" style="border-color:#00e5ff; font-size: 22px; padding: 15px 40px; background:#1a1130;">START GAME</button>
+        </div>
+      </div>
+
+      <div id="resultsScreen" style="display: none; position: fixed; inset: 0; background: rgba(19, 15, 36, 0.95); z-index: 3000; color: white; text-align: center; padding: 40px;">
+        <div style="max-width: 700px; margin: 0 auto; border: 6px solid #6c2bd9; border-radius: 20px; padding: 40px; background: #1a1130;">
+          <h1 style="font-size: 3em; color: #00e5ff;">MATCH OVER</h1>
+          <div style="display:flex; justify-content: space-around; margin: 40px 0;">
+            <div><h2>Team A</h2><p id="finalScoreA" style="font-size: 3em; color: #00e5ff;">0</p></div>
+            <div><h2>Team B</h2><p id="finalScoreB" style="font-size: 3em; color: #ff5e5e;">0</p></div>
+          </div>
+          <button onclick="location.reload()" style="padding: 15px 40px; font-size: 20px; cursor: pointer; background: #6c2bd9; color: white; border: none; border-radius: 5px;">Play Again</button>
         </div>
       </div>
 
@@ -115,12 +146,11 @@
 
     // START BUTTON LOGIC
     document.getElementById("startBtnGame").addEventListener("click", function() {
-      // Get the time (including the quiz bonus) from the UI
       timeLeft = parseInt(timerEl.textContent);
       
       clearInterval(hackTimer);
-      statusEl.textContent = "HACK IN PROGRESS...";
-      statusEl.style.color = "#00ff9d";
+      statusEl.textContent = "GAME IN PROGRESS...";
+      statusEl.style.color = "#00e5ff";
 
       iframe.focus();
       
@@ -131,35 +161,51 @@
           clearInterval(hackTimer);
           statusEl.textContent = "TIME EXPIRED!";
           statusEl.style.color = "#ff5e5e";
-          // Trigger results screen
-          document.getElementById("resultsScreen").style.display = "block";
-          document.getElementById("finalScoreA").textContent = document.getElementById("scoreA").textContent;
-          document.getElementById("finalScoreB").textContent = document.getElementById("scoreB").textContent;
         }
       }, 1000);
     });
 
-    // Unity Message Listener
     window.addEventListener("message", function(event) {
       if (event.data && event.data.type === "STACKER_GAME_OVER") {
         clearInterval(hackTimer);
         const finalScore = event.data.score;
-        // Dispatch event for game.js to catch and send to Firebase
         document.dispatchEvent(new CustomEvent('unityGameOver', { detail: { score: finalScore } }));
       }
     });
 
     window.addEventListener("message", function(event) {
-    if (event.data?.type === "START_GAME") {
-        const time = event.data.time;
+      if (event.data?.type === "START_GAME") {
+          const time = event.data.time;
+          unityInstance.SendMessage('GameManager', 'StartGame', String(time));
+      }
+    });
+  </script>
 
-        unityInstance.SendMessage(
-            'GameManager',
-            'StartGame',
-            String(time)
-        );
+  <script type="module">
+    import { db, listenTeamScores } from './firebase.js';
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const roomId = localStorage.getItem("roomId");
+    let currentMatchId = null;
+
+    async function setupLiveScores() {
+      if (!roomId) return;
+      try {
+        const q = query(collection(db, "matches"), where("roomId", "==", roomId));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          currentMatchId = snap.docs[0].id;
+          listenTeamScores(currentMatchId, ({ A, B }) => {
+            document.getElementById("scoreA").textContent = A;
+            document.getElementById("scoreB").textContent = B;
+          });
+        }
+      } catch (err) {
+        console.error("Error setting up live scores:", err);
+      }
     }
-});
+
+    setupLiveScores();
   </script>
 </body>
 </html>
