@@ -63,6 +63,23 @@ export async function signInWithGoogle() {
   return user;
 }
 
+
+export async function signInWithGoogleTeacher() {
+  const provider = new GoogleAuthProvider();
+  const result   = await signInWithPopup(auth, provider);
+  const user     = result.user;
+
+  // Wait for the user to be saved to Firestore before moving on
+  // This fixes the bug where new players showed their uid instead of username
+  try {
+    await createOrUpdateTeacher(user);
+  } catch (err) {
+    console.warn("Could not save user to Firestore:", err.message);
+  }
+ 
+  return user;
+}
+
 // Watches if the player is logged in or not
 // Useful for redirecting to sign in page if they arent logged in
 export function listenAuthState(callback) {
@@ -77,6 +94,28 @@ export async function logOut() {
 // Saves a new player to the database when they sign in for the first time
 // If they already exist just updates their last login time
 export async function createOrUpdateUser(firebaseUser, role = "student") {
+  const userRef = doc(db, "users", firebaseUser.uid);
+  const snap    = await getDoc(userRef);
+
+  if (!snap.exists()) {
+    // New player - save all their details
+    await setDoc(userRef, {
+      uid:         firebaseUser.uid,
+      username:    firebaseUser.displayName || firebaseUser.email.split("@")[0],
+      email:       firebaseUser.email,
+      role:        role,
+      createdAt:   serverTimestamp(),
+      lastLoginAt: serverTimestamp()
+    });
+  } else {
+    // Already exists - just update last login
+    await updateDoc(userRef, { lastLoginAt: serverTimestamp() });
+  }
+}
+
+// Saves a new player to the database when they sign in for the first time
+// If they already exist just updates their last login time
+export async function createOrUpdateTeacher(firebaseUser, role = "teacher") {
   const userRef = doc(db, "users", firebaseUser.uid);
   const snap    = await getDoc(userRef);
 

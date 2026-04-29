@@ -150,7 +150,11 @@
 
         <button class="google-btn" id="googleBtn">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
-          Continue with Google
+          Continue as a student
+        </button>
+        <button class="google-btn" id="googleBtn1">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+          Continue as a teacher
         </button>
 
         <p id="statusMsg"></p>
@@ -170,7 +174,7 @@
   </div>
 
   <script type="module">
-    import { signInWithGoogle } from './firebase.js';
+    import { signInWithGoogle, signInWithGoogleTeacher, getUser } from './firebase.js';
 
     const statusMsg = document.getElementById("statusMsg");
 
@@ -186,6 +190,38 @@
 
         console.log("Logged in as:", user.displayName, user.uid);
         window.location.href = "join.html";
+
+      } catch (error) {6
+        if (error.code === "auth/popup-closed-by-user") {
+          statusMsg.textContent = "Sign-in cancelled. Please try again.";
+        } else if (error.code === "auth/popup-blocked") {
+          statusMsg.textContent = "Popup was blocked. Please allow popups for this site.";
+        } else {
+          statusMsg.textContent = "Sign-in failed. Please try again.";
+          console.error("Google sign-in error:", error.code, error.message);
+        }
+      }
+    });
+
+    document.getElementById("googleBtn1").addEventListener("click", async () => {
+      statusMsg.textContent = "";
+
+      try {
+        const user = await signInWithGoogleTeacher();
+
+        localStorage.setItem("playerName", user.displayName || user.email.split("@")[0]);
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("uid", user.uid);
+
+        console.log("Logged in as:", user.displayName, user.uid);
+
+        const dbUser = await getUser(user.uid);
+        if (dbUser.role !== "student") {
+          window.location.href = "teacher.html";
+        } else {
+          window.location.href = "join.html";
+        }
+        
 
       } catch (error) {6
         if (error.code === "auth/popup-closed-by-user") {
