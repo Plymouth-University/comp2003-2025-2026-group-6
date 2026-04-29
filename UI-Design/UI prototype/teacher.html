@@ -181,8 +181,10 @@
             <div class="pin-display" id="pinDisplay">------</div>
             <div id="roomStatusBadge" class="status-badge status-open">● Open</div>
             <br>
-            <button class="btn-start" id="startMatchBtn">▶ Start Match</button>
+            <button class="btn-start" id="startMatchBtn" disabled>▶ Start Match</button>
             <button class="btn-end" id="endMatchBtn" disabled>■ End Match</button>
+            <h4 style="margin-top:0;" id="needUploadText">*Upload a question pack to start match*</h4>
+            <button class="musicVolBtn" id="newSessionBtn">Create new session</button>
           </div>
 
           <div class="card">
@@ -238,11 +240,44 @@
         notSignedIn.style.display = "block";
         noRoom.style.display = "none";
         activeRoom.style.display = "none";
-      } else {
-        notSignedIn.style.display = "none";
-        teacherInfo.textContent = `Signed in as: ${user.displayName || user.email}`;
-        noRoom.style.display = "block";
+        return;
       }
+      notSignedIn.style.display = "none";
+      teacherInfo.textContent = `Signed in as: ${user.displayName || user.email}`;
+
+      const savedRoomId = localStorage.getItem("roomId");
+      if (savedRoomId) {
+        try {
+          const roomSnap = await getDoc(doc(db, "rooms", savedRoomId));
+          if (roomSnap.exists()) {
+            currentRoomId = savedRoomId;
+            const data = roomSnap.data();
+            document.getElementById("pinDisplay").textContent = data.joinCode;
+            noRoom.style.display = "none";
+            activeRoom.style.display = "block";
+            startListeningToMembers(savedRoomId);
+
+            const badge = document.getElementById("roomStatusBadge");
+            if (data.status === "in_game") {
+              badge.textContent = "● In Game";
+              badge.className = "status-badge status-in_game";
+              document.getElementById("endMatchBtn").disabled = false;
+              document.getElementById("scoresCard").style.display = "block";
+            } else if (data.status === "closed") {
+              badge.textContent = "● Closed";
+              badge.className = "status-badge status-closed";
+            } else {
+              badge.textContent = "● Open";
+              badge.className = "status-badge status-open";
+            }
+
+            return;
+          }
+        } catch (err) {
+          console.error("Failed to restore room:", err);
+        }
+      }
+      noRoom.style.display = "block";
     });
 
     document.getElementById("teacherSignInBtn").addEventListener("click", async () => {
@@ -280,6 +315,11 @@
         btn.disabled = false;
       }
     });
+
+    newSessionBtn.addEventListener("click", async () => {
+      localStorage.removeItem("roomId");
+      location.reload();
+    })
 
     document.getElementById("startMatchBtn").addEventListener("click", async () => {
       if (!currentRoomId) return;
@@ -400,6 +440,8 @@
       };
 
       reader.readAsText(file);
+      startMatchBtn.disabled = false;
+      needUploadText.style.display = "none";
     });
   </script>
 
