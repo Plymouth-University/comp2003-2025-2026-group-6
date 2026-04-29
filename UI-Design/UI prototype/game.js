@@ -36,13 +36,18 @@ function startQuiz() {
     quizScore = 0;
     questionsThisRound = 0;
 
+    const statsText = document.createElement('div');
+    statsText.style.color = "#00e5ff";
+    statsText.style.marginTop = "15px";
+    statsText.style.fontWeight = "bold";
+
     // Renders a single question
     function renderQuestion() {
         if (currentQ >= questions.length) {
             currentQ = 0;
         }
 
-        if (questionsThisRound >= 3) {
+        if (questionsThisRound >= 4) {
             modal.style.display = 'none';
             return showGameBrief();
         }
@@ -91,6 +96,9 @@ function startQuiz() {
             };
             container.appendChild(btn);
         });
+        
+        statsText.textContent = `Points: ${quizScore} | Multiplier: ${multiplier}x`;
+        container.appendChild(statsText);
     }
 
     // Checks answer and applies points
@@ -118,12 +126,8 @@ function startQuiz() {
             }
         }
 
-        // Displays current points and multiplier
-        const statsText = document.createElement('div');
+        
         statsText.textContent = `Points: ${quizScore} | Multiplier: ${multiplier}x`;
-        statsText.style.color = "#00e5ff";
-        statsText.style.marginTop = "15px";
-        statsText.style.fontWeight = "bold";
         container.appendChild(statsText);
 
         // Moves to next question after delay
@@ -193,11 +197,16 @@ document.addEventListener('unityGameOver', async function(e) {
             await addTeamScore(matchId, team, finalScore);
         }
 
-        // Restarts the quiz loop after 3 seconds
+        
         setTimeout(() => {
-            quizBonusTime = 0; 
-            quizScore = 0; 
-            startQuiz();
+            if (questions.length - currentQ >= 4) { //Start quiz back up if there are 4 or more questions left
+                startQuiz(questions);
+            } else { //Finish game loop
+                statusEl.textContent = "FINISHED";
+                setTimeout(() => {
+                    window.location.href = 'join.html';
+                }, 3000); 
+            }
         }, 3000); 
 
     } catch (error) {
