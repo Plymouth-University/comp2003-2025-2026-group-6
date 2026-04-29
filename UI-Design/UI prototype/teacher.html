@@ -187,7 +187,10 @@
 
           <div class="card">
             <h2 style="margin-top:0;">Upload Questions</h2>
-            <input type="file" id="fileUpload" accept=".json">
+            <input type="file" id="fileUpload" accept=".json"> 
+            <br><br>
+            <h3 style="margin-top:0;">Don't have any question packs?</h3>
+            <button class="musicVolBtn" id="generateQuestionsBtn">Generate some!</button>
           </div>
 
           <div class="card" id="scoresCard" style="display:none;">
@@ -329,6 +332,10 @@
         console.error("Error ending match:", err);
         alert("Could not end match. Please try again.");
       }
+    });
+
+    generateQuestionsBtn.addEventListener("click", async () => {
+      window.location.href = 'question-generation.html';
     });
 
     function startListeningToMembers(roomId) {
