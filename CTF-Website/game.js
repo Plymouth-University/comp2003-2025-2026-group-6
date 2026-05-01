@@ -10,6 +10,7 @@ let currentQ = 0;
 let questions = [];
 let questionsThisRound = 0;
 let questionTimer;
+const games = ["stacker_game/index.html", "jumper_game/index.html"]
 
 // Initializes game and fetches questions
 async function initGameFlow() {
@@ -160,7 +161,9 @@ function launchUnityGame() {
     document.getElementById("status").textContent = `Bonus time: +${quizBonusTime}s`;
 
     const iframe = document.getElementById("unityIframe");
-    iframe.src = iframe.src;
+    const gameNumber = Math.floor(Math.random() * games.length);
+    //iframe.src = games[gameNumber];
+    iframe.src = games[0];
 
     setTimeout(() => {
         iframe.contentWindow.postMessage({ type: "START_GAME", time: finalStartTime }, "*");
