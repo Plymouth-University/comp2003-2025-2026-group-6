@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Choose Team & Role – Capture the Flag</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .screen {
+      position: relative;
+      overflow: hidden;
+      min-height: calc(100vh - 72px);
+    }
+
+    .bg-circuit,
+    .bg-sprites,
+    .top-flags,
+    .fox-mascot {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .bg-circuit {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.16;
+      z-index: 0;
+    }
+
+    .bg-sprites {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.28;
+      z-index: 1;
+    }
+
+    .top-flags {
+      width: 360px;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .fox-mascot {
+      width: 185px;
+      right: 60px;
+      top: 100px;
+      z-index: 2;
+    }
+
+    .welcomeCard {
+      position: relative;
+      z-index: 5;
+      max-width: 900px;
+      margin: 140px auto 0;
+    }
+
+    .team-select {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin: 30px 0;
+    }
+
+    .team-card {
+      background: rgba(255,255,255,0.9);
+      border: 4px solid #000;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 280px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .team-card:hover {
+      transform: scale(1.05);
+    }
+
+    .team-a {
+      background: linear-gradient(135deg, #19b83d, #00ff88);
+    }
+
+    .team-b {
+      background: linear-gradient(135deg, #ff4444, #ff8888);
+    }
+
+    .team-title {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: #000;
+    }
+
+    .role-btn {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 16px;
+      border: 3px solid #000;
+      background: rgba(255,255,255,0.8);
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .role-btn:hover,
+    .role-btn.selected {
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .confirm-btn {
+      display: block;
+      margin: 30px auto 0;
+      font-size: 22px;
+      padding: 18px 40px;
+    }
+
+    @media (max-width: 1000px) {
+      .fox-mascot {
+        width: 145px;
+        right: 10px;
+        top: 90px;
+        opacity: 0.9;
+      }
+
+      .top-flags {
+        width: 250px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .fox-mascot {
+        display: none;
+      }
+
+      .top-flags {
+        width: 210px;
+      }
+
+      .team-select {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .welcomeCard {
+        margin-top: 130px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="tabs" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <div class="windowBtns" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+    </header>
+
+    <main class="screen">
+
+      <img src="assets/background_circuit_blobs.svg" class="bg-circuit" alt="">
+      <img src="assets/login_decor_sprites.svg" class="bg-sprites" alt="">
+      <img src="assets/floating_flags.svg" class="top-flags" alt="">
+      <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
+
+      <section class="welcomeCard">
+        <h2 style="margin-top:0; font-size:36px; font-weight:900; text-align:center;">
+          Choose Your Team & Role
+        </h2>
+
+        <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
+          Pick your team and role for this session!
+        </p>
+
+        <div class="team-select">
+          <div class="team-card team-a" data-team="A">
+            <div class="team-title">TEAM A</div>
+            <button class="role-btn" data-role="scout">🕵️ Scout</button>
+            <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
+            <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
+            <button class="role-btn" data-role="defender">🛡️ Defender</button>
+          </div>
+
+          <div class="team-card team-b" data-team="B">
+            <div class="team-title">TEAM B</div>
+            <button class="role-btn" data-role="scout">🕵️ Scout</button>
+            <button class="role-btn" data-role="warrior">⚔️ Warrior</button>
+            <button class="role-btn" data-role="carrier">🏃 Flag Carrier</button>
+            <button class="role-btn" data-role="defender">🛡️ Defender</button>
+          </div>
+        </div>
+
+        <button id="confirmTeam" class="startBig confirm-btn" disabled>
+          Join Game!
+        </button>
+
+        <p style="margin-top:24px; font-size:16px; color:#333; text-align:center;">
+          <a href="join.html" style="color:#6c2bd9; font-weight:bold; text-decoration:underline;">
+            Back to PIN
+          </a>
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    let selectedTeam = null;
+    let selectedRole = null;
+
+    const roleClickSound = new Audio("assets/click.wav");
+    const joinSound = new Audio("assets/confirm.wav");
+
+    function playSound(sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
+    document.querySelectorAll('.role-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playSound(roleClickSound);
+
+        const teamCard = btn.closest('.team-card');
+
+        selectedTeam = teamCard.dataset.team;
+        selectedRole = btn.dataset.role;
+
+        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        document.getElementById('confirmTeam').disabled = false;
+      });
+    });
+
+    document.getElementById('confirmTeam').addEventListener('click', () => {
+      if (!selectedTeam || !selectedRole) return;
+
+      playSound(joinSound);
+
+      localStorage.setItem('team', selectedTeam);
+      localStorage.setItem('role', selectedRole);
+
+      setTimeout(() => {
+        window.location.href = 'confirm-team.html';
+      }, 250);
+    });
+  </script>
+</body>
+</html>

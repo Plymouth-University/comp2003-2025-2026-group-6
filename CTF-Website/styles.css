@@ -1,0 +1,253 @@
+*{
+  box-sizing: border-box;
+}
+
+body{
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background:#000;
+}
+
+.app{
+  min-height: 100vh;
+}
+
+/* ===== Top Bar ===== */
+
+.topbar{
+  height: 84px;
+  background: #6c2bd9;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 28px;
+}
+
+.tabs span{
+  display:inline-block;
+  width:28px;
+  height:10px;
+  border: 3px solid rgba(255,255,255,.85);
+  transform: skewX(-25deg);
+  margin-right: 10px;
+}
+
+.windowBtns i{
+  display:inline-block;
+  width:18px;
+  height:18px;
+  background: #fff;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+/* ===== Screen Background ===== */
+
+.screen{
+  padding: 24px;
+  min-height: calc(100vh - 84px);
+  background:
+    linear-gradient(#6fb7ff 0%, #eaf6ff 45%, #ffffff 55%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 2px, transparent 2px 56px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 2px, transparent 2px 56px);
+  background-blend-mode: normal, multiply, multiply;
+}
+
+/* ===== Hero / Logo ===== */
+
+.hero{
+  position: relative;
+  display:grid;
+  place-items: center;
+  min-height: 150px;
+  margin: 20px 0 20px;
+}
+
+/* Flag behind title */
+.flagIcon{
+  width: 120px;
+  height: 120px;
+  border: 6px solid rgba(0,0,0,.7);
+  background: linear-gradient(135deg, #ffd400, #ff9900);
+  transform: rotate(-10deg);
+
+  position: absolute;
+  left: 390px;
+  top: 120px;
+  z-index: 1;
+}
+
+/* Title layers */
+.title{
+  position: relative;
+  margin-left: 140px;
+  line-height: 0.9;
+  z-index: 3;
+}
+
+.title-outline{
+  position: absolute;
+  top: 6px;
+  left: -150px;
+  font-weight: 900;
+  font-size: 68px;
+  color: #3a0f8f;
+  z-index: 2;
+}
+
+.title-main{
+  position: absolute;
+  top: 1px;
+  left: -155px;
+  font-weight: 900;
+  font-size: 68px;
+  color: #f5e9ff;
+  z-index: 2;
+
+  text-shadow:
+    -2px -2px 0 #3a0f8f,
+     2px -2px 0 #3a0f8f,
+    -2px  2px 0 #3a0f8f,
+     2px  2px 0 #3a0f8f,
+    -2px  0   0 #3a0f8f,
+     2px  0   0 #3a0f8f,
+     0   -2px 0 #3a0f8f,
+     0    2px 0 #3a0f8f;
+
+  text-shadow:
+     9px  2px 0 #3a0f8f,
+}
+
+/* ===== Welcome Card ===== */
+
+.welcomeCard{
+  border: 4px solid #000;
+  background: rgba(173, 220, 255, .85);
+  max-width: 640px;
+  margin: 150px auto 0;  
+  padding: 20px;
+  text-align: center;
+
+  position: relative;
+  z-index: 1;  
+}
+
+.welcomeText{
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.welcomeControls{
+  display:flex;
+  justify-content:center;
+  margin-top: 14px;
+}
+
+/* ===== Button ===== */
+
+button{
+  font-weight:800;
+  padding: 12px 20px;
+  border: 4px solid #000;
+  background: rgba(255,255,255,.9);
+  cursor:pointer;
+}
+
+.startBig{
+  font-size: 20px;
+}
+
+.gameWrap       { max-width: 900px; margin: 0 auto; text-align: center; color: white; }
+.gameHeader     { font-size: 1.4em; margin: 20px 0; }
+.gameControls   { margin: 10px 0; }
+.gameControls button { margin: 0 8px; }
+.gameInfo       { margin-top: 15px; font-size: 1.1em; }
+
+.game-info-panel {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(15, 15, 35, 0.75);
+  border: 2px solid #444466;
+  border-radius: 12px;
+  color: #d0f0ff;
+  font-size: 1.15em;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.game-info-panel p {
+  margin: 10px 0;
+}
+
+.game-info-panel #timeLeft {
+  color: #ffeb3b;
+  font-weight: bold;
+}
+
+.game-info-panel #status {
+  color: #ffca28;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.game-info-panel #scoreA {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.game-info-panel #scoreB {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.game-info-panel #targetScore {
+  color: #ab47bc;
+  font-weight: bold;
+}
+
+progress#stamina {
+  width: 240px;
+  height: 20px;
+  accent-color: #40c4ff;  
+}
+
+.welcomeCard p {
+  margin: 16px 0;
+}
+
+a {
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #4a1aa3 !important;
+}
+
+.option-btn {
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 800;
+  border: 4px solid #000;
+  background: #f8f8f8;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-btn:hover {
+  background: #e8f4ff;
+  transform: scale(1.03);
+}
+
+#miniGameModal button:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+#miniGameContent {
+  border: 2px dashed #ffd700;
+  color: #e0f7ff;
+}
