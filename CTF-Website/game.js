@@ -162,8 +162,7 @@ function launchUnityGame() {
 
     const iframe = document.getElementById("unityIframe");
     const gameNumber = Math.floor(Math.random() * games.length);
-    //iframe.src = games[gameNumber];
-    iframe.src = games[0];
+    iframe.src = games[gameNumber];
 
     setTimeout(() => {
         iframe.contentWindow.postMessage({ type: "START_GAME", time: finalStartTime }, "*");
