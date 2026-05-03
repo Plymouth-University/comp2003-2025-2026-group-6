@@ -10,7 +10,7 @@ let currentQ = 0;
 let questions = [];
 let questionsThisRound = 0;
 let questionTimer;
-const games = ["stacker_game/index.html", "jumper_game/index.html"]
+const games = ["stacker_game/index.html", "jumper_game/index.html", "flapper_game/index.html"]
 
 // Initializes game and fetches questions
 async function initGameFlow() {
