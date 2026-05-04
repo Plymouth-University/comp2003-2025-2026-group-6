@@ -12,6 +12,10 @@ let questionsThisRound = 0;
 let questionTimer;
 const games = ["stacker_game/index.html", "jumper_game/index.html", "flapper_game/index.html"]
 
+// Role-based quiz timer — Infiltrators get extra time to answer
+const playerRole = localStorage.getItem("role") || "infiltrator";
+const quizTimeLimit = playerRole === "infiltrator" ? 15 : 10;
+
 // Initializes game and fetches questions
 async function initGameFlow() {
     const roomId = localStorage.getItem("roomId");
@@ -60,7 +64,8 @@ function startQuiz() {
         const timerBar = document.getElementById('quizTimerBar');
         container.innerHTML = '';
         
-        let timeLeft = 10;
+        // Use role-based time limit
+        let timeLeft = quizTimeLimit;
         
         // Resets and animates the timer bar
         if (timerBar) {
@@ -76,7 +81,7 @@ function startQuiz() {
         questionTimer = setInterval(() => {
             timeLeft--;
             if (timerBar) {
-                timerBar.style.width = (timeLeft / 10) * 100 + '%';
+                timerBar.style.width = (timeLeft / quizTimeLimit) * 100 + '%';
                 if (timeLeft <= 3) timerBar.style.backgroundColor = '#ff5e5e';
             }
             
