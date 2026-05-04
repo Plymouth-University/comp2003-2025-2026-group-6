@@ -86,6 +86,11 @@
 </head>
 
 <body>
+
+  <button id="themeToggle" aria-label="Toggle dark mode">
+    🌙 Dark mode
+  </button>
+
   <div class="app">
     <header class="topbar">
       <div class="tabs" aria-hidden="true">
@@ -106,8 +111,6 @@
 
       <section id="welcomeScreen">
         <section class="hero">
-          
-
           <div class="title">
             <div class="title-outline">CAPTURE THE<br>FLAG!</div>
             <div class="title-main">CAPTURE THE<br>FLAG!</div>
@@ -140,6 +143,8 @@
 
     </main>
   </div>
+
+  <script src="theme.js"></script>
 
   <script>
     document.getElementById("startBtn").addEventListener("click", () => {

@@ -12,8 +12,9 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      background: #fff;
-      border: 3px solid #000;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 3px solid var(--button-border);
       border-radius: 8px;
       padding: 14px 28px;
       font-size: 18px;
@@ -36,14 +37,14 @@
 
     #statusMsg {
       font-size: 15px;
-      color: #c00;
+      color: #ff5e5e;
       min-height: 22px;
       margin: 8px 0;
     }
 
     #accessDenied {
       display: none;
-      background: #fff0f0;
+      background: var(--card-bg);
       border: 3px solid #c00;
       border-radius: 10px;
       padding: 20px 24px;
@@ -54,13 +55,13 @@
     #accessDenied h3 {
       margin: 0 0 8px;
       font-size: 20px;
-      color: #c00;
+      color: #ff5e5e;
     }
 
     #accessDenied p {
       margin: 0 0 16px;
       font-size: 15px;
-      color: #555;
+      color: var(--text-main);
     }
 
     #accessDenied a {
@@ -72,7 +73,7 @@
       padding: 10px 24px;
       border-radius: 8px;
       text-decoration: none;
-      border: 3px solid #000;
+      border: 3px solid var(--button-border);
       transition: all 0.2s;
     }
 
@@ -135,6 +136,19 @@
       z-index: 5;
     }
 
+    .login-title {
+      margin-top: 0;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    .login-note {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
     @media (max-width: 1000px) {
       .fox-mascot {
         width: 180px;
@@ -163,6 +177,11 @@
 </head>
 
 <body>
+
+  <button id="themeToggle" aria-label="Toggle dark mode">
+    🌙 Dark mode
+  </button>
+
   <div class="app">
 
     <header class="topbar">
@@ -183,7 +202,7 @@
       <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
 
       <section class="welcomeCard">
-        <h2 style="margin-top:0; font-size:32px; font-weight:900;">
+        <h2 class="login-title">
           Log In
         </h2>
 
@@ -193,6 +212,7 @@
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
           Continue as a student
         </button>
+
         <button class="google-btn" id="googleBtn1">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
           Continue as a teacher
@@ -205,12 +225,14 @@
 
         <p id="statusMsg"></p>
 
-        <p style="margin-top:24px; font-size:14px; color:#555;">
+        <p class="login-note">
           Your Google display name will be used as your player name.
         </p>
       </section>
     </main>
   </div>
+
+  <script src="theme.js"></script>
 
   <script type="module">
     import { signInWithGoogle, signInWithGoogleTeacher, getUser } from './firebase.js';
@@ -257,10 +279,8 @@
         const dbUser = await getUser(user.uid);
 
         if (dbUser && dbUser.role === "teacher") {
-          // Confirmed teacher — go to dashboard
           window.location.href = "teacher.html";
         } else {
-          // Not a teacher — show access denied banner, do not redirect
           accessDenied.style.display = "block";
           accessDenied.scrollIntoView({ behavior: "smooth" });
         }

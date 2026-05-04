@@ -54,30 +54,198 @@
       padding: 20px;
     }
 
-    .card { background: rgba(255,255,255,0.92); border: 4px solid #000; border-radius: 16px; padding: 30px; margin-bottom: 24px; text-align: center; }
-    .pin-display { font-size: 72px; font-weight: 900; letter-spacing: 12px; color: #6c2bd9; margin: 20px 0; font-family: monospace; }
-    .status-badge { display: inline-block; padding: 6px 18px; border-radius: 50px; font-weight: 800; font-size: 16px; margin-bottom: 16px; }
-    .status-open    { background: #c8f7c5; color: #1a7a16; border: 2px solid #1a7a16; }
-    .status-in_game { background: #ffd7a8; color: #a05000; border: 2px solid #a05000; }
-    .status-closed  { background: #f7c5c5; color: #7a1616; border: 2px solid #7a1616; }
-    .btn-create { background: #6c2bd9; color: white; font-size: 22px; padding: 18px 50px; border: 4px solid #000; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
-    .btn-create:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
-    .btn-start { background: #4caf50; color: white; font-size: 18px; padding: 14px 36px; border: 4px solid #000; border-radius: 10px; cursor: pointer; margin: 8px; transition: all 0.2s; }
-    .btn-end { background: #f44336; color: white; font-size: 18px; padding: 14px 36px; border: 4px solid #000; border-radius: 10px; cursor: pointer; margin: 8px; transition: all 0.2s; }
-    .btn-start:hover, .btn-end:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-    .btn-start:disabled, .btn-end:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-    .player-list { list-style: none; padding: 0; margin: 0; text-align: left; }
-    .player-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin: 8px 0; border-radius: 10px; font-size: 18px; font-weight: 600; }
-    .team-a-item { background: #c8f7c5; border: 2px solid #19b83d; }
-    .team-b-item { background: #ffc5c5; border: 2px solid #ff4444; }
-    .empty-msg { color: #888; font-size: 16px; font-style: italic; margin: 20px 0; }
-    .scores { display: flex; justify-content: center; gap: 40px; margin: 16px 0; flex-wrap: wrap; }
-    .score-box { min-width: 160px; padding: 16px; border-radius: 12px; text-align: center; border: 3px solid #000; }
-    .score-box-a { background: #c8f7c5; }
-    .score-box-b { background: #ffc5c5; }
-    .score-label { font-size: 18px; font-weight: 800; }
-    .score-value { font-size: 48px; font-weight: 900; }
-    #teacherInfo { font-size: 16px; color: #555; margin-bottom: 16px; }
+    .dashboard-title {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 4px solid var(--card-border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .card p {
+      color: var(--text-main);
+    }
+
+    .pin-display {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: 12px;
+      color: #6c2bd9;
+      margin: 20px 0;
+      font-family: monospace;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    .status-open {
+      background: #c8f7c5;
+      color: #1a7a16;
+      border: 2px solid #1a7a16;
+    }
+
+    .status-in_game {
+      background: #ffd7a8;
+      color: #a05000;
+      border: 2px solid #a05000;
+    }
+
+    .status-closed {
+      background: #f7c5c5;
+      color: #7a1616;
+      border: 2px solid #7a1616;
+    }
+
+    .btn-create {
+      background: #6c2bd9;
+      color: white;
+      font-size: 22px;
+      padding: 18px 50px;
+      border: 4px solid var(--button-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
+    .btn-start {
+      background: #4caf50;
+      color: white;
+      font-size: 18px;
+      padding: 14px 36px;
+      border: 4px solid var(--button-border);
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-end {
+      background: #f44336;
+      color: white;
+      font-size: 18px;
+      padding: 14px 36px;
+      border: 4px solid var(--button-border);
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-start:hover,
+    .btn-end:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .btn-start:disabled,
+    .btn-end:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .player-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .player-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      margin: 8px 0;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .team-a-item {
+      background: #c8f7c5;
+      color: #111;
+      border: 2px solid #19b83d;
+    }
+
+    .team-b-item {
+      background: #ffc5c5;
+      color: #111;
+      border: 2px solid #ff4444;
+    }
+
+    .empty-msg {
+      color: var(--text-main);
+      font-size: 16px;
+      font-style: italic;
+      margin: 20px 0;
+    }
+
+    .scores {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    .score-box {
+      min-width: 160px;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      border: 3px solid var(--button-border);
+      color: #111;
+    }
+
+    .score-box-a {
+      background: #c8f7c5;
+    }
+
+    .score-box-b {
+      background: #ffc5c5;
+    }
+
+    .score-label {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .score-value {
+      font-size: 48px;
+      font-weight: 900;
+    }
+
+    #teacherInfo {
+      font-size: 16px;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+
+    .muted-text {
+      color: var(--text-main);
+      font-size: 18px;
+    }
 
     #musicControls {
       position: fixed;
@@ -93,7 +261,7 @@
     .musicVolBtn {
       background: #6c2bd9;
       color: white;
-      border: 3px solid #000;
+      border: 3px solid var(--button-border);
       border-radius: 12px;
       padding: 10px 14px;
       font-size: 15px;
@@ -130,6 +298,11 @@
 </head>
 
 <body>
+
+  <button id="themeToggle" aria-label="Toggle dark mode">
+    🌙 Dark mode
+  </button>
+
   <div class="app">
     <header class="topbar">
       <div class="tabs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -153,13 +326,13 @@
 
       <div class="dashboard">
 
-        <h1 style="text-align:center; color:#fff; font-size:36px; margin-bottom:30px;">
+        <h1 class="dashboard-title">
           🏫 Teacher Dashboard
         </h1>
 
         <div id="notSignedIn" class="card" style="display:none;">
           <h2 style="margin-top:0;">Sign in to continue</h2>
-          <p style="color:#555;">You need to be signed in to create sessions.</p>
+          <p>You need to be signed in to create sessions.</p>
           <button class="btn-create" id="teacherSignInBtn" style="font-size:18px; padding:14px 36px;">
             Sign in with Google
           </button>
@@ -168,7 +341,7 @@
         <div id="noRoom" class="card" style="display:none;">
           <p id="teacherInfo"></p>
           <h2 style="margin-top:0;">No active session</h2>
-          <p style="color:#555; font-size:18px;">Create a new session to get a PIN for your students.</p>
+          <p class="muted-text">Create a new session to get a PIN for your students.</p>
           <button class="btn-create" id="createRoomBtn">
             + Create New Session
           </button>
@@ -221,6 +394,8 @@
     </main>
   </div>
 
+  <script src="theme.js"></script>
+
   <script type="module">
     import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus,
              createMatch, endMatch, listenRoomMembers, listenTeamScores,
@@ -244,6 +419,7 @@
         activeRoom.style.display = "none";
         return;
       }
+
       notSignedIn.style.display = "none";
       teacherInfo.textContent = `Signed in as: ${user.displayName || user.email}`;
 
@@ -279,6 +455,7 @@
           console.error("Failed to restore room:", err);
         }
       }
+
       noRoom.style.display = "block";
     });
 
