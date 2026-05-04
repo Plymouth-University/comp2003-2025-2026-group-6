@@ -222,7 +222,9 @@
   </div>
 
   <script type="module">
-    import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus, createMatch, endMatch, listenRoomMembers, listenTeamScores, db } from './firebase.js';
+    import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus,
+             createMatch, endMatch, listenRoomMembers, listenTeamScores,
+             uploadQuestions, db } from './firebase.js';
     import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     let currentRoomId = null;
@@ -316,10 +318,10 @@
       }
     });
 
-    newSessionBtn.addEventListener("click", async () => {
+    document.getElementById("newSessionBtn").addEventListener("click", async () => {
       localStorage.removeItem("roomId");
       location.reload();
-    })
+    });
 
     document.getElementById("startMatchBtn").addEventListener("click", async () => {
       if (!currentRoomId) return;
@@ -374,8 +376,31 @@
       }
     });
 
-    generateQuestionsBtn.addEventListener("click", async () => {
+    document.getElementById("generateQuestionsBtn").addEventListener("click", () => {
       window.location.href = 'question-generation.html';
+    });
+
+    document.getElementById("fileUpload").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = async function (e) {
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          const qaArray = Object.values(jsonData);
+
+          await uploadQuestions(qaArray);
+          alert("Questions uploaded successfully!");
+        } catch (error) {
+          alert("Error reading JSON file: " + error);
+        }
+      };
+
+      reader.readAsText(file);
+      document.getElementById("startMatchBtn").disabled = false;
+      document.getElementById("needUploadText").style.display = "none";
     });
 
     function startListeningToMembers(roomId) {
@@ -401,7 +426,7 @@
         );
 
         list.innerHTML = memberDetails.map(m => `
-          <li class="player-item ${m.roomRole ? (m.team === 'B' ? 'team-b-item' : 'team-a-item') : ''}">
+          <li class="player-item ${m.team === 'B' ? 'team-b-item' : 'team-a-item'}">
             <span>${m.username}</span>
             <span>${m.roomRole || "No role yet"}</span>
           </li>
@@ -417,32 +442,6 @@
         document.getElementById("liveScoreB").textContent = B;
       });
     }
-
-    import { uploadQuestions } from './firebase.js';
-
-    document.getElementById("fileUpload").addEventListener("change", function (event) {
-      const file = event.target.files[0];
-
-      if (!file) return;
-
-      const reader = new FileReader();
-
-      reader.onload = async function (e) {
-        try {
-          const jsonData = JSON.parse(e.target.result);
-          const qaArray = Object.values(jsonData);
-
-          await uploadQuestions(qaArray);
-          alert("Questions uploaded successfully!");
-        } catch (error) {
-          alert("Error reading JSON file: " + error);
-        }
-      };
-
-      reader.readAsText(file);
-      startMatchBtn.disabled = false;
-      needUploadText.style.display = "none";
-    });
   </script>
 
   <script>
