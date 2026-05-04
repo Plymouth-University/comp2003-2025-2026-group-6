@@ -188,6 +188,34 @@
           Pick your team and role for this session!
         </p>
 
+        <div style="margin-bottom: 24px; text-align: center;">
+          <button id="rolesToggle" onclick="toggleRoles()" style="background: #6c2bd9; border: 3px solid #000; border-radius: 50px; padding: 12px 28px; color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.2s;">
+            ⚡ What do the roles do? <span id="rolesArrow">▼</span>
+          </button>
+
+          <div id="rolesPanel" style="display: none; margin-top: 16px; background: rgba(235,225,255,0.95); border: 4px solid #6c2bd9; border-radius: 16px; padding: 24px; box-shadow: 0 0 20px rgba(108,43,217,0.2); text-align: center;">
+            <p style="margin: 0 0 16px; font-size: 14px; color: #333; font-style: italic;">Each role comes with a unique ability — pick wisely!</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
+                <div style="font-size: 20px; margin-bottom: 6px;">🕵️ <strong style="color: #5b21b6;">Infiltrator</strong></div>
+                <div style="font-size: 14px; color: #333;">Ghost mode activated — you get <strong style="color: #6c2bd9;">15 seconds</strong> to crack each question. No rush.</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
+                <div style="font-size: 20px; margin-bottom: 6px;">⚔️ <strong style="color: #5b21b6;">Exploit</strong></div>
+                <div style="font-size: 14px; color: #333;">Every correct answer hits <strong style="color: #6c2bd9;">twice as hard</strong>. Double the multiplier, double the damage.</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
+                <div style="font-size: 20px; margin-bottom: 6px;">🏃 <strong style="color: #5b21b6;">Exfiltrator</strong></div>
+                <div style="font-size: 14px; color: #333;">In and out before anyone notices. Earn <strong style="color: #6c2bd9;">+8 seconds</strong> of game time per correct answer.</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
+                <div style="font-size: 20px; margin-bottom: 6px;">🛡️ <strong style="color: #5b21b6;">Firewall</strong></div>
+                <div style="font-size: 14px; color: #333;">Nothing gets through. Wrong answers <strong style="color: #6c2bd9;">won't touch your streak</strong>. Block everything.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="team-select">
           <div class="team-card team-a" data-team="A">
             <div class="team-title">TEAM A</div>
@@ -259,6 +287,15 @@
         window.location.href = 'confirm-team.html';
       }, 250);
     });
+  </script>
+  <script>
+    function toggleRoles() {
+      const panel = document.getElementById('rolesPanel');
+      const arrow = document.getElementById('rolesArrow');
+      const isOpen = panel.style.display === 'block';
+      panel.style.display = isOpen ? 'none' : 'block';
+      arrow.textContent = isOpen ? '▼' : '▲';
+    }
   </script>
 </body>
 </html>
