@@ -118,7 +118,7 @@ function startQuiz() {
 
         if (isCorrect) {
             quizBonusTime += 5;
-            multiplier += 0.25;
+            multiplier += playerRole === "exploit" ? 0.5 : 0.25;
             quizScore += 100;
             
             if (btnClicked) {
