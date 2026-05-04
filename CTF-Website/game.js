@@ -117,7 +117,7 @@ function startQuiz() {
         const isCorrect = String(selectedOpt).trim() === String(questions[currentQ].correctAns).trim();
 
         if (isCorrect) {
-            quizBonusTime += 5;
+            quizBonusTime += playerRole === "exfiltrator" ? 8 : 5;
             multiplier += playerRole === "exploit" ? 0.5 : 0.25;
             quizScore += 100;
             
