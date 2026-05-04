@@ -410,9 +410,8 @@
         const list = document.getElementById("playerList");
         const count = document.getElementById("playerCount");
 
-        count.textContent = members.length;
-
         if (members.length === 0) {
+          count.textContent = 0;
           list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
           return;
         }
@@ -420,12 +419,21 @@
         const memberDetails = await Promise.all(
           members.map(async (m) => {
             const userSnap = await getDoc(doc(db, "users", m.uid));
-            const username = userSnap.exists() ? userSnap.data().username : m.uid;
-            return { ...m, username };
+            const userData = userSnap.exists() ? userSnap.data() : null;
+            return { ...m, username: userData?.username || m.uid, userRole: userData?.role };
           })
         );
 
-        list.innerHTML = memberDetails.map(m => `
+        const students = memberDetails.filter(m => m.userRole !== "teacher");
+
+        count.textContent = students.length;
+
+        if (students.length === 0) {
+          list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
+          return;
+        }
+
+        list.innerHTML = students.map(m => `
           <li class="player-item ${m.team === 'B' ? 'team-b-item' : 'team-a-item'}">
             <span>${m.username}</span>
             <span>${m.roomRole || "No role yet"}</span>
