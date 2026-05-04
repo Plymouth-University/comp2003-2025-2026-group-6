@@ -87,9 +87,27 @@
 
 <body>
 
-  <button id="themeToggle" aria-label="Toggle dark mode">
-    🌙 Dark mode
+  <div id="accessibilityWidget">
+  <button id="accessibilityToggle" aria-label="Open accessibility settings">
+    ⚙️ Accessibility
   </button>
+
+  <div id="accessibilityPanel" hidden>
+    <button id="themeToggle" aria-label="Toggle dark mode">
+      🌙 Dark mode
+    </button>
+
+    <button id="contrastToggle" aria-label="Toggle high contrast">
+  High contrast
+</button>
+
+    <div class="font-row">
+      <span>Text size</span>
+      <button id="fontDown" aria-label="Decrease text size">A-</button>
+      <button id="fontUp" aria-label="Increase text size">A+</button>
+    </div>
+  </div>
+</div>
 
   <div class="app">
     <header class="topbar">

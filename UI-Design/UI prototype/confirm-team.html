@@ -70,7 +70,7 @@
     }
 
     .team-badge {
-      font-size: 48px;
+      font-size: calc(48px * var(--font-scale));
       font-weight: 900;
       margin: 20px 0;
       padding: 12px 30px;
@@ -82,7 +82,7 @@
     .team-b .team-badge { background: #ff4444; color: white; }
 
     .role-name {
-      font-size: 28px;
+      font-size: calc(28px * var(--font-scale));
       font-weight: bold;
       margin: 20px 0 30px;
       color: var(--text-main);
@@ -97,7 +97,7 @@
 
     .btn {
       padding: 16px 40px;
-      font-size: 20px;
+      font-size: calc(20px * var(--font-scale));
       font-weight: 800;
       border: 4px solid var(--button-border);
       border-radius: 10px;
@@ -118,6 +118,21 @@
     .btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    .confirm-title {
+      font-size: calc(34px * var(--font-scale));
+      margin: 0 0 30px;
+    }
+
+    .back-link {
+      margin-top: 40px;
+      font-size: calc(16px * var(--font-scale));
+    }
+
+    .back-link a {
+      color: #6c2bd9;
+      text-decoration: underline;
     }
 
     @media (max-width: 1000px) {
@@ -152,9 +167,27 @@
 
 <body>
 
-  <button id="themeToggle" aria-label="Toggle dark mode">
-    🌙 Dark mode
+  <div id="accessibilityWidget">
+  <button id="accessibilityToggle" aria-label="Open accessibility settings">
+    ⚙️ Accessibility
   </button>
+
+  <div id="accessibilityPanel" hidden>
+    <button id="themeToggle" aria-label="Toggle dark mode">
+      🌙 Dark mode
+    </button>
+
+    <button id="contrastToggle" aria-label="Toggle high contrast">
+  High contrast
+</button>
+
+    <div class="font-row">
+      <span>Text size</span>
+      <button id="fontDown" aria-label="Decrease text size">A-</button>
+      <button id="fontUp" aria-label="Increase text size">A+</button>
+    </div>
+  </div>
+</div>
 
   <div class="app">
     <header class="topbar">
@@ -175,7 +208,7 @@
       <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
 
       <div class="confirmation-card" id="confirmCard">
-        <h2 style="font-size:34px; margin:0 0 30px;">Confirm Your Choice</h2>
+        <h2 class="confirm-title">Confirm Your Choice</h2>
 
         <div id="teamDisplayWrapper">
           <div class="team-badge" id="teamBadge">TEAM ?</div>
@@ -190,8 +223,8 @@
           <button class="btn btn-change" id="changeBtn">Change Team/Role</button>
         </div>
 
-        <p style="margin-top:40px; font-size:16px;">
-          <a href="join.html" style="color:#6c2bd9; text-decoration:underline;">Back to PIN</a>
+        <p class="back-link">
+          <a href="join.html">Back to PIN</a>
         </p>
       </div>
     </main>

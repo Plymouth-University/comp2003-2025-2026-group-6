@@ -26,6 +26,8 @@
   --panel-text: #d0f0ff;
 
   --link-hover: #4a1aa3;
+
+  --font-scale: 1;
 }
 
 [data-theme="dark"] {
@@ -59,6 +61,7 @@ body{
   font-family: system-ui, Arial, sans-serif;
   background: var(--body-bg);
   color: var(--text-main);
+  font-size: calc(16px * var(--font-scale));
 }
 
 .app{
@@ -116,7 +119,6 @@ body{
   margin: 20px 0 20px;
 }
 
-/* Flag behind title */
 .flagIcon{
   width: 120px;
   height: 120px;
@@ -130,7 +132,6 @@ body{
   z-index: 1;
 }
 
-/* Title layers */
 .title{
   position: relative;
   margin-left: 140px;
@@ -143,7 +144,7 @@ body{
   top: 6px;
   left: -150px;
   font-weight: 900;
-  font-size: 68px;
+  font-size: calc(68px * var(--font-scale));
   color: #3a0f8f;
   z-index: 2;
 }
@@ -153,12 +154,10 @@ body{
   top: 1px;
   left: -155px;
   font-weight: 900;
-  font-size: 68px;
+  font-size: calc(68px * var(--font-scale));
   color: #f5e9ff;
   z-index: 2;
-
-  text-shadow:
-     9px  2px 0 #3a0f8f;
+  text-shadow: 9px 2px 0 #3a0f8f;
 }
 
 /* ===== Welcome Card ===== */
@@ -178,7 +177,7 @@ body{
 
 .welcomeText{
   text-align: center;
-  font-size: 18px;
+  font-size: calc(18px * var(--font-scale));
   font-weight: 800;
 }
 
@@ -197,24 +196,19 @@ button{
   background: var(--button-bg);
   color: var(--button-text);
   cursor:pointer;
+  font-size: calc(16px * var(--font-scale));
 }
 
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
   outline: 4px solid #ffd700;
   outline-offset: 4px;
 }
 
-#themeToggle {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 999;
-  border-radius: 999px;
-}
-
 .startBig{
-  font-size: 20px;
+  font-size: calc(20px * var(--font-scale));
 }
 
 .gameWrap {
@@ -225,7 +219,7 @@ a:focus-visible {
 }
 
 .gameHeader {
-  font-size: 1.4em;
+  font-size: calc(1.4em * var(--font-scale));
   margin: 20px 0;
 }
 
@@ -239,7 +233,7 @@ a:focus-visible {
 
 .gameInfo {
   margin-top: 15px;
-  font-size: 1.1em;
+  font-size: calc(1.1em * var(--font-scale));
 }
 
 .game-info-panel {
@@ -249,7 +243,7 @@ a:focus-visible {
   border: 2px solid var(--panel-border);
   border-radius: 12px;
   color: var(--panel-text);
-  font-size: 1.15em;
+  font-size: calc(1.15em * var(--font-scale));
   text-align: center;
   max-width: 800px;
   margin-left: auto;
@@ -268,7 +262,7 @@ a:focus-visible {
 .game-info-panel #status {
   color: #ffca28;
   font-weight: bold;
-  font-size: 1.3em;
+  font-size: calc(1.3em * var(--font-scale));
 }
 
 .game-info-panel #scoreA {
@@ -306,7 +300,7 @@ a:hover {
 
 .option-btn {
   padding: 16px;
-  font-size: 18px;
+  font-size: calc(18px * var(--font-scale));
   font-weight: 800;
   border: 4px solid var(--button-border);
   background: var(--option-bg);
@@ -331,9 +325,127 @@ a:hover {
   color: #e0f7ff;
 }
 
+
+/* ACCESSIBILITY SETTINGS WIDGET */
+
+
+#accessibilityWidget {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 99999;
+  width: auto !important;
+}
+
+#accessibilityToggle {
+  width: auto !important;
+  min-width: 170px;
+  padding: 12px 18px !important;
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 4px solid var(--card-border);
+  border-radius: 999px;
+  font-size: calc(16px * var(--font-scale));
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  display: inline-block !important;
+}
+
+#accessibilityPanel {
+  position: absolute;
+  right: 0;
+  bottom: 65px;
+  width: 250px;
+  padding: 14px;
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 4px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+
+#accessibilityPanel button {
+  width: auto !important;
+  min-width: 70px;
+  padding: 10px 12px !important;
+  margin: 0;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 3px solid var(--button-border);
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: calc(15px * var(--font-scale));
+}
+
+#accessibilityPanel #themeToggle {
+  position: static !important;
+  width: 100% !important;
+  display: block !important;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+.font-row {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 60px 60px;
+  gap: 8px;
+  align-items: center;
+  font-weight: 800;
+}
+
+.font-row span {
+  font-size: calc(15px * var(--font-scale));
+}
+
+.font-row button {
+  margin-top: 0 !important;
+}
+
+/* Hide old floating controls if any old HTML still has them */
+#fontControls {
+  display: none !important;
+}
+
+/* Prevent old floating theme button styling from affecting the new panel */
+body > #themeToggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 999;
+  border-radius: 999px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
     transform: none !important;
+    animation: none !important;
   }
+}
+
+/* High contrast */
+
+[data-contrast="high"] {
+  --card-bg: rgba(255,255,255,1);
+  --card-border: #000;
+  --button-bg: #ffffff;
+  --button-text: #000000;
+  --button-border: #000000;
+  --text-main: #000000;
+  --panel-bg: #000000;
+  --panel-text: #ffffff;
+}
+
+[data-theme="dark"][data-contrast="high"] {
+  --card-bg: rgba(0,0,0,1);
+  --card-border: #ffffff;
+  --button-bg: #000000;
+  --button-text: #ffffff;
+  --button-border: #ffffff;
+  --text-main: #ffffff;
+  --panel-bg: #000000;
+  --panel-text: #ffffff;
 }

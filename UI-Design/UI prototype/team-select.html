@@ -96,7 +96,7 @@
     }
 
     .team-title {
-      font-size: 28px;
+      font-size: calc(28px * var(--font-scale));
       font-weight: 900;
       margin-bottom: 20px;
       color: #000;
@@ -110,7 +110,7 @@
       border: 3px solid #000;
       background: rgba(255,255,255,0.85);
       color: #000;
-      font-size: 18px;
+      font-size: calc(18px * var(--font-scale));
       font-weight: 800;
       border-radius: 8px;
       cursor: pointer;
@@ -126,13 +126,13 @@
     .confirm-btn {
       display: block;
       margin: 30px auto 0;
-      font-size: 22px;
+      font-size: calc(22px * var(--font-scale));
       padding: 18px 40px;
     }
 
     .team-title-main {
       margin-top: 0;
-      font-size: 36px;
+      font-size: calc(36px * var(--font-scale));
       font-weight: 900;
       text-align: center;
       color: var(--text-main);
@@ -140,13 +140,13 @@
 
     .team-subtitle {
       text-align: center;
-      font-size: 20px;
+      font-size: calc(20px * var(--font-scale));
       margin: 20px 0;
     }
 
     .back-text {
       margin-top: 24px;
-      font-size: 16px;
+      font-size: calc(16px * var(--font-scale));
       color: var(--text-main);
       text-align: center;
     }
@@ -193,9 +193,27 @@
 
 <body>
 
-  <button id="themeToggle" aria-label="Toggle dark mode">
-    🌙 Dark mode
+  <div id="accessibilityWidget">
+  <button id="accessibilityToggle" aria-label="Open accessibility settings">
+    ⚙️ Accessibility
   </button>
+
+  <div id="accessibilityPanel" hidden>
+    <button id="themeToggle" aria-label="Toggle dark mode">
+      🌙 Dark mode
+    </button>
+
+    <button id="contrastToggle" aria-label="Toggle high contrast">
+  High contrast
+</button>
+
+    <div class="font-row">
+      <span>Text size</span>
+      <button id="fontDown" aria-label="Decrease text size">A-</button>
+      <button id="fontUp" aria-label="Increase text size">A+</button>
+    </div>
+  </div>
+</div>
 
   <div class="app">
     <header class="topbar">

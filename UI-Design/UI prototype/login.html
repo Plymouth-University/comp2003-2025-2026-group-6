@@ -17,7 +17,7 @@
       border: 3px solid var(--button-border);
       border-radius: 8px;
       padding: 14px 28px;
-      font-size: 18px;
+      font-size: calc(18px * var(--font-scale));
       font-weight: 800;
       cursor: pointer;
       margin: 20px auto;
@@ -36,7 +36,7 @@
     }
 
     #statusMsg {
-      font-size: 15px;
+      font-size: calc(15px * var(--font-scale));
       color: #ff5e5e;
       min-height: 22px;
       margin: 8px 0;
@@ -54,13 +54,13 @@
 
     #accessDenied h3 {
       margin: 0 0 8px;
-      font-size: 20px;
+      font-size: calc(20px * var(--font-scale));
       color: #ff5e5e;
     }
 
     #accessDenied p {
       margin: 0 0 16px;
-      font-size: 15px;
+      font-size: calc(15px * var(--font-scale));
       color: var(--text-main);
     }
 
@@ -69,7 +69,7 @@
       background: #6c2bd9;
       color: #fff;
       font-weight: 800;
-      font-size: 15px;
+      font-size: calc(15px * var(--font-scale));
       padding: 10px 24px;
       border-radius: 8px;
       text-decoration: none;
@@ -138,14 +138,14 @@
 
     .login-title {
       margin-top: 0;
-      font-size: 32px;
+      font-size: calc(32px * var(--font-scale));
       font-weight: 900;
       color: var(--text-main);
     }
 
     .login-note {
       margin-top: 24px;
-      font-size: 14px;
+      font-size: calc(14px * var(--font-scale));
       color: var(--text-main);
     }
 
@@ -178,9 +178,27 @@
 
 <body>
 
-  <button id="themeToggle" aria-label="Toggle dark mode">
-    🌙 Dark mode
+  <div id="accessibilityWidget">
+  <button id="accessibilityToggle" aria-label="Open accessibility settings">
+    ⚙️ Accessibility
   </button>
+
+  <div id="accessibilityPanel" hidden>
+    <button id="themeToggle" aria-label="Toggle dark mode">
+      🌙 Dark mode
+    </button>
+
+    <button id="contrastToggle" aria-label="Toggle high contrast">
+  High contrast
+</button>
+
+    <div class="font-row">
+      <span>Text size</span>
+      <button id="fontDown" aria-label="Decrease text size">A-</button>
+      <button id="fontUp" aria-label="Increase text size">A+</button>
+    </div>
+  </div>
+</div>
 
   <div class="app">
 
@@ -223,7 +241,7 @@
           <p>This account does not have teacher access.<br>Please use the student login instead.</p>
         </div>
 
-        <p id="statusMsg"></p>
+        <p id="statusMsg" aria-live="polite"></p>
 
         <p class="login-note">
           Your Google display name will be used as your player name.
