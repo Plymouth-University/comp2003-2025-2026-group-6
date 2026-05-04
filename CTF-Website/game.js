@@ -126,6 +126,9 @@ function startQuiz() {
                 btnClicked.classList.add("disabled-correct");
             }
         } else {
+            // Firewall role — wrong answers don't break the multiplier streak
+            if (playerRole === "firewall") multiplier += 0.25;
+            
             if (btnClicked) {
                 btnClicked.textContent = "INCORRECT";
                 btnClicked.classList.add("disabled-incorrect");
