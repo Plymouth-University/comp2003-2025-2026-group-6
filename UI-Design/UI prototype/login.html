@@ -41,6 +41,47 @@
       margin: 8px 0;
     }
 
+    #accessDenied {
+      display: none;
+      background: #fff0f0;
+      border: 3px solid #c00;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 16px 0;
+      text-align: center;
+    }
+
+    #accessDenied h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #c00;
+    }
+
+    #accessDenied p {
+      margin: 0 0 16px;
+      font-size: 15px;
+      color: #555;
+    }
+
+    #accessDenied a {
+      display: inline-block;
+      background: #6c2bd9;
+      color: #fff;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 10px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 3px solid #000;
+      transition: all 0.2s;
+    }
+
+    #accessDenied a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      color: #fff !important;
+    }
+
     .screen {
       position: relative;
       overflow: hidden;
@@ -157,6 +198,11 @@
           Continue as a teacher
         </button>
 
+        <div id="accessDenied">
+          <h3>🚫 Access Denied</h3>
+          <p>This account does not have teacher access.<br>Please use the student login instead.</p>
+        </div>
+
         <p id="statusMsg"></p>
 
         <p style="margin-top:24px; font-size:14px; color:#555;">
@@ -170,9 +216,11 @@
     import { signInWithGoogle, signInWithGoogleTeacher, getUser } from './firebase.js';
 
     const statusMsg = document.getElementById("statusMsg");
+    const accessDenied = document.getElementById("accessDenied");
 
     document.getElementById("googleBtn").addEventListener("click", async () => {
       statusMsg.textContent = "";
+      accessDenied.style.display = "none";
 
       try {
         const user = await signInWithGoogle();
@@ -181,10 +229,9 @@
         localStorage.setItem("userEmail", user.email);
         localStorage.setItem("uid", user.uid);
 
-        console.log("Logged in as:", user.displayName, user.uid);
         window.location.href = "join.html";
 
-      } catch (error) {6
+      } catch (error) {
         if (error.code === "auth/popup-closed-by-user") {
           statusMsg.textContent = "Sign-in cancelled. Please try again.";
         } else if (error.code === "auth/popup-blocked") {
@@ -198,6 +245,7 @@
 
     document.getElementById("googleBtn1").addEventListener("click", async () => {
       statusMsg.textContent = "";
+      accessDenied.style.display = "none";
 
       try {
         const user = await signInWithGoogleTeacher();
@@ -206,17 +254,18 @@
         localStorage.setItem("userEmail", user.email);
         localStorage.setItem("uid", user.uid);
 
-        console.log("Logged in as:", user.displayName, user.uid);
-
         const dbUser = await getUser(user.uid);
-        if (dbUser.role !== "student") {
+
+        if (dbUser && dbUser.role === "teacher") {
+          // Confirmed teacher — go to dashboard
           window.location.href = "teacher.html";
         } else {
-          window.location.href = "join.html";
+          // Not a teacher — show access denied banner, do not redirect
+          accessDenied.style.display = "block";
+          accessDenied.scrollIntoView({ behavior: "smooth" });
         }
-        
 
-      } catch (error) {6
+      } catch (error) {
         if (error.code === "auth/popup-closed-by-user") {
           statusMsg.textContent = "Sign-in cancelled. Please try again.";
         } else if (error.code === "auth/popup-blocked") {

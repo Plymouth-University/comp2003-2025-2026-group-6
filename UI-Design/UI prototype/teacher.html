@@ -222,7 +222,9 @@
   </div>
 
   <script type="module">
-    import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus, createMatch, endMatch, listenRoomMembers, listenTeamScores, db } from './firebase.js';
+    import { signInWithGoogle, listenAuthState, createRoom, updateRoomStatus,
+             createMatch, endMatch, listenRoomMembers, listenTeamScores,
+             uploadQuestions, db } from './firebase.js';
     import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     let currentRoomId = null;
@@ -316,10 +318,10 @@
       }
     });
 
-    newSessionBtn.addEventListener("click", async () => {
+    document.getElementById("newSessionBtn").addEventListener("click", async () => {
       localStorage.removeItem("roomId");
       location.reload();
-    })
+    });
 
     document.getElementById("startMatchBtn").addEventListener("click", async () => {
       if (!currentRoomId) return;
@@ -374,55 +376,12 @@
       }
     });
 
-    generateQuestionsBtn.addEventListener("click", async () => {
+    document.getElementById("generateQuestionsBtn").addEventListener("click", () => {
       window.location.href = 'question-generation.html';
     });
 
-    function startListeningToMembers(roomId) {
-      if (unsubMembers) unsubMembers();
-
-      unsubMembers = listenRoomMembers(roomId, async (members) => {
-        const list = document.getElementById("playerList");
-        const count = document.getElementById("playerCount");
-
-        count.textContent = members.length;
-
-        if (members.length === 0) {
-          list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
-          return;
-        }
-
-        const memberDetails = await Promise.all(
-          members.map(async (m) => {
-            const userSnap = await getDoc(doc(db, "users", m.uid));
-            const username = userSnap.exists() ? userSnap.data().username : m.uid;
-            return { ...m, username };
-          })
-        );
-
-        list.innerHTML = memberDetails.map(m => `
-          <li class="player-item ${m.roomRole ? (m.team === 'B' ? 'team-b-item' : 'team-a-item') : ''}">
-            <span>${m.username}</span>
-            <span>${m.roomRole || "No role yet"}</span>
-          </li>
-        `).join("");
-      });
-    }
-
-    function startListeningToScores(matchId) {
-      if (unsubScores) unsubScores();
-
-      unsubScores = listenTeamScores(matchId, ({ A, B }) => {
-        document.getElementById("liveScoreA").textContent = A;
-        document.getElementById("liveScoreB").textContent = B;
-      });
-    }
-
-    import { uploadQuestions } from './firebase.js';
-
     document.getElementById("fileUpload").addEventListener("change", function (event) {
       const file = event.target.files[0];
-
       if (!file) return;
 
       const reader = new FileReader();
@@ -440,9 +399,57 @@
       };
 
       reader.readAsText(file);
-      startMatchBtn.disabled = false;
-      needUploadText.style.display = "none";
+      document.getElementById("startMatchBtn").disabled = false;
+      document.getElementById("needUploadText").style.display = "none";
     });
+
+    function startListeningToMembers(roomId) {
+      if (unsubMembers) unsubMembers();
+
+      unsubMembers = listenRoomMembers(roomId, async (members) => {
+        const list = document.getElementById("playerList");
+        const count = document.getElementById("playerCount");
+
+        if (members.length === 0) {
+          count.textContent = 0;
+          list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
+          return;
+        }
+
+        const memberDetails = await Promise.all(
+          members.map(async (m) => {
+            const userSnap = await getDoc(doc(db, "users", m.uid));
+            const userData = userSnap.exists() ? userSnap.data() : null;
+            return { ...m, username: userData?.username || m.uid, userRole: userData?.role };
+          })
+        );
+
+        const students = memberDetails.filter(m => m.userRole !== "teacher");
+
+        count.textContent = students.length;
+
+        if (students.length === 0) {
+          list.innerHTML = '<li class="empty-msg">Waiting for players to join...</li>';
+          return;
+        }
+
+        list.innerHTML = students.map(m => `
+          <li class="player-item ${m.team === 'B' ? 'team-b-item' : 'team-a-item'}">
+            <span>${m.username}</span>
+            <span>${m.roomRole || "No role yet"}</span>
+          </li>
+        `).join("");
+      });
+    }
+
+    function startListeningToScores(matchId) {
+      if (unsubScores) unsubScores();
+
+      unsubScores = listenTeamScores(matchId, ({ A, B }) => {
+        document.getElementById("liveScoreA").textContent = A;
+        document.getElementById("liveScoreB").textContent = B;
+      });
+    }
   </script>
 
   <script>
