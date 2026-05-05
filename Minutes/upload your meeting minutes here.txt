@@ -14,3 +14,5 @@ Meeting 3 (06/03/2026): Progress update 13:00 -> 14:00
 Client meeting 3 (17/03/2026): Discussion of final steps 14:00 -> 14:30
 Meeting 4 (21/04/2026): Post-easter discussion 13:00 -> 13:30
 Client meeting 4 (27/04/2026): Presentation of (mostly) working final build 10:00 -> 10:30
+Meeting 5 (28/04/2026): Touch ups discussion 14:00 -> 15:00
+Client meeting 5 (05/05/2026): Final client showcase + signoff 12:00 -> 12:30
