@@ -71,8 +71,9 @@
     }
 
     .team-card {
-      background: rgba(255,255,255,0.9);
-      border: 4px solid #000;
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 4px solid var(--card-border);
       border-radius: 12px;
       padding: 24px;
       min-width: 280px;
@@ -86,14 +87,16 @@
 
     .team-a {
       background: linear-gradient(135deg, #19b83d, #00ff88);
+      color: #000;
     }
 
     .team-b {
       background: linear-gradient(135deg, #ff4444, #ff8888);
+      color: #000;
     }
 
     .team-title {
-      font-size: 28px;
+      font-size: calc(28px * var(--font-scale));
       font-weight: 900;
       margin-bottom: 20px;
       color: #000;
@@ -105,8 +108,9 @@
       margin: 10px 0;
       padding: 16px;
       border: 3px solid #000;
-      background: rgba(255,255,255,0.8);
-      font-size: 18px;
+      background: rgba(255,255,255,0.85);
+      color: #000;
+      font-size: calc(18px * var(--font-scale));
       font-weight: 800;
       border-radius: 8px;
       cursor: pointer;
@@ -122,8 +126,35 @@
     .confirm-btn {
       display: block;
       margin: 30px auto 0;
-      font-size: 22px;
+      font-size: calc(22px * var(--font-scale));
       padding: 18px 40px;
+    }
+
+    .team-title-main {
+      margin-top: 0;
+      font-size: calc(36px * var(--font-scale));
+      font-weight: 900;
+      text-align: center;
+      color: var(--text-main);
+    }
+
+    .team-subtitle {
+      text-align: center;
+      font-size: calc(20px * var(--font-scale));
+      margin: 20px 0;
+    }
+
+    .back-text {
+      margin-top: 24px;
+      font-size: calc(16px * var(--font-scale));
+      color: var(--text-main);
+      text-align: center;
+    }
+
+    .back-text a {
+      color: #6c2bd9;
+      font-weight: bold;
+      text-decoration: underline;
     }
 
     @media (max-width: 1000px) {
@@ -161,6 +192,29 @@
 </head>
 
 <body>
+
+  <div id="accessibilityWidget">
+  <button id="accessibilityToggle" aria-label="Open accessibility settings">
+    ⚙️ Accessibility
+  </button>
+
+  <div id="accessibilityPanel" hidden>
+    <button id="themeToggle" aria-label="Toggle dark mode">
+      🌙 Dark mode
+    </button>
+
+    <button id="contrastToggle" aria-label="Toggle high contrast">
+  High contrast
+</button>
+
+    <div class="font-row">
+      <span>Text size</span>
+      <button id="fontDown" aria-label="Decrease text size">A-</button>
+      <button id="fontUp" aria-label="Increase text size">A+</button>
+    </div>
+  </div>
+</div>
+
   <div class="app">
     <header class="topbar">
       <div class="tabs" aria-hidden="true">
@@ -180,41 +234,13 @@
       <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
 
       <section class="welcomeCard">
-        <h2 style="margin-top:0; font-size:36px; font-weight:900; text-align:center;">
+        <h2 class="team-title-main">
           Choose Your Team & Role
         </h2>
 
-        <p class="welcomeText" style="text-align:center; font-size:20px; margin:20px 0;">
+        <p class="welcomeText team-subtitle">
           Pick your team and role for this session!
         </p>
-
-        <div style="margin-bottom: 24px; text-align: center;">
-          <button id="rolesToggle" onclick="toggleRoles()" style="background: #6c2bd9; border: 3px solid #000; border-radius: 50px; padding: 12px 28px; color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.2s;">
-            ⚡ What do the roles do? <span id="rolesArrow">▼</span>
-          </button>
-
-          <div id="rolesPanel" style="display: none; margin-top: 16px; background: rgba(235,225,255,0.95); border: 4px solid #6c2bd9; border-radius: 16px; padding: 24px; box-shadow: 0 0 20px rgba(108,43,217,0.2); text-align: center;">
-            <p style="margin: 0 0 16px; font-size: 14px; color: #333; font-style: italic;">Each role comes with a unique ability — pick wisely!</p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
-              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
-                <div style="font-size: 20px; margin-bottom: 6px;">🕵️ <strong style="color: #5b21b6;">Infiltrator</strong></div>
-                <div style="font-size: 14px; color: #333;">Ghost mode activated — you get <strong style="color: #6c2bd9;">15 seconds</strong> to crack each question. No rush.</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
-                <div style="font-size: 20px; margin-bottom: 6px;">⚔️ <strong style="color: #5b21b6;">Exploit</strong></div>
-                <div style="font-size: 14px; color: #333;">Every correct answer hits <strong style="color: #6c2bd9;">twice as hard</strong>. Double the multiplier, double the damage.</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
-                <div style="font-size: 20px; margin-bottom: 6px;">🏃 <strong style="color: #5b21b6;">Exfiltrator</strong></div>
-                <div style="font-size: 14px; color: #333;">In and out before anyone notices. Earn <strong style="color: #6c2bd9;">+8 seconds</strong> of game time per correct answer.</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.9); border: 2px solid #6c2bd9; border-radius: 10px; padding: 14px;">
-                <div style="font-size: 20px; margin-bottom: 6px;">🛡️ <strong style="color: #5b21b6;">Firewall</strong></div>
-                <div style="font-size: 14px; color: #333;">Nothing gets through. Wrong answers <strong style="color: #6c2bd9;">won't touch your streak</strong>. Block everything.</div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div class="team-select">
           <div class="team-card team-a" data-team="A">
@@ -238,14 +264,16 @@
           Join Game!
         </button>
 
-        <p style="margin-top:24px; font-size:16px; color:#333; text-align:center;">
-          <a href="join.html" style="color:#6c2bd9; font-weight:bold; text-decoration:underline;">
+        <p class="back-text">
+          <a href="join.html">
             Back to PIN
           </a>
         </p>
       </section>
     </main>
   </div>
+
+  <script src="theme.js"></script>
 
   <script type="module">
     let selectedTeam = null;
@@ -287,15 +315,6 @@
         window.location.href = 'confirm-team.html';
       }, 250);
     });
-  </script>
-  <script>
-    function toggleRoles() {
-      const panel = document.getElementById('rolesPanel');
-      const arrow = document.getElementById('rolesArrow');
-      const isOpen = panel.style.display === 'block';
-      panel.style.display = isOpen ? 'none' : 'block';
-      arrow.textContent = isOpen ? '▼' : '▲';
-    }
   </script>
 </body>
 </html>
