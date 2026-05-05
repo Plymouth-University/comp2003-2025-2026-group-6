@@ -122,7 +122,8 @@ async function sendTopic() {
     const topic = document.getElementById("topic").value;
 
     try {
-        const res = await fetch("http://localhost:3000/api/ask", {
+        const API_BASE = window.location.hostname;
+        const res = await fetch(`http://${API_BASE}:3000/api/ask`,  {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ topic })
