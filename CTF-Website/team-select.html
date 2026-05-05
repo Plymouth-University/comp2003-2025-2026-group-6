@@ -62,6 +62,82 @@
       margin: 140px auto 0;
     }
 
+    /* ── Roles toggle ── */
+    .roles-toggle-wrap {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .roles-toggle-btn {
+      background: #6c2bd9;
+      border: 3px solid #000;
+      border-radius: 50px;
+      padding: 12px 28px;
+      color: #fff;
+      font-size: calc(17px * var(--font-scale));
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+    }
+
+    .roles-toggle-btn:hover {
+      background: #5b21b6;
+      transform: scale(1.03);
+    }
+
+    .roles-panel {
+      display: none;
+      margin-top: 16px;
+      background: rgba(235,225,255,0.95);
+      border: 4px solid #6c2bd9;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 0 20px rgba(108,43,217,0.2);
+      text-align: center;
+    }
+
+    .roles-panel.open {
+      display: block;
+    }
+
+    .roles-panel-hint {
+      margin: 0 0 16px;
+      font-size: calc(14px * var(--font-scale));
+      color: #555;
+      font-style: italic;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .role-info-card {
+      background: rgba(255,255,255,0.9);
+      border: 2px solid #6c2bd9;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .role-info-title {
+      font-size: calc(20px * var(--font-scale));
+      margin-bottom: 6px;
+    }
+
+    .role-info-title strong {
+      color: #5b21b6;
+    }
+
+    .role-info-desc {
+      font-size: calc(14px * var(--font-scale));
+      color: #333;
+    }
+
+    /* ── Team cards ── */
     .team-select {
       display: flex;
       justify-content: center;
@@ -157,6 +233,7 @@
       text-decoration: underline;
     }
 
+    /* ── Responsive ── */
     @media (max-width: 1000px) {
       .fox-mascot {
         width: 145px;
@@ -164,63 +241,49 @@
         top: 90px;
         opacity: 0.9;
       }
-
-      .top-flags {
-        width: 250px;
-      }
+      .top-flags { width: 250px; }
     }
 
     @media (max-width: 700px) {
-      .fox-mascot {
-        display: none;
-      }
-
-      .top-flags {
-        width: 210px;
-      }
-
-      .team-select {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .welcomeCard {
-        margin-top: 130px;
-      }
+      .fox-mascot { display: none; }
+      .top-flags { width: 210px; }
+      .team-select { flex-direction: column; align-items: center; }
+      .welcomeCard { margin-top: 130px; }
+      .roles-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
 
+  <!-- Accessibility widget (from file 1) -->
   <div id="accessibilityWidget">
-  <button id="accessibilityToggle" aria-label="Open accessibility settings">
-    ⚙️ Accessibility
-  </button>
-
-  <div id="accessibilityPanel" hidden>
-    <button id="themeToggle" aria-label="Toggle dark mode">
-      🌙 Dark mode
+    <button id="accessibilityToggle" aria-label="Open accessibility settings">
+      ⚙️ Accessibility
     </button>
 
-    <button id="contrastToggle" aria-label="Toggle high contrast">
-  High contrast
-</button>
+    <div id="accessibilityPanel" hidden>
+      <button id="themeToggle" aria-label="Toggle dark mode">
+        🌙 Dark mode
+      </button>
 
-    <div class="font-row">
-      <span>Text size</span>
-      <button id="fontDown" aria-label="Decrease text size">A-</button>
-      <button id="fontUp" aria-label="Increase text size">A+</button>
+      <button id="contrastToggle" aria-label="Toggle high contrast">
+        High contrast
+      </button>
+
+      <div class="font-row">
+        <span>Text size</span>
+        <button id="fontDown" aria-label="Decrease text size">A-</button>
+        <button id="fontUp" aria-label="Increase text size">A+</button>
+      </div>
     </div>
   </div>
-</div>
 
   <div class="app">
     <header class="topbar">
       <div class="tabs" aria-hidden="true">
         <span></span><span></span><span></span><span></span>
       </div>
-
       <div class="windowBtns" aria-hidden="true">
         <i></i><i></i><i></i>
       </div>
@@ -234,14 +297,42 @@
       <img src="assets/side_mascot_hacker_fox.svg" class="fox-mascot" alt="">
 
       <section class="welcomeCard">
-        <h2 class="team-title-main">
-          Choose Your Team & Role
-        </h2>
+        <h2 class="team-title-main">Choose Your Team & Role</h2>
 
         <p class="welcomeText team-subtitle">
           Pick your team and role for this session!
         </p>
 
+        <!-- Roles info toggle (from file 2) -->
+        <div class="roles-toggle-wrap">
+          <button id="rolesToggle" class="roles-toggle-btn" aria-expanded="false" aria-controls="rolesPanel">
+            ⚡ What do the roles do? <span id="rolesArrow" aria-hidden="true">▼</span>
+          </button>
+
+          <div id="rolesPanel" class="roles-panel" role="region" aria-label="Role descriptions">
+            <p class="roles-panel-hint">Each role comes with a unique ability - pick wisely!</p>
+            <div class="roles-grid">
+              <div class="role-info-card">
+                <div class="role-info-title">🕵️ <strong>Infiltrator</strong></div>
+                <div class="role-info-desc">Ghost mode activated - you get <strong>15 seconds</strong> to crack each question. No rush.</div>
+              </div>
+              <div class="role-info-card">
+                <div class="role-info-title">⚔️ <strong>Exploit</strong></div>
+                <div class="role-info-desc">Every correct answer hits <strong>twice as hard</strong>. Double the multiplier, double the damage.</div>
+              </div>
+              <div class="role-info-card">
+                <div class="role-info-title">🏃 <strong>Exfiltrator</strong></div>
+                <div class="role-info-desc">In and out before anyone notices. Earn <strong>+8 seconds</strong> of game time per correct answer.</div>
+              </div>
+              <div class="role-info-card">
+                <div class="role-info-title">🛡️ <strong>Firewall</strong></div>
+                <div class="role-info-desc">Nothing gets through. Wrong answers <strong>won't touch your streak</strong>. Block everything.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team cards -->
         <div class="team-select">
           <div class="team-card team-a" data-team="A">
             <div class="team-title">TEAM A</div>
@@ -265,9 +356,7 @@
         </button>
 
         <p class="back-text">
-          <a href="join.html">
-            Back to PIN
-          </a>
+          <a href="join.html">Back to PIN</a>
         </p>
       </section>
     </main>
@@ -275,12 +364,24 @@
 
   <script src="theme.js"></script>
 
+  <script>
+    const rolesToggle = document.getElementById('rolesToggle');
+    const rolesPanel  = document.getElementById('rolesPanel');
+    const rolesArrow  = document.getElementById('rolesArrow');
+
+    rolesToggle.addEventListener('click', () => {
+      const isOpen = rolesPanel.classList.toggle('open');
+      rolesArrow.textContent = isOpen ? '▲' : '▼';
+      rolesToggle.setAttribute('aria-expanded', isOpen);
+    });
+  </script>
+
   <script type="module">
     let selectedTeam = null;
     let selectedRole = null;
 
-    const roleClickSound = new Audio("assets/click.wav");
-    const joinSound = new Audio("assets/confirm.wav");
+    const roleClickSound = new Audio('assets/click.wav');
+    const joinSound      = new Audio('assets/confirm.wav');
 
     function playSound(sound) {
       sound.currentTime = 0;
@@ -292,7 +393,6 @@
         playSound(roleClickSound);
 
         const teamCard = btn.closest('.team-card');
-
         selectedTeam = teamCard.dataset.team;
         selectedRole = btn.dataset.role;
 
@@ -316,5 +416,6 @@
       }, 250);
     });
   </script>
+
 </body>
 </html>
